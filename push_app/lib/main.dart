@@ -111,9 +111,12 @@ class AlertDialogSample extends StatelessWidget {
     );
   }
 }
+
+late Box box;
 void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(infoAdapter());
+  box = await Hive.openBox('pushup_info');
   runApp(const PushUpApp()); // アプリのエントリーポイント。PushUpAppウィジェットを起動
 }
 
@@ -352,11 +355,7 @@ class _ResultScreenState extends State<ResultScreen> {
   int count;
 
   Future<void> setdata() async {
-    await Hive.initFlutter();
-    late Box box;
     final String dateKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-    box = await Hive.openBox('pushup_info');
 
     info test = info('腕立て伏せ', count);
     box.put(dateKey, test);

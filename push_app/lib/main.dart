@@ -7,8 +7,13 @@ import 'package:table_calendar/table_calendar.dart'; // カレンダー表示用
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
 
-class info{
+part 'main.g.dart'; // Hive Generator用
+
+@HiveType(typeId: 0)
+class info {
+  @HiveField(0)
   String subject;
+  @HiveField(1)
   int count;
 
   info(this.subject, this.count);
@@ -106,7 +111,9 @@ class AlertDialogSample extends StatelessWidget {
     );
   }
 }
-void main() {
+void main() async {
+  await Hive.initFlutter();
+  Hive.registerAdapter(infoAdapter());
   runApp(const PushUpApp()); // アプリのエントリーポイント。PushUpAppウィジェットを起動
 }
 
@@ -246,7 +253,7 @@ class _PushUpCounterScreenState extends State<PushUpCounterScreen> {
           // ここに処理を書く
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const ResultScreen()),
+            MaterialPageRoute(builder: (context) => ResultScreen(_pushUpCount)),
           );
         }
   }
@@ -268,7 +275,7 @@ class _PushUpCounterScreenState extends State<PushUpCounterScreen> {
         //   // ここに処理を書く
         //   Navigator.push(
         //     context,
-        //     MaterialPageRoute(builder: (context) => const ResultScreen()),
+        //     MaterialPageRoute(builder: (context) => ResultScreen(_pushUpCount)),
         //   );
         // }
       }
@@ -333,13 +340,29 @@ class _PushUpCounterScreenState extends State<PushUpCounterScreen> {
 
 class ResultScreen extends StatefulWidget {
   // 状態を持つ画面ウィジェット
-  const ResultScreen({super.key}); // コンストラクタ
+  ResultScreen(this.count); // コンストラクタ
+  int count;
 
   @override
-  State<ResultScreen> createState() => _ResultScreenState(); // 状態管理クラスを生成
+  State<ResultScreen> createState() => _ResultScreenState(count); // 状態管理クラスを生成
 }
 
 class _ResultScreenState extends State<ResultScreen> {
+  _ResultScreenState(this.count); // コンストラクタ
+  int count;
+
+  Future<void> setdata() async {
+    await Hive.initFlutter();
+    late Box box;
+    final String dateKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    box = await Hive.openBox('pushup_info');
+
+    info test = info('腕立て伏せ', count);
+    box.put(dateKey, test);
+    debugPrint(box.get(dateKey).subject);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -370,6 +393,7 @@ class _ResultScreenState extends State<ResultScreen> {
               ),
               // ボタンウィジェット
               onPressed: () {
+                setdata();
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => Calendar()),

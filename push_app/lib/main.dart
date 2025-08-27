@@ -25,7 +25,7 @@ class AlertDialogSample extends StatelessWidget {
       // content: Icon(Icons.circle),//まるばつくん
       actions: <Widget>[
         Container(
-          width: 250,
+          width: 300,
           height: 200,
           decoration: ShapeDecoration(
             shape: RoundedRectangleBorder(
@@ -38,7 +38,7 @@ class AlertDialogSample extends StatelessWidget {
                 left: 0,
                 top: 0,
                 child: Container(
-                  width: 250,
+                  width: 300,
                   height: 200,
                   decoration: ShapeDecoration(
                     color: const Color(0xFFD5FF5F) /* メインテーマ */,
@@ -52,12 +52,12 @@ class AlertDialogSample extends StatelessWidget {
                 left: 20,
                 top: 47,
                 child: Text(
-                  '腕立て伏せ：25回\n腹筋：50回',
+                  '腕立て伏せ：25回\n腹筋　　　：50回',
                   style: TextStyle(
                     color: const Color(0xFF14151A) /* 背景 */,
-                    fontSize: 25,
+                    fontSize: 20,
                     fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -132,6 +132,7 @@ class _CalendarState extends State<Calendar> {
     return Scaffold(
       // 画面のレイアウトを定義
       appBar: AppBar(
+        toolbarHeight: 150,
         title: const Align(
           alignment: Alignment.centerLeft, // ← 強制的に左寄せ
           child: Column(
@@ -146,62 +147,83 @@ class _CalendarState extends State<Calendar> {
         backgroundColor: Color(0xFF2D2D35), // AppBarの背景色
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0), // 画面の余白を設定
-        child: Column(
-          children: [
-            TableCalendar(
-              firstDay: DateTime.utc(2000, 1, 1), // カレンダーの開始日
-              lastDay: DateTime.utc(2200, 12, 31), // カレンダーの終了日
-              focusedDay: _focusedDay, // 現在フォーカスされている日付
-              selectedDayPredicate: (day) =>
-                  isSameDay(_selectedDay, day), // 選択判定
-              onDaySelected: (selectedDay, focusedDay) {
-                showDialog<void>(
-                  context: context,
-                  builder: (_) {
-                    return AlertDialogSample(selectedDay);
-                  }
-                );
-                // 日付選択時の処理
-                setState(() {
-                  _selectedDay = selectedDay; // 選択日を更新
-                  _focusedDay = focusedDay; // フォーカス日を更新
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => NextPage('KBOY')),
-                  // );
-                });
-              },
-              calendarStyle: CalendarStyle(
-                selectedDecoration: BoxDecoration(
-                  color: Colors.deepPurple, // 選択日の背景色
-                  shape: BoxShape.circle, // 選択日の形状
+      body: Stack(
+        children: [// 背景色を置く
+          Container(
+            color: Colors.black, // 背景色
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0), // 画面の余白を設定        
+            child: Column(
+              children: [
+                SizedBox(height: 50), // 余白
+                TableCalendar(
+                  firstDay: DateTime.utc(2000, 1, 1), // カレンダーの開始日
+                  lastDay: DateTime.utc(2200, 12, 31), // カレンダーの終了日
+                  focusedDay: _focusedDay, // 現在フォーカスされている日付
+                  selectedDayPredicate: (day) =>
+                      isSameDay(_selectedDay, day), // 選択判定
+                  onDaySelected: (selectedDay, focusedDay) {
+                    showDialog<void>(
+                      context: context,
+                      builder: (_) {
+                        return AlertDialogSample(selectedDay);
+                      }
+                    );
+                    // 日付選択時の処理
+                    setState(() {
+                      _selectedDay = selectedDay; // 選択日を更新
+                      _focusedDay = focusedDay; // フォーカス日を更新
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(builder: (context) => NextPage('KBOY')),
+                      // );
+                    });
+                  },
+                  calendarStyle: CalendarStyle(
+                    defaultTextStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),  // 通常の日付の文字色
+                    weekendTextStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w700),
+                    selectedDecoration: BoxDecoration(),  //軽微なばぐ
+                    todayDecoration: BoxDecoration(
+                      color:Color.fromARGB(134, 212, 255, 95), // 今日の背景色
+                      shape: BoxShape.circle, // 今日の形状
+                    ),
+                  ),
+                  headerStyle: HeaderStyle(
+                    formatButtonVisible: false, // フォーマット切替ボタン非表示
+                    titleCentered: true,
+                        titleTextStyle: TextStyle(color: Colors.white, fontSize: 20,fontWeight: FontWeight.w700), // 月タイトル
+                        leftChevronIcon: Icon(Icons.chevron_left, color: Colors.white),
+                        rightChevronIcon: Icon(Icons.chevron_right, color: Colors.white),                   
+                        ),
+                  daysOfWeekStyle: const DaysOfWeekStyle(
+                    weekdayStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w700), // 平日
+                    weekendStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w700), // 土日
+                  ),
                 ),
-                todayDecoration: BoxDecoration(
-                  color: Colors.orangeAccent, // 今日の背景色
-                  shape: BoxShape.circle, // 今日の形状
+                const SizedBox(height: 100), // 余白
+                ElevatedButton( // ボタンウィジェット
+                  onPressed: () { // ボタン押下時の処理
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PushUpCounterScreen(),
+                      ), // PushUpCounterScreenへ遷移
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFD5FF5F), // ボタンの背景色
+                    padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15), // ボタンの内側の余白
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50), // ボタンの角を丸くする
+                    ),
+                  ),
+                  child: const Text('Start',style: TextStyle(fontSize: 30.0, color: Colors.black),), // ボタンのラベル
                 ),
-              ),
-              headerStyle: HeaderStyle(
-                formatButtonVisible: false, // フォーマット切替ボタン非表示
-                titleCentered: true, // タイトル中央揃え
-              ),
+              ],
             ),
-            const SizedBox(height: 20), // 余白
-            OutlinedButton( // ボタンウィジェット
-              onPressed: () { // ボタン押下時の処理
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const PushUpCounterScreen(),
-                  ), // PushUpCounterScreenへ遷移
-                );
-              },
-              child: const Text('Start',style: TextStyle(fontSize: 50.0,),), // ボタンのラベル
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

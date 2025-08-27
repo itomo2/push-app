@@ -22,7 +22,7 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(infoAdapter());
   box = await Hive.openBox('pushup_info');
-  runApp(const PushUpApp()); // アプリのエントリーポイント。PushUpAppウィジェットを起動
+  runApp(const PushApp()); // アプリのエントリーポイント。PushAppウィジェットを起動
 }
 
 class AlertDialogSample extends StatelessWidget {
@@ -118,9 +118,9 @@ class AlertDialogSample extends StatelessWidget {
   }
 }
 
-class PushUpApp extends StatelessWidget {
+class PushApp extends StatelessWidget {
   // アプリ全体のウィジェット（Stateless: 状態を持たない）
-  const PushUpApp({super.key}); // コンストラクタ（keyはウィジェットの識別用）
+  const PushApp({super.key}); // コンストラクタ（keyはウィジェットの識別用）
 
   @override
   Widget build(BuildContext context) {

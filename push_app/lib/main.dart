@@ -17,6 +17,14 @@ class info {
   info(this.subject, this.count);
 }
 
+late Box box;
+void main() async {
+  await Hive.initFlutter();
+  Hive.registerAdapter(infoAdapter());
+  box = await Hive.openBox('pushup_info');
+  runApp(const PushUpApp()); // アプリのエントリーポイント。PushUpAppウィジェットを起動
+}
+
 class AlertDialogSample extends StatelessWidget {
   const AlertDialogSample(this.selectedDay);
   final DateTime selectedDay;
@@ -108,14 +116,6 @@ class AlertDialogSample extends StatelessWidget {
       ],
     );
   }
-}
-
-late Box box;
-void main() async {
-  await Hive.initFlutter();
-  Hive.registerAdapter(infoAdapter());
-  box = await Hive.openBox('pushup_info');
-  runApp(const PushUpApp()); // アプリのエントリーポイント。PushUpAppウィジェットを起動
 }
 
 class PushUpApp extends StatelessWidget {

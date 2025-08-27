@@ -4,6 +4,16 @@ import 'package:intl/intl.dart'; // 日付フォーマット用パッケージ�
 import 'package:proximity_sensor/proximity_sensor.dart'; // 近接センサーを使うためのパッケージをインポート
 import 'package:table_calendar/table_calendar.dart'; // カレンダー表示用パッケージをインポート
 
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
+
+class info{
+  String subject;
+  int count;
+
+  info(this.subject, this.count);
+}
+
 class AlertDialogSample extends StatelessWidget {
   const AlertDialogSample(this.selectedDay);
   final DateTime selectedDay;

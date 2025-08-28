@@ -534,7 +534,7 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
             ),
             const SizedBox(height: 20), // 余白
             SizedBox(
-              width: 185,
+              width: double.infinity,
               child: Text(
               '$count', // 回数を表示
                 textAlign: TextAlign.center,

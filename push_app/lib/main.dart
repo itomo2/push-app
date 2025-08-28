@@ -505,7 +505,7 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
     final key = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 日付をキーに変換
     try {
       final infoData = box.get(key); // Hiveからデータ取得
-      if( subject == "pushup"){
+      if(subject == "pushup"){
         anotherCount = infoData?.situpcount ?? 0;
       }else{
         anotherCount = infoData?.pushupcount ?? 0; // データがなければ0
@@ -567,7 +567,7 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
             SizedBox(
               width: 185,
               child: Text(
-              '$count', // 腕立て回数を表示
+              '$count', // 回数を表示
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: const Color(0xFFD5FF5F), // メインテーマ色
@@ -581,16 +581,27 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
             SizedBox(
               width: 304,
               height: 69,
-              child: Text(
-                'スマホを地面に置いて、\n胸を近づけるとカウントされます', // 説明文
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white, // 文字色
-                  fontSize: 14, // 文字サイズ
-                  fontFamily: 'Inter', // フォント
-                  fontWeight: FontWeight.w600, // 太字
-                ),
-              ),
+              child: subject == "pushup"?
+                Text(
+                  'スマホを地面に置いて、\n胸を近づけるとカウントされます', // 説明文
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white, // 文字色
+                    fontSize: 14, // 文字サイズ
+                    fontFamily: 'Inter', // フォント
+                    fontWeight: FontWeight.w600, // 太字
+                  ),
+                ):
+                Text(
+                  'スマホを地面に置いて、\n背中を近づけるとカウントされます', // 説明文
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white, // 文字色
+                    fontSize: 14, // 文字サイズ
+                    fontFamily: 'Inter', // フォント
+                    fontWeight: FontWeight.w600, // 太字
+                  ),
+                )
             ),
             if(count >= goalcount)
               ElevatedButton( // ボタンウィジェット

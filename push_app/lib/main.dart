@@ -152,8 +152,8 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
   DateTime _focusedDay = DateTime.now(); // 現在フォーカスされている日付
   DateTime? _selectedDay; // 選択された日付（未選択ならnull）
 
-  int _pushUpGoalCount = 20; // 腕立て伏せの目標回数
-  int _sitUpGoalCount = 50;  // 腹筋の目標回数
+  int _pushUpGoalCount = box.get('pushUpGoalCount', defaultValue: 20); // 腕立て伏せの目標回数
+  int _sitUpGoalCount = box.get('sitUpGoalCount', defaultValue: 20);  // 腹筋の目標回数
 
   bool _isPushUpEditing = false; // 腕立て伏せ編集モード
   bool _isSitUpEditing = false;  // 腹筋編集モード
@@ -188,6 +188,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
     if (parsed != null && parsed > 0) { // 正の整数なら
       setState(() {
         _pushUpGoalCount = parsed; // 目標回数を更新
+        box.put('pushUpGoalCount', parsed);
         _isPushUpEditing = false; // 編集モードOFF
       });
     } else {
@@ -204,6 +205,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
     if (parsed != null && parsed > 0) { // 正の整数なら
       setState(() {
         _sitUpGoalCount = parsed; // 目標回数を更新
+        box.put('sitUpGoalCount', parsed);
         _isSitUpEditing = false; // 編集モードOFF
       });
     } else {

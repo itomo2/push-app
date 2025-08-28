@@ -125,8 +125,6 @@ class Calendar extends StatefulWidget { // カレンダー画面（状態を持�
 
 class _CalendarState extends State<Calendar> { // Calendar画面の状態管理クラス
 
-
-
   DateTime _focusedDay = DateTime.now(); // 現在フォーカスされている日付
   DateTime? _selectedDay; // 選択された日付（未選択ならnull）
 
@@ -350,7 +348,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(202, 212, 255, 95), // ボタンの背景色
+                    backgroundColor: const Color.fromARGB(255, 212, 255, 95), // ボタンの背景色
                     padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15), // ボタンの内側の余白
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50), // ボタンの角を丸くする
@@ -583,7 +581,7 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(202, 212, 255, 95), // ボタンの背景色
+                  backgroundColor: const Color.fromARGB(255, 212, 255, 95), // ボタンの背景色
                   padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15), // ボタンの内側の余白
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50), // ボタンの角を丸くする

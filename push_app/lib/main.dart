@@ -283,21 +283,29 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                   selectedDayPredicate: (day) =>
                       isSameDay(_selectedDay, day), // 選択判定
                   onDaySelected: (selectedDay, focusedDay) { // 日付選択時の処理
+                    setState(() {
+                      _selectedDay = selectedDay; // 選択日を更新
+                      _focusedDay = focusedDay; // フォーカス日を更新
+                    });
                     showDialog<void>(
                       context: context,
                       builder: (_) {
                         return AlertDialogSample(selectedDay); // ダイアログ表示
                       }
                     );
-                    setState(() {
-                      _selectedDay = selectedDay; // 選択日を更新
-                      _focusedDay = focusedDay; // フォーカス日を更新
-                    });
                   },
                   calendarStyle: CalendarStyle(
                     defaultTextStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),  // 通常の日付の文字色
                     weekendTextStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w700), // 土日の文字色
-                    selectedDecoration: BoxDecoration(),  // 選択日の装飾（未設定）
+                    selectedDecoration: isSameDay(_selectedDay, DateTime.now())
+                      ? BoxDecoration(
+                        color: Color.fromARGB(134, 212, 255, 95), // 選択日の背景色   
+                        shape: BoxShape.circle, // 選択日の形状
+                      ) 
+                      : BoxDecoration(), 
+                    selectedTextStyle: isSameDay(_selectedDay, DateTime.now())
+                      ? TextStyle(color: const Color.fromARGB(255, 212, 255, 95),fontWeight: FontWeight.w700)
+                      : TextStyle(color: Colors.white, fontWeight: FontWeight.w700), // 選択日の装飾（未設定）
                     todayDecoration: BoxDecoration(
                       color:Color.fromARGB(134, 212, 255, 95), // 今日の背景色
                       shape: BoxShape.circle, // 今日の形状

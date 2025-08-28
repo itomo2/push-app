@@ -1,50 +1,70 @@
-import 'package:flutter/material.dart'; //flutterのUI部品を使うためのパッケージをインポート
+import 'package:flutter/material.dart'; // FlutterのUI部品を使うためのパッケージをインポート
 import 'package:intl/intl.dart'; // 日付フォーマット用パッケージをインポート
 
 import 'package:proximity_sensor/proximity_sensor.dart'; // 近接センサーを使うためのパッケージをインポート
 import 'package:table_calendar/table_calendar.dart'; // カレンダー表示用パッケージをインポート
 
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:hive/hive.dart';
+import 'package:hive/hive.dart'; // Hive（ローカルDB）を使うためのパッケージをインポート
+import 'package:hive_flutter/hive_flutter.dart'; // HiveのFlutter用パッケージをインポート
+part 'main.g.dart'; // Hive Generator用（TypeAdapter自動生成ファイル）
 
-part 'main.g.dart'; // Hive Generator用
-
-@HiveType(typeId: 0)
+// infoクラス: 運動名(subject)と回数(count)を保持するデータモデル
+@HiveType(typeId: 0) // Hive用の型IDを指定
 class info {
-  @HiveField(0)
-  String subject;
-  @HiveField(1)
-  int count;
+  @HiveField(0) // Hiveで保存するフィールド番号
+  int pushupcount; // 運動名（例：腕立て伏せ）
+  @HiveField(1) // Hiveで保存するフィールド番号
+  int situpcount; // 回数
 
-  info(this.subject, this.count);
+  info(this.pushupcount, this.situpcount); // コンストラクタ
 }
 
-class AlertDialogSample extends StatelessWidget {
-  const AlertDialogSample(this.selectedDay);
-  final DateTime selectedDay;
+late Box box; // HiveのBox（データ保存領域）をグローバル変数として宣言
+void main() async {
+  // Hive初期化 & info型の保存を可能にする
+  await Hive.initFlutter(); // Hiveの初期化（Flutter用）
+  Hive.registerAdapter(infoAdapter()); // info型のアダプターを登録（これがないと保存時にクラッシュ）
+  box = await Hive.openBox('app_info'); // 'pushup_info'という名前のBoxを開く（なければ作成）
+  runApp(const PushApp()); // アプリのエントリーポイント。PushAppウィジェットを起動
+}
+
+class AlertDialogSample extends StatelessWidget { // 日付選択時に表示するダイアログ
+  const AlertDialogSample(this.selectedDay); // コンストラクタ
+  final DateTime selectedDay; // 選択された日付
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { // ダイアログのUIを構築
+    int pushupcount,situpcount;
+    
+      try {
+        final key = DateFormat('yyyy-MM-dd').format(selectedDay); // 日付をキーに変換
+        final infoData = box.get(key); // Hiveからデータ取得
+        pushupcount = infoData?.pushupcount ?? 0;
+        situpcount = infoData?.situpcount ?? 0; // データがなければ0
+      } catch (e) {
+        pushupcount = 0;
+        situpcount = 0;
+      }
     return AlertDialog(
-      backgroundColor: const Color(0xFFD5FF5F),
+      backgroundColor: const Color(0xFFD5FF5F), // ダイアログの背景色
       title: Text(
-        "${DateFormat('  yyyy.M.d').format(selectedDay)}",
-        textAlign: TextAlign.left,
+        "${DateFormat('  yyyy.M.d').format(selectedDay)}", // 選択日を表示
+        textAlign: TextAlign.left, // 左寄せ
         style: TextStyle(
-          color: const Color(0xFF14151A) /* 背景 */,
-          fontSize: 32,
-          fontFamily: 'Inter',
-          fontWeight: FontWeight.w600,
+          color: const Color(0xFF14151A), // 文字色
+          fontSize: 32, // 文字サイズ
+          fontFamily: 'Inter', // フォント
+          fontWeight: FontWeight.w600, // 太字
         ),
       ),
-      // content: Icon(Icons.circle),//まるばつくん
+      // content: Icon(Icons.circle), // アイコン（未使用）
       actions: <Widget>[
         Container(
-          width: 300,
-          height: 200,
+          width: 300, // ダイアログの幅
+          height: 200, // ダイアログの高さ
           decoration: ShapeDecoration(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(30), // 角丸
             ),
           ),
           child: Stack(
@@ -56,9 +76,9 @@ class AlertDialogSample extends StatelessWidget {
                   width: 300,
                   height: 200,
                   decoration: ShapeDecoration(
-                    color: const Color(0xFFD5FF5F) /* メインテーマ */,
+                    color: const Color(0xFFD5FF5F), // メインテーマ色
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(30), // 角丸
                     ),
                   ),
                 ),
@@ -67,108 +87,208 @@ class AlertDialogSample extends StatelessWidget {
                 left: 20,
                 top: 47,
                 child: Text(
-                  '腕立て伏せ：25回\n腹筋　　　：50回',
+                  'Push-up：$pushupcount回\nSit-up    ：$situpcount回', // サンプルデータ（本来は保存データを表示する）
                   style: TextStyle(
-                    color: const Color(0xFF14151A) /* 背景 */,
-                    fontSize: 20,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF14151A), // 文字色
+                    fontSize: 20, // 文字サイズ
+                    fontFamily: 'Inter', // フォント
+                    fontWeight: FontWeight.w500, // 太字
                   ),
                 ),
               ),
-              // Positioned(
-              //   left: 40,
-              //   top: 33,
-              //   child: SizedBox(
-              //     width: 239,
-              //     height: 61,
-              //     child: Text(
-              //       '2025.6.16',
-              //       style: TextStyle(
-              //         color: const Color(0xFF14151A) /* 背景 */,
-              //         fontSize: 32,
-              //         fontFamily: 'Inter',
-              //         fontWeight: FontWeight.w600,
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
         ),
-        // Column(
-        //   crossAxisAlignment: CrossAxisAlignment.center,
-        //   children: <Widget>[
-        //     TextButton(
-        //       child: Text('Back'),
-        //       onPressed: () {
-        //         Navigator.pop(context);
-        //       },
-        //     ),
-        //   ]
-        // )
       ],
     );
   }
 }
 
-late Box box;
-void main() async {
-  await Hive.initFlutter();
-  Hive.registerAdapter(infoAdapter());
-  box = await Hive.openBox('pushup_info');
-  runApp(const PushUpApp()); // アプリのエントリーポイント。PushUpAppウィジェットを起動
-}
-
-class PushUpApp extends StatelessWidget {
-  // アプリ全体のウィジェット（Stateless: 状態を持たない）
-  const PushUpApp({super.key}); // コンストラクタ（keyはウィジェットの識別用）
+class PushApp extends StatelessWidget { // アプリ全体のウィジェット（Stateless: 状態を持たない）
+  const PushApp({super.key}); // コンストラクタ（keyはウィジェットの識別用）
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { // アプリのUI構築
     return const MaterialApp(
-      // マテリアルデザインのアプリを構築
-      title: '腕立てカウンター', // アプリのタイトル
+      title: 'PushApp', // アプリのタイトル
       home: Calendar(), // メイン画面としてCalendarウィジェットを表示
     );
   }
 }
 
-class Calendar extends StatefulWidget {
-  // 状態を持つ画面ウィジェット
+class Calendar extends StatefulWidget { // カレンダー画面（状態を持つ）
   const Calendar({super.key}); // コンストラクタ
 
   @override
   State<Calendar> createState() => _CalendarState(); // 状態管理クラスを生成
 }
 
-class _CalendarState extends State<Calendar> {
-  // Calendar画面の状態管理クラス
+class _CalendarState extends State<Calendar> { // Calendar画面の状態管理クラス
+
   DateTime _focusedDay = DateTime.now(); // 現在フォーカスされている日付
   DateTime? _selectedDay; // 選択された日付（未選択ならnull）
 
+  int _pushUpGoalCount = box.get('pushUpGoalCount', defaultValue: 20); // 腕立て伏せの目標回数
+  int _sitUpGoalCount = box.get('sitUpGoalCount', defaultValue: 20);  // 腹筋の目標回数
+
+  bool _isPushUpEditing = false; // 腕立て伏せ編集モード
+  bool _isSitUpEditing = false;  // 腹筋編集モード
+
+  TextEditingController _pushUpController = TextEditingController(); // 腕立て伏せ編集用コントローラー
+  TextEditingController _sitUpController = TextEditingController();  // 腹筋編集用コントローラー
+    
   @override
-  Widget build(BuildContext context) {
+  void dispose() { // ウィジェット破棄時の処理
+    _pushUpController.dispose(); // コントローラーの破棄
+    _sitUpController.dispose();  // コントローラーの破棄
+    super.dispose();
+  }
+
+  void _startPushUpEditing() { // 編集モード開始
+    setState(() {
+      _isPushUpEditing = true; // 編集モードON
+      _pushUpController.text = _pushUpGoalCount.toString(); // 現在の目標回数をテキストフィールドにセット
+    });
+  }
+
+  void _startSitUpEditing() { // 編集モード開始
+    setState(() {
+      _isSitUpEditing = true; // 編集モードON
+      _sitUpController.text = _sitUpGoalCount.toString(); // 現在の目標回数をテキストフィールドにセット
+    });
+  }
+
+  void _submitPushUpEditing() { // 編集内容を確定
+    final input = _pushUpController.text; // 入力値取得
+    final parsed = int.tryParse(input); // 整数に変換
+    if (parsed != null && parsed > 0) { // 正の整数なら
+      setState(() {
+        _pushUpGoalCount = parsed; // 目標回数を更新
+        box.put('pushUpGoalCount', parsed);
+        _isPushUpEditing = false; // 編集モードOFF
+      });
+    } else {
+      // 無効な入力の場合、アラート表示（SnackBar）
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('正の整数を入力してください')),
+      );
+    }
+  }
+
+  void _submitSitUpEditing() { // 編集内容を確定
+    final input = _sitUpController.text; // 入力値取得
+    final parsed = int.tryParse(input); // 整数に変換
+    if (parsed != null && parsed > 0) { // 正の整数なら
+      setState(() {
+        _sitUpGoalCount = parsed; // 目標回数を更新
+        box.put('sitUpGoalCount', parsed);
+        _isSitUpEditing = false; // 編集モードOFF
+      });
+    } else {
+      // 無効な入力の場合、アラート表示（SnackBar）
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('正の整数を入力してください')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) { // 画面のUI構築
     return Scaffold(
-      // 画面のレイアウトを定義
       appBar: AppBar(
-        toolbarHeight: 150,
-        title: const Align(
-          alignment: Alignment.centerLeft, // ← 強制的に左寄せ
-          child: Column(
-            children: [ // 上の余白
-              Text(
-                '   Target number of reps\n',
-                style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),),
+        toolbarHeight: 150, // AppBarの高さ
+        backgroundColor: Color(0xFF2D2D35), // AppBarの背景色
+        titleSpacing: 0, // タイトルの余白
+        title: Padding(
+          padding: const EdgeInsets.only(left: 30), // 左に余白追加
+          child:Align(
+            alignment: Alignment.centerLeft, // 左寄せ
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start, // 左寄せ
+              children: [
+                Text(
+                  'Target number of reps', // 目標回数ラベル
+                  style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
+                ),    
+                _isPushUpEditing // 編集モードかどうかで表示切替
+                ? Row(children: [
+                  Text("Push-up:  ", style: TextStyle(color: Colors.white70, fontSize: 20),),
+                  SizedBox(
+                    width: 60,
+                    child: 
+                    TextField(
+                      controller: _pushUpController, // 入力コントローラー
+                      autofocus: true, // 自動フォーカス
+                      keyboardType: TextInputType.number, // 数値入力
+                      style: TextStyle(color: Colors.white70, fontSize: 20,), // テキストスタイル
+                      decoration: InputDecoration(
+                        border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // 下線
+                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // フォーカス時の下線
+                        isDense: true, // コンパクト表示
+                        contentPadding: EdgeInsets.symmetric(vertical: 8), // パディング
+                      ),
+                      onSubmitted: (_) => _submitPushUpEditing(), // Enterで確定
+                    ),
+                  ),
+                  Text('reps', style: TextStyle(color: Colors.white70, fontSize: 20),),
+                  IconButton(
+                    icon: Icon(Icons.check, color: Colors.white), // 確定ボタン
+                    onPressed: _submitPushUpEditing, // 確定処理
+                  ),
+                ])
+                : Row(children: [
+                  Text(
+                    'Push-up:  $_pushUpGoalCount reps', // 目標回数表示
+                    style: TextStyle(color: Colors.white70, fontSize: 20),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.edit, color: Colors.white), // 編集ボタン
+                    onPressed: _startPushUpEditing, // 編集開始
+                  ),
+                ],),
+                _isSitUpEditing // 編集モードかどうかで表示切替
+                ? Row(children: [
+                  Text('Sit-up:  ', style: TextStyle(color: Colors.white70, fontSize: 20),),
+                  SizedBox(
+                    width: 60,
+                      child: TextField(
+                      controller: _sitUpController, // 入力コントローラー
+                      autofocus: true, // 自動フォーカス
+                      keyboardType: TextInputType.number, // 数値入力
+                      style: TextStyle(color: Colors.white70, fontSize: 20,), // テキストスタイル
+                      decoration: InputDecoration(
+                        border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // 下線
+                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // フォーカス時の下線
+                        isDense: true, // コンパクト表示
+                        contentPadding: EdgeInsets.symmetric(vertical: 8), // パディング
+                      ),
+                      onSubmitted: (_) => _submitSitUpEditing(), // Enterで確定
+                    ),
+                  ),
+                  Text('reps', style: TextStyle(color: Colors.white70, fontSize: 20),),
+                  IconButton(
+                    icon: Icon(Icons.check, color: Colors.white), // 確定ボタン
+                    onPressed: _submitSitUpEditing, // 確定処理
+                  ),
+                ])
+                : Row(children: [
+                  Text(
+                    'Sit-up:  $_sitUpGoalCount reps', // 目標回数表示
+                    style: TextStyle(color: Colors.white70, fontSize: 20),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.edit, color: Colors.white), // 編集ボタン
+                    onPressed: _startSitUpEditing, // 編集開始
+                  ),
+                ],)
               ]
+            ),
           ),
         ),
-        titleSpacing: 0, // ← 左余白をなくす
-        backgroundColor: Color(0xFF2D2D35), // AppBarの背景色
       ),
 
       body: Stack(
-        children: [// 背景色を置く
+        children: [ // 背景色を置く
           Container(
             color: Colors.black, // 背景色
           ),
@@ -183,38 +303,34 @@ class _CalendarState extends State<Calendar> {
                   focusedDay: _focusedDay, // 現在フォーカスされている日付
                   selectedDayPredicate: (day) =>
                       isSameDay(_selectedDay, day), // 選択判定
-                  onDaySelected: (selectedDay, focusedDay) {
+                  onDaySelected: (selectedDay, focusedDay) { // 日付選択時の処理
                     showDialog<void>(
                       context: context,
                       builder: (_) {
-                        return AlertDialogSample(selectedDay);
+                        return AlertDialogSample(selectedDay); // ダイアログ表示
                       }
                     );
-                    // 日付選択時の処理
                     setState(() {
                       _selectedDay = selectedDay; // 選択日を更新
                       _focusedDay = focusedDay; // フォーカス日を更新
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => NextPage('KBOY')),
-                      // );
                     });
                   },
                   calendarStyle: CalendarStyle(
                     defaultTextStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),  // 通常の日付の文字色
-                    weekendTextStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w700),
-                    selectedDecoration: BoxDecoration(),  //軽微なばぐ
+                    weekendTextStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w700), // 土日の文字色
+                    selectedDecoration: BoxDecoration(),  // 選択日の装飾（未設定）
                     todayDecoration: BoxDecoration(
                       color:Color.fromARGB(134, 212, 255, 95), // 今日の背景色
                       shape: BoxShape.circle, // 今日の形状
                     ),
+                    todayTextStyle: TextStyle(color: const Color.fromARGB(255, 212, 255, 95),fontWeight: FontWeight.w700), // 今日の日付の文字色
                   ),
                   headerStyle: HeaderStyle(
                     formatButtonVisible: false, // フォーマット切替ボタン非表示
-                    titleCentered: true,
+                    titleCentered: true, // 月タイトル中央揃え
                         titleTextStyle: TextStyle(color: Colors.white, fontSize: 20,fontWeight: FontWeight.w700), // 月タイトル
-                        leftChevronIcon: Icon(Icons.chevron_left, color: Colors.white),
-                        rightChevronIcon: Icon(Icons.chevron_right, color: Colors.white),                   
+                        leftChevronIcon: Icon(Icons.chevron_left, color: Colors.white), // 左矢印
+                        rightChevronIcon: Icon(Icons.chevron_right, color: Colors.white), // 右矢印
                         ),
                   daysOfWeekStyle: const DaysOfWeekStyle(
                     weekdayStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w700), // 平日
@@ -227,12 +343,12 @@ class _CalendarState extends State<Calendar> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const PushUpCounterScreen(),
-                      ), // PushUpCounterScreenへ遷移
+                        builder: (context) => const SelectScreen(), // PushUpCounterScreenへ遷移
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD5FF5F), // ボタンの背景色
+                    backgroundColor: const Color.fromARGB(255, 212, 255, 95), // ボタンの背景色
                     padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15), // ボタンの内側の余白
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50), // ボタンの角を丸くする
@@ -249,112 +365,237 @@ class _CalendarState extends State<Calendar> {
   }
 }
 
-class PushUpCounterScreen extends StatefulWidget {
-  // 状態を持つ画面ウィジェット
-  const PushUpCounterScreen({super.key}); // コンストラクタ
+class SelectScreen extends StatefulWidget { // 運動選択画面（状態を持つ）
+  const SelectScreen({super.key}); // コンストラクタ
 
   @override
-  State<PushUpCounterScreen> createState() => _PushUpCounterScreenState(); // 状態管理クラスを生成
+  State<SelectScreen> createState() => _SelectScreenState(); // 状態管理クラスを生成
 }
 
-class _PushUpCounterScreenState extends State<PushUpCounterScreen> {
-  // 状態管理クラス
-  int _pushUpCount = 0; // 腕立ての回数を保持する変数
+class _SelectScreenState extends State<SelectScreen> {// 状態管理クラス
+  bool _isChecked1 = true; // 1つ目のチェック状
+  bool _isChecked2 = false;
+  late String subject;
+
+  @override
+  Widget build(BuildContext context) { // 画面のUI構築
+    return Scaffold(
+      backgroundColor: const Color(0xFFD5FF5F), // 背景色を黒に設定
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center, // 中央揃え,
+        children: [
+          const Text(
+            'Select Exercise', // タイトル表示
+            style: TextStyle(fontSize: 32, color: Colors.black, fontWeight: FontWeight.w700), // 文字サイズと色
+          ),
+          const SizedBox(height: 40), 
+          CheckboxListTile(
+            title: const Text("Push-up"),
+            value: _isChecked1,
+            onChanged: (bool? value) {
+              setState(() {
+                _isChecked1 = true;
+                _isChecked2 = false;
+              });
+            },
+          ),
+          CheckboxListTile(
+            title: const Text("Sit-up"),
+            value: _isChecked2,
+            onChanged: (bool? value) {
+              setState(() {
+                _isChecked2 = true;
+                _isChecked1 = false;
+              });
+            },
+          ),
+          SizedBox(height: 30),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black, // ボタンの背景色
+              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20), // ボタンの内側の余白
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30), // ボタンの角を丸くする
+              ),
+            ),
+            onPressed: () { //ボタン押下時の処理
+              subject = _isChecked1 ?"pushup" : "situp";
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CounterScreen(subject), // PushUpCounterScreenへ遷移
+                ),
+              );
+            },
+            child: 
+            const Text("Let's training!",style: TextStyle(fontSize: 20.0,color: Colors.white),), // ボタンのラベル
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CounterScreen extends StatefulWidget { // 腕立てカウンター画面（状態を持つ）
+  CounterScreen(this.subject);
+  String subject; // コンストラクタ
+
+  @override
+  State<CounterScreen> createState() => _CounterScreenState(subject); // 状態管理クラスを生成
+}
+
+class _CounterScreenState extends State<CounterScreen> { // 状態管理クラス
+  _CounterScreenState(this.subject);
+  String subject;
+  late int count, goalcount;
+
   bool _isNear = false; // 近接センサーが近いかどうかを保持
   late Stream<bool> _proximityStream; // 近接センサーの状態を監視するストリーム
 
   @override
-  void initState() {
+  void initState() { // 初期化処理
     super.initState();
-    _startListening(); // 初期化時に近接センサーの監視を開始
+    _startListening(); // 近接センサーの監視を開始
   }
 
-  void debugyou() {
-    setState((){
-      _pushUpCount++;
-    });
-    if (_pushUpCount == 2) {
-          // 2回目で何か処理（例：メッセージ表示）をしたい場合
-          // ここに処理を書く
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ResultScreen(_pushUpCount)),
-          );
-        }
-  }
-
-  void _startListening() {
-    // proximity_sensorのStream<int>をboolに変換
+  void _startListening() { // 近接センサーの監視開始
     _proximityStream = ProximitySensor.events.map(
-      (event) => event > 0,
-    ); // センサー値が0より大きければtrue
-    _proximityStream.listen((isNear) {
-      // センサーの状態変化を監視
-      if (isNear && !_isNear) {
-        // 近づいた瞬間のみカウントアップ（ステップ関数）
+      (event) => event > 0, // センサー値が0より大きければtrue
+    );
+    _proximityStream.listen((isNear) { // センサーの状態変化を監視
+      if (isNear && !_isNear) { // 近づいた瞬間のみカウントアップ
         setState(() {
-          _pushUpCount++; // 腕立て回数を増やす
+          count++; // 腕立て回数を増やす
         });
-        // if (_pushUpCount == 2) {
-        //   // 2回目で何か処理（例：メッセージ表示）をしたい場合
-        //   // ここに処理を書く
-        //   Navigator.push(
-        //     context,
-        //     MaterialPageRoute(builder: (context) => ResultScreen(_pushUpCount)),
-        //   );
-        // }
       }
-      _isNear = isNear; // 状態を更新（過去の状態として残しておく）
+      _isNear = isNear; // 状態を更新
+    });
+  }
+
+  Future<void> setdata() async { // データ保存処理
+    late int anotherCount;
+    final key = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 日付をキーに変換
+    try {
+      final infoData = box.get(key); // Hiveからデータ取得
+      if(subject == "pushup"){
+        anotherCount = infoData?.situpcount ?? 0;
+      }else{
+        anotherCount = infoData?.pushupcount ?? 0; // データがなければ0
+      }
+    } catch (e) {
+      anotherCount = 0;
+    }
+
+    late info infoObject;
+    if(subject == 'pushup'){
+      infoObject = info(count, anotherCount);
+    }else{
+      infoObject = info(anotherCount, count);
+    }
+    box.put(key, infoObject); // Hiveに保存
+  }
+
+  void debugyou() { // デバッグ用ボタン（腕立て回数を増やす）
+    setState((){
+      count++; // 回数を増やす
+      setdata();
+    });
+  }
+
+  void debugyouyou() { // デバッグ用ボタン（腕立て回数を増やす）
+    setState((){
+      count--; // 回数を増やす
+      setdata();
     });
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { // 画面のUI構築
+    final key = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 日付をキーに変換
+    final infoData = box.get(key); // Hiveからデータ取得
+
+    // カウント取得（subjectによって分岐）
+    count = (subject == "pushup")
+        ? (infoData?.pushupcount ?? 0)
+        : (infoData?.situpcount ?? 0);
+
+    // 目標回数取得（subjectによって分岐、なければ20）
+    goalcount = box.get(subject == "pushup" ? "pushUpGoalCount" : "sitUpGoalCount") ?? 20;
+
     return Scaffold(
-      // 画面のレイアウトを定義
       backgroundColor: Colors.black, // 背景色を黒に設定
       body: Center(
-        // 中央に配置
         child: Column(
-          // 縦方向にウィジェットを並べる
           mainAxisAlignment: MainAxisAlignment.center, // 中央揃え
           children: [
-            const Text(
-              'Push-ups', // タイトル表示
-              style: TextStyle(fontSize: 32, color: Colors.white), // 文字サイズと色
+            Text(
+              '$subject', // タイトル表示
+              style: const TextStyle(fontSize: 32, color: Colors.white), // 文字サイズと色
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 20), // 余白
             SizedBox(
-              width: 185,
+              width: double.infinity,
               child: Text(
-              '$_pushUpCount', // 腕立て回数を表示
+              '$count', // 回数を表示
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: const Color(0xFFD5FF5F) /* メインテーマ */,
-                  fontSize: 128,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFFD5FF5F), // メインテーマ色
+                  fontSize: 128, // 文字サイズ
+                  fontFamily: 'Inter', // フォント
+                  fontWeight: FontWeight.w600, // 太字
                 ),
               ),
-            ), // 余白
+            ),
             const SizedBox(height: 40), // 余白
             SizedBox(
               width: 304,
               height: 69,
-              child: Text(
-                'スマホを地面に置いて、\n胸を近づけるとカウントされます',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white /* 文字 */,
-                  fontSize: 14,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w600,
+              child: subject == "pushup"?
+                Text(
+                  'スマホを地面に置いて、\n胸を近づけるとカウントされます', // 説明文
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white, // 文字色
+                    fontSize: 14, // 文字サイズ
+                    fontFamily: 'Inter', // フォント
+                    fontWeight: FontWeight.w600, // 太字
+                  ),
+                ):
+                Text(
+                  'スマホを地面に置いて、\n背中を近づけるとカウントされます', // 説明文
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white, // 文字色
+                    fontSize: 14, // 文字サイズ
+                    fontFamily: 'Inter', // フォント
+                    fontWeight: FontWeight.w600, // 太字
+                  ),
+                )
+            ),
+            if(count >= goalcount)
+              ElevatedButton( // ボタンウィジェット
+                onPressed: () { // ボタン押下時の処理
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ResultScreen()), // 結果画面へ遷移
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 212, 255, 95), // ボタンの背景色
+                  padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15), // ボタンの内側の余白
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50), // ボタンの角を丸くする
+                  ),
                 ),
+                child: const Text('Finish',style: TextStyle(fontSize: 30.0, color: Colors.black),), // ボタンのラベル
               ),
+            ElevatedButton(
+              onPressed: debugyou, // デバッグ用ボタン
+              child: Text('debug+') // ボタンラベル
             ),
             ElevatedButton(
-              onPressed: debugyou, 
-              child: Text('debug') 
+              onPressed: debugyouyou, // デバッグ用ボタン
+              child: Text('debug-') // ボタンラベル
             ),
           ],
         ),
@@ -363,44 +604,30 @@ class _PushUpCounterScreenState extends State<PushUpCounterScreen> {
   }
 }
 
-class ResultScreen extends StatefulWidget {
-  // 状態を持つ画面ウィジェット
-  ResultScreen(this.count); // コンストラクタ
-  int count;
+class ResultScreen extends StatefulWidget { // 結果画面（状態を持つ）
+  ResultScreen({super.key}); // コンストラクタ 
 
   @override
-  State<ResultScreen> createState() => _ResultScreenState(count); // 状態管理クラスを生成
+  State<ResultScreen> createState() => _ResultScreenState(); // 状態管理クラスを生成
 }
 
-class _ResultScreenState extends State<ResultScreen> {
-  _ResultScreenState(this.count); // コンストラクタ
-  int count;
-
-  Future<void> setdata() async {
-    final String dateKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-    info test = info('腕立て伏せ', count);
-    box.put(dateKey, test);
-    debugPrint(box.get(dateKey).subject);
-  }
+class _ResultScreenState extends State<ResultScreen> { // 状態管理クラス
+  // _ResultScreenState({super.key}); // コンストラクタ
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { // 画面のUI構築
     return Scaffold(
-      // 画面のレイアウトを定義
-      backgroundColor: const Color(0xFFD5FF5F), // 背景色を黒に設定
+      backgroundColor: const Color(0xFFD5FF5F), // 背景色
       body: Center(
-        // 中央に配置
         child: Column(
-          // 縦方向にウィジェットを並べる
           mainAxisAlignment: MainAxisAlignment.center, // 中央揃え
           children: [
-            Icon(Icons.task_alt, size: 100, color: Colors.black,),
+            Icon(Icons.task_alt, size: 100, color: Colors.black,), // 完了アイコン
             SizedBox(
               height: 20,
-            ),// タイトル表示
+            ),
             const Text(
-              "Finish!", // タイトル表示
+              "Finish!", // 完了メッセージ
               style: TextStyle(fontSize: 32, color: Colors.black), // 文字サイズと色
             ),
             const SizedBox(height: 20), // 余白
@@ -412,13 +639,11 @@ class _ResultScreenState extends State<ResultScreen> {
                   borderRadius: BorderRadius.circular(30), // ボタンの角を丸くする
                 ),
               ),
-              // ボタンウィジェット
-              onPressed: () {
-                setdata();
+              onPressed: () { // ボタン押下時の処理 // データ保存sinai
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => Calendar()),
-                  (Route<dynamic> route) => false,
+                  MaterialPageRoute(builder: (context) => Calendar()), // カレンダー画面へ戻る
+                  (Route<dynamic> route) => false, // 履歴を全て消す
                 );
               },
               child: 

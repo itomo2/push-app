@@ -87,7 +87,7 @@ class AlertDialogSample extends StatelessWidget { // 日付選択時に表示す
                 left: 20,
                 top: 47,
                 child: Text(
-                  '腕立て伏せ：$pushupcount回\n腹筋　　　：$situpcount回', // サンプルデータ（本来は保存データを表示する）
+                  'Push-up：$pushupcount回\nSit-up　　　：$situpcount回', // サンプルデータ（本来は保存データを表示する）
                   style: TextStyle(
                     color: const Color(0xFF14151A), // 文字色
                     fontSize: 20, // 文字サイズ
@@ -96,37 +96,9 @@ class AlertDialogSample extends StatelessWidget { // 日付選択時に表示す
                   ),
                 ),
               ),
-              // Positioned(
-              //   left: 40,
-              //   top: 33,
-              //   child: SizedBox(
-              //     width: 239,
-              //     height: 61,
-              //     child: Text(
-              //       '2025.6.16',
-              //       style: TextStyle(
-              //         color: const Color(0xFF14151A),
-              //         fontSize: 32,
-              //         fontFamily: 'Inter',
-              //         fontWeight: FontWeight.w600,
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
         ),
-        // Column(
-        //   crossAxisAlignment: CrossAxisAlignment.center,
-        //   children: <Widget>[
-        //     TextButton(
-        //       child: Text('Back'),
-        //       onPressed: () {
-        //         Navigator.pop(context);
-        //       },
-        //     ),
-        //   ]
-        // )
       ],
     );
   }
@@ -138,7 +110,7 @@ class PushApp extends StatelessWidget { // アプリ全体のウィジェット�
   @override
   Widget build(BuildContext context) { // アプリのUI構築
     return const MaterialApp(
-      title: '腕立てカウンター', // アプリのタイトル
+      title: 'PushApp', // アプリのタイトル
       home: Calendar(), // メイン画面としてCalendarウィジェットを表示
     );
   }
@@ -242,6 +214,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 ),    
                 _isPushUpEditing // 編集モードかどうかで表示切替
                 ? Row(children: [
+                  Text("Push-up", style: TextStyle(color: Colors.white70, fontSize: 20),),
                   SizedBox(
                     width: 60,
                     child: 
@@ -267,7 +240,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 ])
                 : Row(children: [
                   Text(
-                    '$_pushUpGoalCount reps', // 目標回数表示
+                    'Push-up: $_pushUpGoalCount reps', // 目標回数表示
                     style: TextStyle(color: Colors.white70, fontSize: 20),
                   ),
                   IconButton(
@@ -277,6 +250,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 ],),
                 _isSitUpEditing // 編集モードかどうかで表示切替
                 ? Row(children: [
+                  Text('Sit-up', style: TextStyle(color: Colors.white70, fontSize: 20),),
                   SizedBox(
                     width: 60,
                       child: TextField(
@@ -301,7 +275,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 ])
                 : Row(children: [
                   Text(
-                    '$_sitUpGoalCount reps', // 目標回数表示
+                    'Sit-up: $_sitUpGoalCount reps', // 目標回数表示
                     style: TextStyle(color: Colors.white70, fontSize: 20),
                   ),
                   IconButton(

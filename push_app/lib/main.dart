@@ -398,6 +398,8 @@ class SelectScreen extends StatefulWidget { // 運動選択画面（状態を持
 }
 
 class _SelectScreenState extends State<SelectScreen> {// 状態管理クラス
+  bool _isChecked1 = true; // 1つ目のチェック状
+  bool _isChecked2 = false;
 
   @override
   Widget build(BuildContext context) { // 画面のUI構築
@@ -411,40 +413,60 @@ class _SelectScreenState extends State<SelectScreen> {// 状態管理クラス
             style: TextStyle(fontSize: 32, color: Colors.black, fontWeight: FontWeight.w700), // 文字サイズと色
           ),
           const SizedBox(height: 40), 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Column(
-                children: [
-                  IconButton( // ボタンウィジェット
-                    onPressed: () { // ボタン押下時の処理
-                      //処理を追加
-                    },
-                    icon: const Icon(Icons.check_box_outline_blank, size: 30, color: Colors.black,), // ボタンのラベル)
-                  ),
-                  IconButton( // ボタンウィジェット
-                    onPressed: () { // ボタン押下時の処理
-                      //処理を追加
-                    },
-                    icon: const Icon(Icons.check_box_outline_blank, size: 30, color: Colors.black,), // ボタンのラベル)
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    "Push-up",
-                     style: TextStyle(fontSize: 25, color: Colors.black, fontWeight: FontWeight.w500),
-                  ),
-                  SizedBox(height: 10),
-                  Text("Sit-up",
-                    style: TextStyle(fontSize: 25, 
-                    color: Colors.black, fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
-            ]
+          CheckboxListTile(
+            title: const Text("Push-up"),
+            value: _isChecked1,
+            onChanged: (bool? value) {
+              setState(() {
+                _isChecked1 = true;
+                _isChecked2 = false;
+              });
+            },
           ),
+          CheckboxListTile(
+            title: const Text("Sit-up"),
+            value: _isChecked2,
+            onChanged: (bool? value) {
+              setState(() {
+                _isChecked2 = true;
+                _isChecked1 = false;
+              });
+            },
+          ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.center,
+          //   children: [
+          //     Column(
+          //       children: [
+          //         IconButton( // ボタンウィジェット
+          //           onPressed: () { // ボタン押下時の処理
+          //             //処理を追加
+          //           },
+          //           icon: const Icon(Icons.check_box_outline_blank, size: 30, color: Colors.black,), // ボタンのラベル)
+          //         ),
+          //         IconButton( // ボタンウィジェット
+          //           onPressed: () { // ボタン押下時の処理
+          //             //処理を追加
+          //           },
+          //           icon: const Icon(Icons.check_box_outline_blank, size: 30, color: Colors.black,), // ボタンのラベル)
+          //         ),
+          //       ],
+          //     ),
+          //     Column(
+          //       children: [
+          //         Text(
+          //           "Push-up",
+          //            style: TextStyle(fontSize: 25, color: Colors.black, fontWeight: FontWeight.w500),
+          //         ),
+          //         SizedBox(height: 10),
+          //         Text("Sit-up",
+          //           style: TextStyle(fontSize: 25, 
+          //           color: Colors.black, fontWeight: FontWeight.w500),
+          //         ),
+          //       ],
+          //     ),
+          //   ]
+          // ),
           SizedBox(height: 30),
           ElevatedButton(
             style: ElevatedButton.styleFrom(

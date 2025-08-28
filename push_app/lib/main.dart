@@ -471,15 +471,20 @@ class _SelectScreenState extends State<SelectScreen> {// 状態管理クラス
   }
 }
 
-class PushUpCounterScreen extends StatefulWidget { // 腕立てカウンター画面（状態を持つ）
-  const PushUpCounterScreen({super.key}); // コンストラクタ
+class CounterScreen extends StatefulWidget { // 腕立てカウンター画面（状態を持つ）
+  CounterScreen(this.subject);
+  String subject; // コンストラクタ
 
   @override
-  State<PushUpCounterScreen> createState() => _PushUpCounterScreenState(); // 状態管理クラスを生成
+  State<CounterScreen> createState() => _CounterScreenState(subject); // 状態管理クラスを生成
 }
 
-class _PushUpCounterScreenState extends State<PushUpCounterScreen> { // 状態管理クラス
-  int _pushUpCount = 0; // 腕立ての回数を保持する変数
+class _CounterScreenState extends State<CounterScreen> { // 状態管理クラス
+  String subject;
+  _CounterScreenState(this.subject);
+
+  int _pushUpCount = box.get('${subject}Count', defaultValue: 0); // 腕立ての回数を保持する変数
+
   bool _isNear = false; // 近接センサーが近いかどうかを保持
   late Stream<bool> _proximityStream; // 近接センサーの状態を監視するストリーム
 
@@ -487,18 +492,6 @@ class _PushUpCounterScreenState extends State<PushUpCounterScreen> { // 状態�
   void initState() { // 初期化処理
     super.initState();
     _startListening(); // 近接センサーの監視を開始
-  }
-
-  void debugyou() { // デバッグ用ボタン（腕立て回数を増やす）
-    setState((){
-      _pushUpCount++; // 回数を増やす
-    });
-    if (_pushUpCount == 2) { // 2回目で画面遷移
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ResultScreen(_pushUpCount)), // 結果画面へ遷移
-          );
-        }
   }
 
   void _startListening() { // 近接センサーの監視開始
@@ -515,6 +508,18 @@ class _PushUpCounterScreenState extends State<PushUpCounterScreen> { // 状態�
     });
   }
 
+  void debugyou() { // デバッグ用ボタン（腕立て回数を増やす）
+    setState((){
+      _pushUpCount++; // 回数を増やす
+    });
+    if (_pushUpCount == 2) { // 2回目で画面遷移
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ResultScreen(_pushUpCount)), // 結果画面へ遷移
+          );
+        }
+  }
+
   @override
   Widget build(BuildContext context) { // 画面のUI構築
     return Scaffold(
@@ -523,9 +528,9 @@ class _PushUpCounterScreenState extends State<PushUpCounterScreen> { // 状態�
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center, // 中央揃え
           children: [
-            const Text(
-              'Push-ups', // タイトル表示
-              style: TextStyle(fontSize: 32, color: Colors.white), // 文字サイズと色
+            Text(
+              '$subject', // タイトル表示
+              style: const TextStyle(fontSize: 32, color: Colors.white), // 文字サイズと色
             ),
             const SizedBox(height: 20), // 余白
             SizedBox(

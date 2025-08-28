@@ -214,7 +214,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 ),    
                 _isPushUpEditing // 編集モードかどうかで表示切替
                 ? Row(children: [
-                  Text("Push-up", style: TextStyle(color: Colors.white70, fontSize: 20),),
+                  Text("Push-up:  ", style: TextStyle(color: Colors.white70, fontSize: 20),),
                   SizedBox(
                     width: 60,
                     child: 
@@ -222,7 +222,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                       controller: _pushUpController, // 入力コントローラー
                       autofocus: true, // 自動フォーカス
                       keyboardType: TextInputType.number, // 数値入力
-                      style: TextStyle(color: Colors.white70, fontSize: 20, fontWeight: FontWeight.bold), // テキストスタイル
+                      style: TextStyle(color: Colors.white70, fontSize: 20,), // テキストスタイル
                       decoration: InputDecoration(
                         border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // 下線
                         focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // フォーカス時の下線
@@ -240,7 +240,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 ])
                 : Row(children: [
                   Text(
-                    'Push-up: $_pushUpGoalCount reps', // 目標回数表示
+                    'Push-up:  $_pushUpGoalCount reps', // 目標回数表示
                     style: TextStyle(color: Colors.white70, fontSize: 20),
                   ),
                   IconButton(
@@ -250,14 +250,14 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 ],),
                 _isSitUpEditing // 編集モードかどうかで表示切替
                 ? Row(children: [
-                  Text('Sit-up', style: TextStyle(color: Colors.white70, fontSize: 20),),
+                  Text('Sit-up:  ', style: TextStyle(color: Colors.white70, fontSize: 20),),
                   SizedBox(
                     width: 60,
                       child: TextField(
                       controller: _sitUpController, // 入力コントローラー
                       autofocus: true, // 自動フォーカス
                       keyboardType: TextInputType.number, // 数値入力
-                      style: TextStyle(color: Colors.white70, fontSize: 20, fontWeight: FontWeight.bold), // テキストスタイル
+                      style: TextStyle(color: Colors.white70, fontSize: 20,), // テキストスタイル
                       decoration: InputDecoration(
                         border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // 下線
                         focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // フォーカス時の下線
@@ -275,7 +275,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 ])
                 : Row(children: [
                   Text(
-                    'Sit-up: $_sitUpGoalCount reps', // 目標回数表示
+                    'Sit-up:  $_sitUpGoalCount reps', // 目標回数表示
                     style: TextStyle(color: Colors.white70, fontSize: 20),
                   ),
                   IconButton(

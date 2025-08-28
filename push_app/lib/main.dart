@@ -149,6 +149,9 @@ class Calendar extends StatefulWidget { // カレンダー画面（状態を持�
 }
 
 class _CalendarState extends State<Calendar> { // Calendar画面の状態管理クラス
+
+
+
   DateTime _focusedDay = DateTime.now(); // 現在フォーカスされている日付
   DateTime? _selectedDay; // 選択された日付（未選択ならnull）
 
@@ -365,7 +368,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const PushUpCounterScreen(), // PushUpCounterScreenへ遷移
+                        builder: (context) => const SelectScreen(), // PushUpCounterScreenへ遷移
                       ),
                     );
                   },
@@ -380,6 +383,87 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SelectScreen extends StatefulWidget { // 運動選択画面（状態を持つ）
+  const SelectScreen({super.key}); // コンストラクタ
+
+  @override
+  State<SelectScreen> createState() => _SelectScreenState(); // 状態管理クラスを生成
+}
+
+class _SelectScreenState extends State<SelectScreen> {// 状態管理クラス
+
+  @override
+  Widget build(BuildContext context) { // 画面のUI構築
+    return Scaffold(
+      backgroundColor: const Color(0xFFD5FF5F), // 背景色を黒に設定
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center, // 中央揃え,
+        children: [
+          const Text(
+            'Select Exercise', // タイトル表示
+            style: TextStyle(fontSize: 32, color: Colors.black, fontWeight: FontWeight.w700), // 文字サイズと色
+          ),
+          const SizedBox(height: 40), 
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Column(
+                children: [
+                  IconButton( // ボタンウィジェット
+                    onPressed: () { // ボタン押下時の処理
+                      //処理を追加
+                    },
+                    icon: const Icon(Icons.check_box_outline_blank, size: 30, color: Colors.black,), // ボタンのラベル)
+                  ),
+                  IconButton( // ボタンウィジェット
+                    onPressed: () { // ボタン押下時の処理
+                      //処理を追加
+                    },
+                    icon: const Icon(Icons.check_box_outline_blank, size: 30, color: Colors.black,), // ボタンのラベル)
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  Text(
+                    "Push-up",
+                     style: TextStyle(fontSize: 25, color: Colors.black, fontWeight: FontWeight.w500),
+                  ),
+                  SizedBox(height: 10),
+                  Text("Sit-up",
+                    style: TextStyle(fontSize: 25, 
+                    color: Colors.black, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ]
+          ),
+          SizedBox(height: 30),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black, // ボタンの背景色
+              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20), // ボタンの内側の余白
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30), // ボタンの角を丸くする
+              ),
+            ),
+            onPressed: () { // ボタン押下時の処理
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PushUpCounterScreen(), // PushUpCounterScreenへ遷移
+                ),
+              );
+            },
+            child: 
+            const Text("Let's training!",style: TextStyle(fontSize: 20.0,color: Colors.white),), // ボタンのラベル
           ),
         ],
       ),

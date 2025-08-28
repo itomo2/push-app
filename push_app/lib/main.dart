@@ -475,7 +475,7 @@ class CounterScreen extends StatefulWidget { // 腕立てカウンター画面�
 class _CounterScreenState extends State<CounterScreen> { // 状態管理クラス
   _CounterScreenState(this.subject);
   String subject;
-  late int count=0;
+  late int count, goalcount;
 
   bool _isNear = false; // 近接センサーが近いかどうかを保持
   late Stream<bool> _proximityStream; // 近接センサーの状態を監視するストリーム
@@ -500,16 +500,41 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
     });
   }
 
+  Future<void> setdata() async { // データ保存処理
+    late int anotherCount;
+    final key = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 日付をキーに変換
+    try {
+      final infoData = box.get(key); // Hiveからデータ取得
+      if( subject == "pushup"){
+        anotherCount = infoData?.situpcount ?? 0;
+      }else{
+        anotherCount = infoData?.pushupcount ?? 0; // データがなければ0
+      }
+    } catch (e) {
+      anotherCount = 0;
+    }
+
+    late info infoObject;
+    if(subject == 'pushup'){
+      infoObject = info(count, anotherCount);
+    }else{
+      infoObject = info(anotherCount, count);
+    }
+    box.put(key, infoObject); // Hiveに保存
+  }
+
   void debugyou() { // デバッグ用ボタン（腕立て回数を増やす）
     setState((){
       count++; // 回数を増やす
+      setdata();
     });
-    if (count == 2) { // 2回目で画面遷移
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ResultScreen()), // 結果画面へ遷移
-          );
-        }
+  }
+
+  void debugyouyou() { // デバッグ用ボタン（腕立て回数を増やす）
+    setState((){
+      count--; // 回数を増やす
+      setdata();
+    });
   }
 
   @override
@@ -519,8 +544,10 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
       final infoData = box.get(key); // Hiveからデータ取得
       if( subject == "pushup"){
         count = infoData?.pushupcount ?? 0;
+        goalcount = box.get("pushUpGoalCount");
       }else{
         count = infoData?.situpcount ?? 0; // データがなければ0
+        goalcount = box.get("sitUpGoalCount");
       }
     } catch (e) {
       count = 0;
@@ -565,9 +592,30 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
                 ),
               ),
             ),
+            if(count >= goalcount)
+              ElevatedButton( // ボタンウィジェット
+                onPressed: () { // ボタン押下時の処理
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ResultScreen()), // 結果画面へ遷移
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(202, 212, 255, 95), // ボタンの背景色
+                  padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15), // ボタンの内側の余白
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50), // ボタンの角を丸くする
+                  ),
+                ),
+                child: const Text('Finish',style: TextStyle(fontSize: 30.0, color: Colors.black),), // ボタンのラベル
+              ),
             ElevatedButton(
               onPressed: debugyou, // デバッグ用ボタン
-              child: Text('debug') // ボタンラベル
+              child: Text('debug+') // ボタンラベル
+            ),
+            ElevatedButton(
+              onPressed: debugyouyou, // デバッグ用ボタン
+              child: Text('debug-') // ボタンラベル
             ),
           ],
         ),

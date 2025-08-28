@@ -49,7 +49,7 @@ class AlertDialogSample extends StatelessWidget { // 日付選択時に表示す
     return AlertDialog(
       backgroundColor: const Color(0xFFD5FF5F), // ダイアログの背景色
       title: Text(
-        "${DateFormat('  yyyy.M.d').format(selectedDay)}", // 選択日を表示
+        "${DateFormat(' yyyy.M.d').format(selectedDay)}", // 選択日を表示
         textAlign: TextAlign.left, // 左寄せ
         style: TextStyle(
           color: const Color(0xFF14151A), // 文字色
@@ -59,47 +59,20 @@ class AlertDialogSample extends StatelessWidget { // 日付選択時に表示す
         ),
       ),
       // content: Icon(Icons.circle), // アイコン（未使用）
-      actions: <Widget>[
-        Container(
-          width: 300, // ダイアログの幅
-          height: 200, // ダイアログの高さ
-          decoration: ShapeDecoration(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30), // 角丸
+      actions: [
+        Align(
+          alignment: Alignment.topLeft,
+          child: Text(
+            '  Push-up：$pushupcount回\n  Sit-up    ：$situpcount回', // サンプルデータ（本来は保存データを表示する）
+            style: TextStyle(
+              color: const Color(0xFF14151A), // 文字色
+              fontSize: 20, // 文字サイズ
+              fontFamily: 'Inter', // フォント
+            fontWeight: FontWeight.w500, // 太字
             ),
           ),
-          child: Stack(
-            children: [
-              Positioned(
-                left: 0,
-                top: 0,
-                child: Container(
-                  width: 300,
-                  height: 200,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFD5FF5F), // メインテーマ色
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30), // 角丸
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 20,
-                top: 47,
-                child: Text(
-                  'Push-up：$pushupcount回\nSit-up    ：$situpcount回', // サンプルデータ（本来は保存データを表示する）
-                  style: TextStyle(
-                    color: const Color(0xFF14151A), // 文字色
-                    fontSize: 20, // 文字サイズ
-                    fontFamily: 'Inter', // フォント
-                    fontWeight: FontWeight.w500, // 太字
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
+        SizedBox(height: 16),
       ],
     );
   }

@@ -17,7 +17,7 @@ class infoAdapter extends TypeAdapter<info> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return info(
-      fields[0] as String,
+      fields[0] as int,
       fields[1] as int,
     );
   }
@@ -27,9 +27,9 @@ class infoAdapter extends TypeAdapter<info> {
     writer
       ..writeByte(2)
       ..writeByte(0)
-      ..write(obj.subject)
+      ..write(obj.pushupcount)
       ..writeByte(1)
-      ..write(obj.count);
+      ..write(obj.situpcount);
   }
 
   @override

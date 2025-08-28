@@ -12,11 +12,11 @@ part 'main.g.dart'; // Hive Generator用（TypeAdapter自動生成ファイル�
 @HiveType(typeId: 0) // Hive用の型IDを指定
 class info {
   @HiveField(0) // Hiveで保存するフィールド番号
-  String subject; // 運動名（例：腕立て伏せ）
+  int pushupcount; // 運動名（例：腕立て伏せ）
   @HiveField(1) // Hiveで保存するフィールド番号
-  int count; // 回数
+  int situpcount; // 回数
 
-  info(this.subject, this.count); // コンストラクタ
+  info(this.pushupcount, this.situpcount); // コンストラクタ
 }
 
 late Box box; // HiveのBox（データ保存領域）をグローバル変数として宣言
@@ -24,7 +24,7 @@ void main() async {
   // Hive初期化 & info型の保存を可能にする
   await Hive.initFlutter(); // Hiveの初期化（Flutter用）
   Hive.registerAdapter(infoAdapter()); // info型のアダプターを登録（これがないと保存時にクラッシュ）
-  box = await Hive.openBox('pushup_info'); // 'pushup_info'という名前のBoxを開く（なければ作成）
+  box = await Hive.openBox('app_info'); // 'pushup_info'という名前のBoxを開く（なければ作成）
   runApp(const PushApp()); // アプリのエントリーポイント。PushAppウィジェットを起動
 }
 
@@ -34,13 +34,16 @@ class AlertDialogSample extends StatelessWidget { // 日付選択時に表示す
 
   @override
   Widget build(BuildContext context) { // ダイアログのUIを構築
-    int count;
+    int pushupcount,situpcount;
+    
       try {
         final key = DateFormat('yyyy-MM-dd').format(selectedDay); // 日付をキーに変換
         final infoData = box.get(key); // Hiveからデータ取得
-        count = infoData?.count ?? 0; // データがなければ0
+        pushupcount = infoData?.pushupcount ?? 0;
+        situpcount = infoData?.situpcount ?? 0; // データがなければ0
       } catch (e) {
-        count = 0;
+        pushupcount = 0;
+        situpcount = 0;
       }
     return AlertDialog(
       backgroundColor: const Color(0xFFD5FF5F), // ダイアログの背景色
@@ -84,7 +87,7 @@ class AlertDialogSample extends StatelessWidget { // 日付選択時に表示す
                 left: 20,
                 top: 47,
                 child: Text(
-                  '腕立て伏せ：$count回\n腹筋　　　：50回', // サンプルデータ（本来は保存データを表示する）
+                  '腕立て伏せ：$pushupcount回\n腹筋　　　：$situpcount回', // サンプルデータ（本来は保存データを表示する）
                   style: TextStyle(
                     color: const Color(0xFF14151A), // 文字色
                     fontSize: 20, // 文字サイズ
@@ -400,6 +403,7 @@ class SelectScreen extends StatefulWidget { // 運動選択画面（状態を持
 class _SelectScreenState extends State<SelectScreen> {// 状態管理クラス
   bool _isChecked1 = true; // 1つ目のチェック状
   bool _isChecked2 = false;
+  late String subject;
 
   @override
   Widget build(BuildContext context) { // 画面のUI構築
@@ -433,40 +437,6 @@ class _SelectScreenState extends State<SelectScreen> {// 状態管理クラス
               });
             },
           ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   children: [
-          //     Column(
-          //       children: [
-          //         IconButton( // ボタンウィジェット
-          //           onPressed: () { // ボタン押下時の処理
-          //             //処理を追加
-          //           },
-          //           icon: const Icon(Icons.check_box_outline_blank, size: 30, color: Colors.black,), // ボタンのラベル)
-          //         ),
-          //         IconButton( // ボタンウィジェット
-          //           onPressed: () { // ボタン押下時の処理
-          //             //処理を追加
-          //           },
-          //           icon: const Icon(Icons.check_box_outline_blank, size: 30, color: Colors.black,), // ボタンのラベル)
-          //         ),
-          //       ],
-          //     ),
-          //     Column(
-          //       children: [
-          //         Text(
-          //           "Push-up",
-          //            style: TextStyle(fontSize: 25, color: Colors.black, fontWeight: FontWeight.w500),
-          //         ),
-          //         SizedBox(height: 10),
-          //         Text("Sit-up",
-          //           style: TextStyle(fontSize: 25, 
-          //           color: Colors.black, fontWeight: FontWeight.w500),
-          //         ),
-          //       ],
-          //     ),
-          //   ]
-          // ),
           SizedBox(height: 30),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -476,11 +446,12 @@ class _SelectScreenState extends State<SelectScreen> {// 状態管理クラス
                 borderRadius: BorderRadius.circular(30), // ボタンの角を丸くする
               ),
             ),
-            onPressed: () { // ボタン押下時の処理
+            onPressed: () { //ボタン押下時の処理
+              subject = _isChecked1 ?"pushup" : "situp";
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const PushUpCounterScreen(), // PushUpCounterScreenへ遷移
+                  builder: (context) => CounterScreen(subject), // PushUpCounterScreenへ遷移
                 ),
               );
             },
@@ -493,15 +464,19 @@ class _SelectScreenState extends State<SelectScreen> {// 状態管理クラス
   }
 }
 
-class PushUpCounterScreen extends StatefulWidget { // 腕立てカウンター画面（状態を持つ）
-  const PushUpCounterScreen({super.key}); // コンストラクタ
+class CounterScreen extends StatefulWidget { // 腕立てカウンター画面（状態を持つ）
+  CounterScreen(this.subject);
+  String subject; // コンストラクタ
 
   @override
-  State<PushUpCounterScreen> createState() => _PushUpCounterScreenState(); // 状態管理クラスを生成
+  State<CounterScreen> createState() => _CounterScreenState(subject); // 状態管理クラスを生成
 }
 
-class _PushUpCounterScreenState extends State<PushUpCounterScreen> { // 状態管理クラス
-  int _pushUpCount = 0; // 腕立ての回数を保持する変数
+class _CounterScreenState extends State<CounterScreen> { // 状態管理クラス
+  _CounterScreenState(this.subject);
+  String subject;
+  late int count, goalcount;
+
   bool _isNear = false; // 近接センサーが近いかどうかを保持
   late Stream<bool> _proximityStream; // 近接センサーの状態を監視するストリーム
 
@@ -511,18 +486,6 @@ class _PushUpCounterScreenState extends State<PushUpCounterScreen> { // 状態�
     _startListening(); // 近接センサーの監視を開始
   }
 
-  void debugyou() { // デバッグ用ボタン（腕立て回数を増やす）
-    setState((){
-      _pushUpCount++; // 回数を増やす
-    });
-    if (_pushUpCount == 2) { // 2回目で画面遷移
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ResultScreen(_pushUpCount)), // 結果画面へ遷移
-          );
-        }
-  }
-
   void _startListening() { // 近接センサーの監視開始
     _proximityStream = ProximitySensor.events.map(
       (event) => event > 0, // センサー値が0より大きければtrue
@@ -530,30 +493,81 @@ class _PushUpCounterScreenState extends State<PushUpCounterScreen> { // 状態�
     _proximityStream.listen((isNear) { // センサーの状態変化を監視
       if (isNear && !_isNear) { // 近づいた瞬間のみカウントアップ
         setState(() {
-          _pushUpCount++; // 腕立て回数を増やす
+          count++; // 腕立て回数を増やす
         });
       }
       _isNear = isNear; // 状態を更新
     });
   }
 
+  Future<void> setdata() async { // データ保存処理
+    late int anotherCount;
+    final key = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 日付をキーに変換
+    try {
+      final infoData = box.get(key); // Hiveからデータ取得
+      if( subject == "pushup"){
+        anotherCount = infoData?.situpcount ?? 0;
+      }else{
+        anotherCount = infoData?.pushupcount ?? 0; // データがなければ0
+      }
+    } catch (e) {
+      anotherCount = 0;
+    }
+
+    late info infoObject;
+    if(subject == 'pushup'){
+      infoObject = info(count, anotherCount);
+    }else{
+      infoObject = info(anotherCount, count);
+    }
+    box.put(key, infoObject); // Hiveに保存
+  }
+
+  void debugyou() { // デバッグ用ボタン（腕立て回数を増やす）
+    setState((){
+      count++; // 回数を増やす
+      setdata();
+    });
+  }
+
+  void debugyouyou() { // デバッグ用ボタン（腕立て回数を増やす）
+    setState((){
+      count--; // 回数を増やす
+      setdata();
+    });
+  }
+
   @override
   Widget build(BuildContext context) { // 画面のUI構築
+    try {
+      final key = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 日付をキーに変換
+      final infoData = box.get(key); // Hiveからデータ取得
+      if( subject == "pushup"){
+        count = infoData?.pushupcount ?? 0;
+        goalcount = box.get("pushUpGoalCount");
+      }else{
+        count = infoData?.situpcount ?? 0; // データがなければ0
+        goalcount = box.get("sitUpGoalCount");
+      }
+    } catch (e) {
+      count = 0;
+    }
+
     return Scaffold(
       backgroundColor: Colors.black, // 背景色を黒に設定
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center, // 中央揃え
           children: [
-            const Text(
-              'Push-ups', // タイトル表示
-              style: TextStyle(fontSize: 32, color: Colors.white), // 文字サイズと色
+            Text(
+              '$subject', // タイトル表示
+              style: const TextStyle(fontSize: 32, color: Colors.white), // 文字サイズと色
             ),
             const SizedBox(height: 20), // 余白
             SizedBox(
               width: 185,
               child: Text(
-              '$_pushUpCount', // 腕立て回数を表示
+              '$count', // 腕立て回数を表示
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: const Color(0xFFD5FF5F), // メインテーマ色
@@ -578,9 +592,30 @@ class _PushUpCounterScreenState extends State<PushUpCounterScreen> { // 状態�
                 ),
               ),
             ),
+            if(count >= goalcount)
+              ElevatedButton( // ボタンウィジェット
+                onPressed: () { // ボタン押下時の処理
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ResultScreen()), // 結果画面へ遷移
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(202, 212, 255, 95), // ボタンの背景色
+                  padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15), // ボタンの内側の余白
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50), // ボタンの角を丸くする
+                  ),
+                ),
+                child: const Text('Finish',style: TextStyle(fontSize: 30.0, color: Colors.black),), // ボタンのラベル
+              ),
             ElevatedButton(
               onPressed: debugyou, // デバッグ用ボタン
-              child: Text('debug') // ボタンラベル
+              child: Text('debug+') // ボタンラベル
+            ),
+            ElevatedButton(
+              onPressed: debugyouyou, // デバッグ用ボタン
+              child: Text('debug-') // ボタンラベル
             ),
           ],
         ),
@@ -590,24 +625,14 @@ class _PushUpCounterScreenState extends State<PushUpCounterScreen> { // 状態�
 }
 
 class ResultScreen extends StatefulWidget { // 結果画面（状態を持つ）
-  ResultScreen(this.count); // コンストラクタ
-  int count; // 腕立て回数
+  ResultScreen({super.key}); // コンストラクタ 
 
   @override
-  State<ResultScreen> createState() => _ResultScreenState(count); // 状態管理クラスを生成
+  State<ResultScreen> createState() => _ResultScreenState(); // 状態管理クラスを生成
 }
 
 class _ResultScreenState extends State<ResultScreen> { // 状態管理クラス
-  _ResultScreenState(this.count); // コンストラクタ
-  int count; // 腕立て回数
-
-  Future<void> setdata() async { // データ保存処理
-    final String dateKey = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 今日の日付だけをキーにする
-
-    info test = info('腕立て伏せ', count); // 保存するデータを作成
-    box.put(dateKey, test); // Hiveに保存
-    debugPrint('${box.get(dateKey).count}'); // 保存した回数をデバッグ出力
-  }
+  // _ResultScreenState({super.key}); // コンストラクタ
 
   @override
   Widget build(BuildContext context) { // 画面のUI構築
@@ -634,8 +659,7 @@ class _ResultScreenState extends State<ResultScreen> { // 状態管理クラス
                   borderRadius: BorderRadius.circular(30), // ボタンの角を丸くする
                 ),
               ),
-              onPressed: () { // ボタン押下時の処理
-                setdata(); // データ保存
+              onPressed: () { // ボタン押下時の処理 // データ保存sinai
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => Calendar()), // カレンダー画面へ戻る

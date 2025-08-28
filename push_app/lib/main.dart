@@ -3,6 +3,7 @@ import 'package:intl/intl.dart'; // 日付フォーマット用パッケージ�
 
 import 'package:proximity_sensor/proximity_sensor.dart'; // 近接センサーを使うためのパッケージをインポート
 import 'package:table_calendar/table_calendar.dart'; // カレンダー表示用パッケージをインポート
+import 'dart:async'; // StreamSubscription用
 
 import 'package:hive/hive.dart'; // Hive（ローカルDB）を使うためのパッケージをインポート
 import 'package:hive_flutter/hive_flutter.dart'; // HiveのFlutter用パッケージをインポート
@@ -87,7 +88,7 @@ class AlertDialogSample extends StatelessWidget { // 日付選択時に表示す
                 left: 20,
                 top: 47,
                 child: Text(
-                  'Push-up：$pushupcount回\nSit-up　　　：$situpcount回', // サンプルデータ（本来は保存データを表示する）
+                  'Push-up：$pushupcount回\nSit-up    ：$situpcount回', // サンプルデータ（本来は保存データを表示する）
                   style: TextStyle(
                     color: const Color(0xFF14151A), // 文字色
                     fontSize: 20, // 文字サイズ
@@ -149,6 +150,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
   void _startPushUpEditing() { // 編集モード開始
     setState(() {
       _isPushUpEditing = true; // 編集モードON
+      _isSitUpEditing = false; // 腹筋編集モードOFF
       _pushUpController.text = _pushUpGoalCount.toString(); // 現在の目標回数をテキストフィールドにセット
     });
   }
@@ -156,6 +158,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
   void _startSitUpEditing() { // 編集モード開始
     setState(() {
       _isSitUpEditing = true; // 編集モードON
+      _isPushUpEditing = false; // 腕立て伏せ編集モードOFF
       _sitUpController.text = _sitUpGoalCount.toString(); // 現在の目標回数をテキストフィールドにセット
     });
   }
@@ -197,6 +200,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
   @override
   Widget build(BuildContext context) { // 画面のUI構築
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         toolbarHeight: 150, // AppBarの高さ
         backgroundColor: Color(0xFF2D2D35), // AppBarの背景色
@@ -339,7 +343,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                     weekendStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w700), // 土日
                   ),
                 ),
-                const SizedBox(height: 100), // 余白
+                const SizedBox(height: 50), // 余白
                 ElevatedButton( // ボタンウィジェット
                   onPressed: () { // ボタン押下時の処理
                     Navigator.push(
@@ -350,7 +354,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(202, 212, 255, 95), // ボタンの背景色
+                    backgroundColor: const Color.fromARGB(255, 212, 255, 95), // ボタンの背景色
                     padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15), // ボタンの内側の余白
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50), // ボタンの角を丸くする
@@ -391,25 +395,37 @@ class _SelectScreenState extends State<SelectScreen> {// 状態管理クラス
             style: TextStyle(fontSize: 32, color: Colors.black, fontWeight: FontWeight.w700), // 文字サイズと色
           ),
           const SizedBox(height: 40), 
-          CheckboxListTile(
-            title: const Text("Push-up"),
-            value: _isChecked1,
-            onChanged: (bool? value) {
-              setState(() {
-                _isChecked1 = true;
-                _isChecked2 = false;
-              });
-            },
+          Theme(
+            data: Theme.of(context).copyWith(
+              splashColor: const Color.fromARGB(19, 0, 0, 0), // チェックボックスの枠線の色
+            ),
+              child: CheckboxListTile(
+              title: const Text("Push-up"),
+              activeColor: Colors.black,
+              value: _isChecked1,
+              onChanged: (bool? value) {
+                setState(() {
+                  _isChecked1 = true;
+                  _isChecked2 = false;
+                });
+              },
+            ),
           ),
-          CheckboxListTile(
-            title: const Text("Sit-up"),
-            value: _isChecked2,
-            onChanged: (bool? value) {
-              setState(() {
-                _isChecked2 = true;
-                _isChecked1 = false;
-              });
-            },
+          Theme(
+            data: Theme.of(context).copyWith(
+              splashColor: const Color.fromARGB(19, 0, 0, 0), // チェックボックスの枠線の色
+            ),
+            child: CheckboxListTile(
+              title: const Text("Sit-up"),
+              activeColor: Colors.black,
+              value: _isChecked2,
+              onChanged: (bool? value) {
+                setState(() {
+                  _isChecked2 = true;
+                  _isChecked1 = false;
+                });
+              },
+            ),
           ),
           SizedBox(height: 30),
           ElevatedButton(
@@ -422,12 +438,11 @@ class _SelectScreenState extends State<SelectScreen> {// 状態管理クラス
             ),
             onPressed: () { //ボタン押下時の処理
               subject = _isChecked1 ?"pushup" : "situp";
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CounterScreen(subject), // PushUpCounterScreenへ遷移
-                ),
-              );
+               Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => CounterScreen(subject)), // カウンター画面へ遷移
+                  (Route<dynamic> route) => false, // 履歴を全て消す
+                );
             },
             child: 
             const Text("Let's training!",style: TextStyle(fontSize: 20.0,color: Colors.white),), // ボタンのラベル
@@ -453,25 +468,31 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
 
   bool _isNear = false; // 近接センサーが近いかどうかを保持
   late Stream<bool> _proximityStream; // 近接センサーの状態を監視するストリーム
+  late StreamSubscription<bool> _proximitySubscription; // 購読用変数
 
   @override
-  void initState() { // 初期化処理
+  void initState() {
     super.initState();
-    _startListening(); // 近接センサーの監視を開始
+    _startListening();
   }
 
-  void _startListening() { // 近接センサーの監視開始
-    _proximityStream = ProximitySensor.events.map(
-      (event) => event > 0, // センサー値が0より大きければtrue
-    );
-    _proximityStream.listen((isNear) { // センサーの状態変化を監視
-      if (isNear && !_isNear) { // 近づいた瞬間のみカウントアップ
+  void _startListening() {
+    _proximityStream = ProximitySensor.events.map((event) => event > 0);
+    _proximitySubscription = _proximityStream.listen((isNear) {
+      if (isNear && !_isNear) {
         setState(() {
-          count++; // 腕立て回数を増やす
+          count++;
+          setdata();
         });
       }
-      _isNear = isNear; // 状態を更新
+      _isNear = isNear;
     });
+  }
+
+  @override
+  void dispose() {
+    _proximitySubscription.cancel(); // センサー購読を停止
+    super.dispose();
   }
 
   Future<void> setdata() async { // データ保存処理
@@ -506,7 +527,7 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
 
   void debugyouyou() { // デバッグ用ボタン（腕立て回数を増やす）
     setState((){
-      count--; // 回数を増やす
+      count--; // 回数を減らす
       setdata();
     });
   }
@@ -583,7 +604,7 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(202, 212, 255, 95), // ボタンの背景色
+                  backgroundColor: const Color.fromARGB(255, 212, 255, 95), // ボタンの背景色
                   padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15), // ボタンの内側の余白
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50), // ボタンの角を丸くする

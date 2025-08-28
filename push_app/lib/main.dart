@@ -235,23 +235,23 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 _isPushUpEditing // 編集モードかどうかで表示切替
                 ? Row(children: [
                   SizedBox(
-                    width: 200,
-                      child: TextField(
+                    width: 60,
+                    child: 
+                    TextField(
                       controller: _pushUpController, // 入力コントローラー
                       autofocus: true, // 自動フォーカス
                       keyboardType: TextInputType.number, // 数値入力
-                      style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold), // テキストスタイル
+                      style: TextStyle(color: Colors.white70, fontSize: 20, fontWeight: FontWeight.bold), // テキストスタイル
                       decoration: InputDecoration(
-                        hintText: 'Enter target reps', // ヒント
-                        hintStyle: TextStyle(color: Colors.white54), // ヒントの色
-                        border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)), // 下線
-                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)), // フォーカス時の下線
+                        border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // 下線
+                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // フォーカス時の下線
                         isDense: true, // コンパクト表示
                         contentPadding: EdgeInsets.symmetric(vertical: 8), // パディング
                       ),
                       onSubmitted: (_) => _submitPushUpEditing(), // Enterで確定
                     ),
                   ),
+                  Text('reps', style: TextStyle(color: Colors.white70, fontSize: 20),),
                   IconButton(
                     icon: Icon(Icons.check, color: Colors.white), // 確定ボタン
                     onPressed: _submitPushUpEditing, // 確定処理
@@ -270,7 +270,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 _isSitUpEditing // 編集モードかどうかで表示切替
                 ? Row(children: [
                   SizedBox(
-                    width: 200,
+                    width: 60,
                       child: TextField(
                       controller: _sitUpController, // 入力コントローラー
                       autofocus: true, // 自動フォーカス
@@ -287,6 +287,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                       onSubmitted: (_) => _submitSitUpEditing(), // Enterで確定
                     ),
                   ),
+                  Text('reps', style: TextStyle(color: Colors.white70, fontSize: 20),),
                   IconButton(
                     icon: Icon(Icons.check, color: Colors.white), // 確定ボタン
                     onPressed: _submitSitUpEditing, // 確定処理
@@ -307,7 +308,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
           ),
         ),
       ),
-      
+
       body: Stack(
         children: [ // 背景色を置く
           Container(

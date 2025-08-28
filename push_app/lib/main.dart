@@ -71,38 +71,6 @@ class AlertDialogSample extends StatelessWidget { // 日付選択時に表示す
             fontWeight: FontWeight.w500, // 太字
             ),
           ),
-
-          child: Stack(
-            children: [
-              Positioned(
-                left: 0,
-                top: 0,
-                child: Container(
-                  width: 300,
-                  height: 200,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFD5FF5F), // メインテーマ色
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30), // 角丸
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 20,
-                top: 47,
-                child: Text(
-                  'Push-up：$pushupcount回\nSit-up    ：$situpcount回', // サンプルデータ（本来は保存データを表示する）
-                  style: TextStyle(
-                    color: const Color(0xFF14151A), // 文字色
-                    fontSize: 20, // 文字サイズ
-                    fontFamily: 'Inter', // フォント
-                    fontWeight: FontWeight.w500, // 太字
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
         SizedBox(height: 16),
       ],
@@ -130,6 +98,8 @@ class Calendar extends StatefulWidget { // カレンダー画面（状態を持�
 }
 
 class _CalendarState extends State<Calendar> { // Calendar画面の状態管理クラス
+
+
 
   DateTime _focusedDay = DateTime.now(); // 現在フォーカスされている日付
   DateTime? _selectedDay; // 選択された日付（未選択ならnull）
@@ -560,7 +530,7 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
             ),
             const SizedBox(height: 20), // 余白
             SizedBox(
-              width: double.infinity,
+              width: 185,
               child: Text(
               '$count', // 回数を表示
                 textAlign: TextAlign.center,

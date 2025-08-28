@@ -28,20 +28,22 @@ void main() async {
   runApp(const PushApp()); // アプリのエントリーポイント。PushAppウィジェットを起動
 }
 
-class AlertDialogSample extends StatelessWidget { // 日付選択時に表示するダイアログ
+class AlertDialogSample extends StatelessWidget {
+  // 日付選択時に表示するダイアログ
   const AlertDialogSample(this.selectedDay); // コンストラクタ
   final DateTime selectedDay; // 選択された日付
 
   @override
-  Widget build(BuildContext context) { // ダイアログのUIを構築
+  Widget build(BuildContext context) {
+    // ダイアログのUIを構築
     int count;
-      try {
-        final key = DateFormat('yyyy-MM-dd').format(selectedDay); // 日付をキーに変換
-        final infoData = box.get(key); // Hiveからデータ取得
-        count = infoData?.count ?? 0; // データがなければ0
-      } catch (e) {
-        count = 0;
-      }
+    try {
+      final key = DateFormat('yyyy-MM-dd').format(selectedDay); // 日付をキーに変換
+      final infoData = box.get(key); // Hiveからデータ取得
+      count = infoData?.count ?? 0; // データがなければ0
+    } catch (e) {
+      count = 0;
+    }
     return AlertDialog(
       backgroundColor: const Color(0xFFD5FF5F), // ダイアログの背景色
       title: Text(
@@ -129,11 +131,13 @@ class AlertDialogSample extends StatelessWidget { // 日付選択時に表示す
   }
 }
 
-class PushApp extends StatelessWidget { // アプリ全体のウィジェット（Stateless: 状態を持たない）
+class PushApp extends StatelessWidget {
+  // アプリ全体のウィジェット（Stateless: 状態を持たない）
   const PushApp({super.key}); // コンストラクタ（keyはウィジェットの識別用）
 
   @override
-  Widget build(BuildContext context) { // アプリのUI構築
+  Widget build(BuildContext context) {
+    // アプリのUI構築
     return const MaterialApp(
       title: '腕立てカウンター', // アプリのタイトル
       home: Calendar(), // メイン画面としてCalendarウィジェットを表示
@@ -141,14 +145,16 @@ class PushApp extends StatelessWidget { // アプリ全体のウィジェット�
   }
 }
 
-class Calendar extends StatefulWidget { // カレンダー画面（状態を持つ）
+class Calendar extends StatefulWidget {
+  // カレンダー画面（状態を持つ）
   const Calendar({super.key}); // コンストラクタ
 
   @override
   State<Calendar> createState() => _CalendarState(); // 状態管理クラスを生成
 }
 
-class _CalendarState extends State<Calendar> { // Calendar画面の状態管理クラス
+class _CalendarState extends State<Calendar> {
+  // Calendar画面の状態管理クラス
   DateTime _focusedDay = DateTime.now(); // 現在フォーカスされている日付
   DateTime? _selectedDay; // 選択された日付（未選択ならnull）
 
@@ -157,36 +163,41 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
   TextEditingController _controller = TextEditingController(); // 目標回数編集用コントローラー
 
   @override
-  void dispose() { // ウィジェット破棄時の処理
+  void dispose() {
+    // ウィジェット破棄時の処理
     _controller.dispose(); // コントローラーの破棄
     super.dispose();
   }
 
-  void _startEditing() { // 編集モード開始
+  void _startEditing() {
+    // 編集モード開始
     setState(() {
       _isEditing = true; // 編集モードON
       _controller.text = _goalCount.toString(); // 現在の目標回数をテキストフィールドにセット
     });
   }
 
-  void _submitEditing() { // 編集内容を確定
+  void _submitEditing() {
+    // 編集内容を確定
     final input = _controller.text; // 入力値取得
     final parsed = int.tryParse(input); // 整数に変換
-    if (parsed != null && parsed > 0) { // 正の整数なら
+    if (parsed != null && parsed > 0) {
+      // 正の整数なら
       setState(() {
         _goalCount = parsed; // 目標回数を更新
         _isEditing = false; // 編集モードOFF
       });
     } else {
       // 無効な入力の場合、アラート表示（SnackBar）
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('正の整数を入力してください')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('正の整数を入力してください')));
     }
   }
 
   @override
-  Widget build(BuildContext context) { // 画面のUI構築
+  Widget build(BuildContext context) {
+    // 画面のUI構築
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 150, // AppBarの高さ
@@ -194,42 +205,58 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
         titleSpacing: 0, // タイトルの余白
         title: Padding(
           padding: const EdgeInsets.only(left: 30), // 左に余白追加
-          child:Align(
+          child: Align(
             alignment: Alignment.centerLeft, // 左寄せ
-            child: _isEditing // 編集モードかどうかで表示切替
-              ? SizedBox(
-                width: 200,
-                child: TextField(
-                  controller: _controller, // 入力コントローラー
-                  autofocus: true, // 自動フォーカス
-                  keyboardType: TextInputType.number, // 数値入力
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold), // テキストスタイル
-                  decoration: InputDecoration(
-                    hintText: 'Enter target reps', // ヒント
-                    hintStyle: TextStyle(color: Colors.white54), // ヒントの色
-                    border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)), // 下線
-                    focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)), // フォーカス時の下線
-                    isDense: true, // コンパクト表示
-                    contentPadding: EdgeInsets.symmetric(vertical: 8), // パディング
+            child:
+                _isEditing // 編集モードかどうかで表示切替
+                ? SizedBox(
+                    width: 200,
+                    child: TextField(
+                      controller: _controller, // 入力コントローラー
+                      autofocus: true, // 自動フォーカス
+                      keyboardType: TextInputType.number, // 数値入力
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ), // テキストスタイル
+                      decoration: InputDecoration(
+                        hintText: 'Enter target reps', // ヒント
+                        hintStyle: TextStyle(color: Colors.white54), // ヒントの色
+                        border: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ), // 下線
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ), // フォーカス時の下線
+                        isDense: true, // コンパクト表示
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: 8,
+                        ), // パディング
+                      ),
+                      onSubmitted: (_) => _submitEditing(), // Enterで確定
+                    ),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start, // 左寄せ
+                    children: [
+                      Text(
+                        'Target number of reps', // 目標回数ラベル
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8), // 余白
+                      Text(
+                        '$_goalCount reps', // 目標回数表示
+                        style: TextStyle(color: Colors.white70, fontSize: 20),
+                      ),
+                    ],
                   ),
-                  onSubmitted: (_) => _submitEditing(), // Enterで確定
-                ),
-              )
-              : Column(
-                crossAxisAlignment: CrossAxisAlignment.start, // 左寄せ
-                children: [
-                  Text(
-                    'Target number of reps', // 目標回数ラベル
-                    style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8), // 余白
-                  Text(
-                    '$_goalCount reps', // 目標回数表示
-                    style: TextStyle(color: Colors.white70, fontSize: 20),
-                  ),
-                ],
-              ),
-        ),),
+          ),
+        ),
         actions: [
           _isEditing // 編集モードかどうかでボタン切替
               ? IconButton(
@@ -244,12 +271,17 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
       ),
 
       body: Stack(
-        children: [ // 背景色を置く
+        children: [
+          // 背景色を置く
           Container(
             color: Colors.black, // 背景色
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0), // 画面の余白を設定        
+            padding: const EdgeInsets.only(
+              bottom: 16.0,
+              left: 16.0,
+              right: 16.0,
+            ), // 画面の余白を設定
             child: Column(
               children: [
                 SizedBox(height: 50), // 余白
@@ -259,12 +291,13 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                   focusedDay: _focusedDay, // 現在フォーカスされている日付
                   selectedDayPredicate: (day) =>
                       isSameDay(_selectedDay, day), // 選択判定
-                  onDaySelected: (selectedDay, focusedDay) { // 日付選択時の処理
+                  onDaySelected: (selectedDay, focusedDay) {
+                    // 日付選択時の処理
                     showDialog<void>(
                       context: context,
                       builder: (_) {
                         return AlertDialogSample(selectedDay); // ダイアログ表示
-                      }
+                      },
                     );
                     setState(() {
                       _selectedDay = selectedDay; // 選択日を更新
@@ -272,45 +305,84 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                     });
                   },
                   calendarStyle: CalendarStyle(
-                    defaultTextStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),  // 通常の日付の文字色
-                    weekendTextStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w700), // 土日の文字色
-                    selectedDecoration: BoxDecoration(),  // 選択日の装飾（未設定）
+                    defaultTextStyle: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ), // 通常の日付の文字色
+                    weekendTextStyle: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ), // 土日の文字色
+                    selectedDecoration: BoxDecoration(), // 選択日の装飾（未設定）
                     todayDecoration: BoxDecoration(
-                      color:Color.fromARGB(134, 212, 255, 95), // 今日の背景色
+                      color: Color.fromARGB(134, 212, 255, 95), // 今日の背景色
                       shape: BoxShape.circle, // 今日の形状
                     ),
-                    todayTextStyle: TextStyle(color: const Color.fromARGB(255, 212, 255, 95),fontWeight: FontWeight.w700), // 今日の日付の文字色
+                    todayTextStyle: TextStyle(
+                      color: const Color.fromARGB(255, 212, 255, 95),
+                      fontWeight: FontWeight.w700,
+                    ), // 今日の日付の文字色
                   ),
                   headerStyle: HeaderStyle(
                     formatButtonVisible: false, // フォーマット切替ボタン非表示
                     titleCentered: true, // 月タイトル中央揃え
-                        titleTextStyle: TextStyle(color: Colors.white, fontSize: 20,fontWeight: FontWeight.w700), // 月タイトル
-                        leftChevronIcon: Icon(Icons.chevron_left, color: Colors.white), // 左矢印
-                        rightChevronIcon: Icon(Icons.chevron_right, color: Colors.white), // 右矢印
-                        ),
+                    titleTextStyle: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                    ), // 月タイトル
+                    leftChevronIcon: Icon(
+                      Icons.chevron_left,
+                      color: Colors.white,
+                    ), // 左矢印
+                    rightChevronIcon: Icon(
+                      Icons.chevron_right,
+                      color: Colors.white,
+                    ), // 右矢印
+                  ),
                   daysOfWeekStyle: const DaysOfWeekStyle(
-                    weekdayStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w700), // 平日
-                    weekendStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w700), // 土日
+                    weekdayStyle: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ), // 平日
+                    weekendStyle: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ), // 土日
                   ),
                 ),
                 const SizedBox(height: 100), // 余白
-                ElevatedButton( // ボタンウィジェット
-                  onPressed: () { // ボタン押下時の処理
+                ElevatedButton(
+                  // ボタンウィジェット
+                  onPressed: () {
+                    // ボタン押下時の処理
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const PushUpCounterScreen(), // PushUpCounterScreenへ遷移
+                        builder: (context) =>
+                            const PushUpCounterScreen(), // PushUpCounterScreenへ遷移
                       ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(202, 212, 255, 95), // ボタンの背景色
-                    padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15), // ボタンの内側の余白
+                    backgroundColor: const Color.fromARGB(
+                      202,
+                      212,
+                      255,
+                      95,
+                    ), // ボタンの背景色
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 100,
+                      vertical: 15,
+                    ), // ボタンの内側の余白
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50), // ボタンの角を丸くする
                     ),
                   ),
-                  child: const Text('Start',style: TextStyle(fontSize: 30.0, color: Colors.black),), // ボタンのラベル
+                  child: const Text(
+                    'Start',
+                    style: TextStyle(fontSize: 30.0, color: Colors.black),
+                  ), // ボタンのラベル
                 ),
               ],
             ),
@@ -321,42 +393,52 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
   }
 }
 
-class PushUpCounterScreen extends StatefulWidget { // 腕立てカウンター画面（状態を持つ）
+class PushUpCounterScreen extends StatefulWidget {
+  // 腕立てカウンター画面（状態を持つ）
   const PushUpCounterScreen({super.key}); // コンストラクタ
 
   @override
   State<PushUpCounterScreen> createState() => _PushUpCounterScreenState(); // 状態管理クラスを生成
 }
 
-class _PushUpCounterScreenState extends State<PushUpCounterScreen> { // 状態管理クラス
+class _PushUpCounterScreenState extends State<PushUpCounterScreen> {
+  // 状態管理クラス
   int _pushUpCount = 0; // 腕立ての回数を保持する変数
   bool _isNear = false; // 近接センサーが近いかどうかを保持
   late Stream<bool> _proximityStream; // 近接センサーの状態を監視するストリーム
 
   @override
-  void initState() { // 初期化処理
+  void initState() {
+    // 初期化処理
     super.initState();
     _startListening(); // 近接センサーの監視を開始
   }
 
-  void debugyou() { // デバッグ用ボタン（腕立て回数を増やす）
-    setState((){
+  void debugyou() {
+    // デバッグ用ボタン（腕立て回数を増やす）
+    setState(() {
       _pushUpCount++; // 回数を増やす
     });
-    if (_pushUpCount == 2) { // 2回目で画面遷移
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ResultScreen(_pushUpCount)), // 結果画面へ遷移
-          );
-        }
+    if (_pushUpCount == 2) {
+      // 2回目で画面遷移
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultScreen(_pushUpCount),
+        ), // 結果画面へ遷移
+      );
+    }
   }
 
-  void _startListening() { // 近接センサーの監視開始
+  void _startListening() {
+    // 近接センサーの監視開始
     _proximityStream = ProximitySensor.events.map(
       (event) => event > 0, // センサー値が0より大きければtrue
     );
-    _proximityStream.listen((isNear) { // センサーの状態変化を監視
-      if (isNear && !_isNear) { // 近づいた瞬間のみカウントアップ
+    _proximityStream.listen((isNear) {
+      // センサーの状態変化を監視
+      if (isNear && !_isNear) {
+        // 近づいた瞬間のみカウントアップ
         setState(() {
           _pushUpCount++; // 腕立て回数を増やす
         });
@@ -366,7 +448,8 @@ class _PushUpCounterScreenState extends State<PushUpCounterScreen> { // 状態�
   }
 
   @override
-  Widget build(BuildContext context) { // 画面のUI構築
+  Widget build(BuildContext context) {
+    // 画面のUI構築
     return Scaffold(
       backgroundColor: Colors.black, // 背景色を黒に設定
       body: Center(
@@ -381,7 +464,7 @@ class _PushUpCounterScreenState extends State<PushUpCounterScreen> { // 状態�
             SizedBox(
               width: 185,
               child: Text(
-              '$_pushUpCount', // 腕立て回数を表示
+                '$_pushUpCount', // 腕立て回数を表示
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: const Color(0xFFD5FF5F), // メインテーマ色
@@ -408,7 +491,7 @@ class _PushUpCounterScreenState extends State<PushUpCounterScreen> { // 状態�
             ),
             ElevatedButton(
               onPressed: debugyou, // デバッグ用ボタン
-              child: Text('debug') // ボタンラベル
+              child: Text('debug'), // ボタンラベル
             ),
           ],
         ),
@@ -417,7 +500,8 @@ class _PushUpCounterScreenState extends State<PushUpCounterScreen> { // 状態�
   }
 }
 
-class ResultScreen extends StatefulWidget { // 結果画面（状態を持つ）
+class ResultScreen extends StatefulWidget {
+  // 結果画面（状態を持つ）
   ResultScreen(this.count); // コンストラクタ
   int count; // 腕立て回数
 
@@ -425,12 +509,16 @@ class ResultScreen extends StatefulWidget { // 結果画面（状態を持つ）
   State<ResultScreen> createState() => _ResultScreenState(count); // 状態管理クラスを生成
 }
 
-class _ResultScreenState extends State<ResultScreen> { // 状態管理クラス
+class _ResultScreenState extends State<ResultScreen> {
+  // 状態管理クラス
   _ResultScreenState(this.count); // コンストラクタ
   int count; // 腕立て回数
 
-  Future<void> setdata() async { // データ保存処理
-    final String dateKey = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 今日の日付だけをキーにする
+  Future<void> setdata() async {
+    // データ保存処理
+    final String dateKey = DateFormat(
+      'yyyy-MM-dd',
+    ).format(DateTime.now()); // 今日の日付だけをキーにする
 
     info test = info('腕立て伏せ', count); // 保存するデータを作成
     box.put(dateKey, test); // Hiveに保存
@@ -438,17 +526,16 @@ class _ResultScreenState extends State<ResultScreen> { // 状態管理クラス
   }
 
   @override
-  Widget build(BuildContext context) { // 画面のUI構築
+  Widget build(BuildContext context) {
+    // 画面のUI構築
     return Scaffold(
       backgroundColor: const Color(0xFFD5FF5F), // 背景色
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center, // 中央揃え
           children: [
-            Icon(Icons.task_alt, size: 100, color: Colors.black,), // 完了アイコン
-            SizedBox(
-              height: 20,
-            ),
+            Icon(Icons.task_alt, size: 100, color: Colors.black), // 完了アイコン
+            SizedBox(height: 20),
             const Text(
               "Finish!", // 完了メッセージ
               style: TextStyle(fontSize: 32, color: Colors.black), // 文字サイズと色
@@ -457,21 +544,29 @@ class _ResultScreenState extends State<ResultScreen> { // 状態管理クラス
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black, // ボタンの背景色
-                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20), // ボタンの内側の余白
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 50,
+                  vertical: 20,
+                ), // ボタンの内側の余白
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30), // ボタンの角を丸くする
                 ),
               ),
-              onPressed: () { // ボタン押下時の処理
+              onPressed: () {
+                // ボタン押下時の処理
                 setdata(); // データ保存
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => Calendar()), // カレンダー画面へ戻る
+                  MaterialPageRoute(
+                    builder: (context) => Calendar(),
+                  ), // カレンダー画面へ戻る
                   (Route<dynamic> route) => false, // 履歴を全て消す
                 );
               },
-              child: 
-              const Text('Back to Calendar',style: TextStyle(fontSize: 20.0,color: Colors.white),), // ボタンのラベル
+              child: const Text(
+                'Back to Calendar',
+                style: TextStyle(fontSize: 20.0, color: Colors.white),
+              ), // ボタンのラベル
             ),
           ],
         ),
@@ -479,3 +574,5 @@ class _ResultScreenState extends State<ResultScreen> { // 状態管理クラス
     );
   }
 }
+
+//push

@@ -87,7 +87,7 @@ class AlertDialogSample extends StatelessWidget { // 日付選択時に表示す
                 left: 20,
                 top: 47,
                 child: Text(
-                  'Push-up：$pushupcount回\nSit-up　　　：$situpcount回', // サンプルデータ（本来は保存データを表示する）
+                  'Push-up：$pushupcount回\nSit-up    ：$situpcount回', // サンプルデータ（本来は保存データを表示する）
                   style: TextStyle(
                     color: const Color(0xFF14151A), // 文字色
                     fontSize: 20, // 文字サイズ

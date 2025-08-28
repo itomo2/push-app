@@ -539,19 +539,16 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
 
   @override
   Widget build(BuildContext context) { // 画面のUI構築
-    try {
-      final key = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 日付をキーに変換
-      final infoData = box.get(key); // Hiveからデータ取得
-      if( subject == "pushup"){
-        count = infoData?.pushupcount ?? 0;
-        goalcount = box.get("pushUpGoalCount");
-      }else{
-        count = infoData?.situpcount ?? 0; // データがなければ0
-        goalcount = box.get("sitUpGoalCount");
-      }
-    } catch (e) {
-      count = 0;
-    }
+    final key = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 日付をキーに変換
+    final infoData = box.get(key); // Hiveからデータ取得
+
+    // カウント取得（subjectによって分岐）
+    count = (subject == "pushup")
+        ? (infoData?.pushupcount ?? 0)
+        : (infoData?.situpcount ?? 0);
+
+    // 目標回数取得（subjectによって分岐、なければ20）
+    goalcount = box.get(subject == "pushup" ? "pushUpGoalCount" : "sitUpGoalCount") ?? 20;
 
     return Scaffold(
       backgroundColor: Colors.black, // 背景色を黒に設定

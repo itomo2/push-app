@@ -279,6 +279,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                       color:Color.fromARGB(134, 212, 255, 95), // 今日の背景色
                       shape: BoxShape.circle, // 今日の形状
                     ),
+                    todayTextStyle: TextStyle(color: const Color.fromARGB(255, 212, 255, 95),fontWeight: FontWeight.w700), // 今日の日付の文字色
                   ),
                   headerStyle: HeaderStyle(
                     formatButtonVisible: false, // フォーマット切替ボタン非表示
@@ -303,7 +304,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD5FF5F), // ボタンの背景色
+                    backgroundColor: const Color.fromARGB(202, 212, 255, 95), // ボタンの背景色
                     padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15), // ボタンの内側の余白
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50), // ボタンの角を丸くする

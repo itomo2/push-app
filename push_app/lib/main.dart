@@ -152,30 +152,61 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
   DateTime _focusedDay = DateTime.now(); // 現在フォーカスされている日付
   DateTime? _selectedDay; // 選択された日付（未選択ならnull）
 
-  int _goalCount = 20; // 初期目標回数
-  bool _isEditing = false; // 編集モードかどうか
-  TextEditingController _controller = TextEditingController(); // 目標回数編集用コントローラー
+  int _pushUpGoalCount = box.get('pushUpGoalCount', defaultValue: 20); // 腕立て伏せの目標回数
+  int _sitUpGoalCount = box.get('sitUpGoalCount', defaultValue: 20);  // 腹筋の目標回数
 
+  bool _isPushUpEditing = false; // 腕立て伏せ編集モード
+  bool _isSitUpEditing = false;  // 腹筋編集モード
+
+  TextEditingController _pushUpController = TextEditingController(); // 腕立て伏せ編集用コントローラー
+  TextEditingController _sitUpController = TextEditingController();  // 腹筋編集用コントローラー
+    
   @override
   void dispose() { // ウィジェット破棄時の処理
-    _controller.dispose(); // コントローラーの破棄
+    _pushUpController.dispose(); // コントローラーの破棄
+    _sitUpController.dispose();  // コントローラーの破棄
     super.dispose();
   }
 
-  void _startEditing() { // 編集モード開始
+  void _startPushUpEditing() { // 編集モード開始
     setState(() {
-      _isEditing = true; // 編集モードON
-      _controller.text = _goalCount.toString(); // 現在の目標回数をテキストフィールドにセット
+      _isPushUpEditing = true; // 編集モードON
+      _pushUpController.text = _pushUpGoalCount.toString(); // 現在の目標回数をテキストフィールドにセット
     });
   }
 
-  void _submitEditing() { // 編集内容を確定
-    final input = _controller.text; // 入力値取得
+  void _startSitUpEditing() { // 編集モード開始
+    setState(() {
+      _isSitUpEditing = true; // 編集モードON
+      _sitUpController.text = _sitUpGoalCount.toString(); // 現在の目標回数をテキストフィールドにセット
+    });
+  }
+
+  void _submitPushUpEditing() { // 編集内容を確定
+    final input = _pushUpController.text; // 入力値取得
     final parsed = int.tryParse(input); // 整数に変換
     if (parsed != null && parsed > 0) { // 正の整数なら
       setState(() {
-        _goalCount = parsed; // 目標回数を更新
-        _isEditing = false; // 編集モードOFF
+        _pushUpGoalCount = parsed; // 目標回数を更新
+        box.put('pushUpGoalCount', parsed);
+        _isPushUpEditing = false; // 編集モードOFF
+      });
+    } else {
+      // 無効な入力の場合、アラート表示（SnackBar）
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('正の整数を入力してください')),
+      );
+    }
+  }
+
+  void _submitSitUpEditing() { // 編集内容を確定
+    final input = _sitUpController.text; // 入力値取得
+    final parsed = int.tryParse(input); // 整数に変換
+    if (parsed != null && parsed > 0) { // 正の整数なら
+      setState(() {
+        _sitUpGoalCount = parsed; // 目標回数を更新
+        box.put('sitUpGoalCount', parsed);
+        _isSitUpEditing = false; // 編集モードOFF
       });
     } else {
       // 無効な入力の場合、アラート表示（SnackBar）
@@ -196,51 +227,86 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
           padding: const EdgeInsets.only(left: 30), // 左に余白追加
           child:Align(
             alignment: Alignment.centerLeft, // 左寄せ
-            child: _isEditing // 編集モードかどうかで表示切替
-              ? SizedBox(
-                width: 200,
-                child: TextField(
-                  controller: _controller, // 入力コントローラー
-                  autofocus: true, // 自動フォーカス
-                  keyboardType: TextInputType.number, // 数値入力
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold), // テキストスタイル
-                  decoration: InputDecoration(
-                    hintText: 'Enter target reps', // ヒント
-                    hintStyle: TextStyle(color: Colors.white54), // ヒントの色
-                    border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)), // 下線
-                    focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)), // フォーカス時の下線
-                    isDense: true, // コンパクト表示
-                    contentPadding: EdgeInsets.symmetric(vertical: 8), // パディング
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start, // 左寄せ
+              children: [
+                Text(
+                  'Target number of reps', // 目標回数ラベル
+                  style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
+                ),    
+                _isPushUpEditing // 編集モードかどうかで表示切替
+                ? Row(children: [
+                  SizedBox(
+                    width: 60,
+                    child: 
+                    TextField(
+                      controller: _pushUpController, // 入力コントローラー
+                      autofocus: true, // 自動フォーカス
+                      keyboardType: TextInputType.number, // 数値入力
+                      style: TextStyle(color: Colors.white70, fontSize: 20, fontWeight: FontWeight.bold), // テキストスタイル
+                      decoration: InputDecoration(
+                        border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // 下線
+                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // フォーカス時の下線
+                        isDense: true, // コンパクト表示
+                        contentPadding: EdgeInsets.symmetric(vertical: 8), // パディング
+                      ),
+                      onSubmitted: (_) => _submitPushUpEditing(), // Enterで確定
+                    ),
                   ),
-                  onSubmitted: (_) => _submitEditing(), // Enterで確定
-                ),
-              )
-              : Column(
-                crossAxisAlignment: CrossAxisAlignment.start, // 左寄せ
-                children: [
-                  Text(
-                    'Target number of reps', // 目標回数ラベル
-                    style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
+                  Text('reps', style: TextStyle(color: Colors.white70, fontSize: 20),),
+                  IconButton(
+                    icon: Icon(Icons.check, color: Colors.white), // 確定ボタン
+                    onPressed: _submitPushUpEditing, // 確定処理
                   ),
-                  SizedBox(height: 8), // 余白
+                ])
+                : Row(children: [
                   Text(
-                    '$_goalCount reps', // 目標回数表示
+                    '$_pushUpGoalCount reps', // 目標回数表示
                     style: TextStyle(color: Colors.white70, fontSize: 20),
                   ),
-                ],
-              ),
-        ),),
-        actions: [
-          _isEditing // 編集モードかどうかでボタン切替
-              ? IconButton(
-                  icon: Icon(Icons.check, color: Colors.white), // 確定ボタン
-                  onPressed: _submitEditing, // 確定処理
-                )
-              : IconButton(
-                  icon: Icon(Icons.edit, color: Colors.white), // 編集ボタン
-                  onPressed: _startEditing, // 編集開始
-                ),
-        ],
+                  IconButton(
+                    icon: Icon(Icons.edit, color: Colors.white), // 編集ボタン
+                    onPressed: _startPushUpEditing, // 編集開始
+                  ),
+                ],),
+                _isSitUpEditing // 編集モードかどうかで表示切替
+                ? Row(children: [
+                  SizedBox(
+                    width: 60,
+                      child: TextField(
+                      controller: _sitUpController, // 入力コントローラー
+                      autofocus: true, // 自動フォーカス
+                      keyboardType: TextInputType.number, // 数値入力
+                      style: TextStyle(color: Colors.white70, fontSize: 20, fontWeight: FontWeight.bold), // テキストスタイル
+                      decoration: InputDecoration(
+                        border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // 下線
+                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // フォーカス時の下線
+                        isDense: true, // コンパクト表示
+                        contentPadding: EdgeInsets.symmetric(vertical: 8), // パディング
+                      ),
+                      onSubmitted: (_) => _submitSitUpEditing(), // Enterで確定
+                    ),
+                  ),
+                  Text('reps', style: TextStyle(color: Colors.white70, fontSize: 20),),
+                  IconButton(
+                    icon: Icon(Icons.check, color: Colors.white), // 確定ボタン
+                    onPressed: _submitSitUpEditing, // 確定処理
+                  ),
+                ])
+                : Row(children: [
+                  Text(
+                    '$_sitUpGoalCount reps', // 目標回数表示
+                    style: TextStyle(color: Colors.white70, fontSize: 20),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.edit, color: Colors.white), // 編集ボタン
+                    onPressed: _startSitUpEditing, // 編集開始
+                  ),
+                ],)
+              ]
+            ),
+          ),
+        ),
       ),
 
       body: Stack(

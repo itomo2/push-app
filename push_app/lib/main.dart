@@ -87,7 +87,7 @@ class AlertDialogSample extends StatelessWidget { // 日付選択時に表示す
                 left: 20,
                 top: 47,
                 child: Text(
-                  '腕立て伏せ：$pushupcount回\n腹筋　　　：$situpcount回', // サンプルデータ（本来は保存データを表示する）
+                  'Push-up：$pushupcount回\nSit-up　　　：$situpcount回', // サンプルデータ（本来は保存データを表示する）
                   style: TextStyle(
                     color: const Color(0xFF14151A), // 文字色
                     fontSize: 20, // 文字サイズ
@@ -96,37 +96,9 @@ class AlertDialogSample extends StatelessWidget { // 日付選択時に表示す
                   ),
                 ),
               ),
-              // Positioned(
-              //   left: 40,
-              //   top: 33,
-              //   child: SizedBox(
-              //     width: 239,
-              //     height: 61,
-              //     child: Text(
-              //       '2025.6.16',
-              //       style: TextStyle(
-              //         color: const Color(0xFF14151A),
-              //         fontSize: 32,
-              //         fontFamily: 'Inter',
-              //         fontWeight: FontWeight.w600,
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
         ),
-        // Column(
-        //   crossAxisAlignment: CrossAxisAlignment.center,
-        //   children: <Widget>[
-        //     TextButton(
-        //       child: Text('Back'),
-        //       onPressed: () {
-        //         Navigator.pop(context);
-        //       },
-        //     ),
-        //   ]
-        // )
       ],
     );
   }
@@ -138,7 +110,7 @@ class PushApp extends StatelessWidget { // アプリ全体のウィジェット�
   @override
   Widget build(BuildContext context) { // アプリのUI構築
     return const MaterialApp(
-      title: '腕立てカウンター', // アプリのタイトル
+      title: 'PushApp', // アプリのタイトル
       home: Calendar(), // メイン画面としてCalendarウィジェットを表示
     );
   }
@@ -242,6 +214,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 ),    
                 _isPushUpEditing // 編集モードかどうかで表示切替
                 ? Row(children: [
+                  Text("Push-up:  ", style: TextStyle(color: Colors.white70, fontSize: 20),),
                   SizedBox(
                     width: 60,
                     child: 
@@ -249,7 +222,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                       controller: _pushUpController, // 入力コントローラー
                       autofocus: true, // 自動フォーカス
                       keyboardType: TextInputType.number, // 数値入力
-                      style: TextStyle(color: Colors.white70, fontSize: 20, fontWeight: FontWeight.bold), // テキストスタイル
+                      style: TextStyle(color: Colors.white70, fontSize: 20,), // テキストスタイル
                       decoration: InputDecoration(
                         border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // 下線
                         focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // フォーカス時の下線
@@ -267,7 +240,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 ])
                 : Row(children: [
                   Text(
-                    '$_pushUpGoalCount reps', // 目標回数表示
+                    'Push-up:  $_pushUpGoalCount reps', // 目標回数表示
                     style: TextStyle(color: Colors.white70, fontSize: 20),
                   ),
                   IconButton(
@@ -277,13 +250,14 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 ],),
                 _isSitUpEditing // 編集モードかどうかで表示切替
                 ? Row(children: [
+                  Text('Sit-up:  ', style: TextStyle(color: Colors.white70, fontSize: 20),),
                   SizedBox(
                     width: 60,
                       child: TextField(
                       controller: _sitUpController, // 入力コントローラー
                       autofocus: true, // 自動フォーカス
                       keyboardType: TextInputType.number, // 数値入力
-                      style: TextStyle(color: Colors.white70, fontSize: 20, fontWeight: FontWeight.bold), // テキストスタイル
+                      style: TextStyle(color: Colors.white70, fontSize: 20,), // テキストスタイル
                       decoration: InputDecoration(
                         border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // 下線
                         focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // フォーカス時の下線
@@ -301,7 +275,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 ])
                 : Row(children: [
                   Text(
-                    '$_sitUpGoalCount reps', // 目標回数表示
+                    'Sit-up:  $_sitUpGoalCount reps', // 目標回数表示
                     style: TextStyle(color: Colors.white70, fontSize: 20),
                   ),
                   IconButton(
@@ -539,19 +513,16 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
 
   @override
   Widget build(BuildContext context) { // 画面のUI構築
-    try {
-      final key = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 日付をキーに変換
-      final infoData = box.get(key); // Hiveからデータ取得
-      if( subject == "pushup"){
-        count = infoData?.pushupcount ?? 0;
-        goalcount = box.get("pushUpGoalCount");
-      }else{
-        count = infoData?.situpcount ?? 0; // データがなければ0
-        goalcount = box.get("sitUpGoalCount");
-      }
-    } catch (e) {
-      count = 0;
-    }
+    final key = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 日付をキーに変換
+    final infoData = box.get(key); // Hiveからデータ取得
+
+    // カウント取得（subjectによって分岐）
+    count = (subject == "pushup")
+        ? (infoData?.pushupcount ?? 0)
+        : (infoData?.situpcount ?? 0);
+
+    // 目標回数取得（subjectによって分岐、なければ20）
+    goalcount = box.get(subject == "pushup" ? "pushUpGoalCount" : "sitUpGoalCount") ?? 20;
 
     return Scaffold(
       backgroundColor: Colors.black, // 背景色を黒に設定

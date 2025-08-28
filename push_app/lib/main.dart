@@ -275,12 +275,10 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                       controller: _sitUpController, // 入力コントローラー
                       autofocus: true, // 自動フォーカス
                       keyboardType: TextInputType.number, // 数値入力
-                      style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold), // テキストスタイル
+                      style: TextStyle(color: Colors.white70, fontSize: 20, fontWeight: FontWeight.bold), // テキストスタイル
                       decoration: InputDecoration(
-                        hintText: 'Enter target reps', // ヒント
-                        hintStyle: TextStyle(color: Colors.white54), // ヒントの色
-                        border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)), // 下線
-                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)), // フォーカス時の下線
+                        border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // 下線
+                        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)), // フォーカス時の下線
                         isDense: true, // コンパクト表示
                         contentPadding: EdgeInsets.symmetric(vertical: 8), // パディング
                       ),
@@ -295,7 +293,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
                 ])
                 : Row(children: [
                   Text(
-                    '$_pushUpGoalCount reps', // 目標回数表示
+                    '$_sitUpGoalCount reps', // 目標回数表示
                     style: TextStyle(color: Colors.white70, fontSize: 20),
                   ),
                   IconButton(

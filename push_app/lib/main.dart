@@ -22,7 +22,8 @@ class info {
 }
 
 late Box box; // HiveのBox（データ保存領域）をグローバル変数として宣言
-late List<dynamic> highlightDays = [];
+late List<dynamic> highlightDays = [
+];
 
 void main() async {
   // Hive初期化 & info型の保存を可能にする

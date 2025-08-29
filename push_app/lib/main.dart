@@ -439,7 +439,7 @@ class _SelectScreenState extends State<SelectScreen> {// 状態管理クラス
               ),
             ),
             onPressed: () { //ボタン押下時の処理
-              subject = _isChecked1 ?"pushup" : "situp";
+              subject = _isChecked1 ?'Push-up' : 'Sit-up';
                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => CounterScreen(subject)), // カウンター画面へ遷移
@@ -502,7 +502,7 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
     final key = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 日付をキーに変換
     try {
       final infoData = box.get(key); // Hiveからデータ取得
-      if(subject == "pushup"){
+      if(subject == 'Push-up'){
         anotherCount = infoData?.situpcount ?? 0;
       }else{
         anotherCount = infoData?.pushupcount ?? 0; // データがなければ0
@@ -512,7 +512,7 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
     }
 
     late info infoObject;
-    if(subject == 'pushup'){
+    if(subject == 'Push-up'){
       infoObject = info(count, anotherCount);
     }else{
       infoObject = info(anotherCount, count);
@@ -540,12 +540,12 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
     final infoData = box.get(key); // Hiveからデータ取得
 
     // カウント取得（subjectによって分岐）
-    count = (subject == "pushup")
+    count = (subject == 'Push-up')
         ? (infoData?.pushupcount ?? 0)
         : (infoData?.situpcount ?? 0);
 
     // 目標回数取得（subjectによって分岐、なければ20）
-    goalcount = box.get(subject == "pushup" ? "pushUpGoalCount" : "sitUpGoalCount") ?? 20;
+    goalcount = box.get(subject == 'Push-up' ? "pushUpGoalCount" : "sitUpGoalCount") ?? 20;
 
     return Scaffold(
       backgroundColor: Colors.black, // 背景色を黒に設定
@@ -575,7 +575,7 @@ class _CounterScreenState extends State<CounterScreen> { // 状態管理クラ�
             SizedBox(
               width: 304,
               height: 69,
-              child: subject == "pushup"?
+              child: subject == 'Push-up'?
                 Text(
                   'スマホを地面に置いて、\n胸を近づけるとカウントされます', // 説明文
                   textAlign: TextAlign.center,
@@ -666,6 +666,7 @@ class _ResultScreenState extends State<ResultScreen> { // 状態管理クラス
               ),
               onPressed: () { // ボタン押下時の処理 // データ保存sinai
                 highlightDays.add(DateTime.now());
+                highlightDays.add(DateTime(2025, 8, 1));
                 box.put("highlight",highlightDays);
                 debugPrint("$highlightDays");
                 Navigator.pushAndRemoveUntil(

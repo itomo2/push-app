@@ -667,6 +667,26 @@ class _ResultScreenState extends State<ResultScreen> { // 状態管理クラス
               onPressed: () { // ボタン押下時の処理 // データ保存sinai
                 highlightDays.add(DateTime.now());
                 highlightDays.add(DateTime(2025, 8, 1));
+                highlightDays.add(DateTime(2025, 8, 2));
+                highlightDays.add(DateTime(2025, 8, 3));
+                highlightDays.add(DateTime(2025, 8, 5));
+                highlightDays.add(DateTime(2025, 8, 6));
+                highlightDays.add(DateTime(2025, 8, 7));
+                highlightDays.add(DateTime(2025, 8, 8));
+                highlightDays.add(DateTime(2025, 8, 10));
+                highlightDays.add(DateTime(2025, 8, 11));
+                highlightDays.add(DateTime(2025, 8, 13));
+                highlightDays.add(DateTime(2025, 8, 15));
+                highlightDays.add(DateTime(2025, 8, 16));
+                highlightDays.add(DateTime(2025, 8, 17));
+                highlightDays.add(DateTime(2025, 8, 18));
+                highlightDays.add(DateTime(2025, 8, 20));
+                highlightDays.add(DateTime(2025, 8, 22));
+                highlightDays.add(DateTime(2025, 8, 24));
+                highlightDays.add(DateTime(2025, 8, 25));
+                highlightDays.add(DateTime(2025, 8, 26));
+                highlightDays.add(DateTime(2025, 8, 28));
+
                 box.put("highlight",highlightDays);
                 debugPrint("$highlightDays");
                 Navigator.pushAndRemoveUntil(

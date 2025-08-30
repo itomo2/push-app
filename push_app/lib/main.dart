@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart'; // FlutterのUI部品を使うためのパッケージをインポート
+import 'package:intl/date_time_patterns.dart';
 import 'package:intl/intl.dart'; // 日付フォーマット用パッケージをインポート
 
 import 'package:proximity_sensor/proximity_sensor.dart'; // 近接センサーを使うためのパッケージをインポート
@@ -10,7 +11,7 @@ import 'package:hive_flutter/hive_flutter.dart'; // HiveのFlutter用パッケ�
 part 'main.g.dart'; // Hive Generator用（TypeAdapter自動生成ファイル）
 
 // infoクラス: 運動名(subject)と回数(count)を保持するデータモデル
-@HiveType(typeId: 0) // Hive用の型IDを指定
+@HiveType(typeId: 0) // Hive用の型IDを指
 class info {
   @HiveField(0) // Hiveで保存するフィールド番号
   int pushupcount; // 運動名（例：腕立て伏せ）
@@ -21,6 +22,8 @@ class info {
 }
 
 late Box box; // HiveのBox（データ保存領域）をグローバル変数として宣言
+late List<dynamic> highlightDays = [];
+
 void main() async {
   // Hive初期化 & info型の保存を可能にする
   await Hive.initFlutter(); // Hiveの初期化（Flutter用）
@@ -112,6 +115,7 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
 
   TextEditingController _pushUpController = TextEditingController(); // 腕立て伏せ編集用コントローラー
   TextEditingController _sitUpController = TextEditingController();  // 腹筋編集用コントローラー
+
     
   @override
   void dispose() { // ウィジェット破棄時の処理
@@ -171,7 +175,8 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
   }
 
   @override
-  Widget build(BuildContext context) { // 画面のUI構築
+  Widget build(BuildContext context) {
+    highlightDays = box.get("highlight") ?? []; // 画面のUI構築
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -277,6 +282,21 @@ class _CalendarState extends State<Calendar> { // Calendar画面の状態管理�
               children: [
                 SizedBox(height: 50), // 余白
                 TableCalendar(
+                  calendarBuilders: CalendarBuilders(
+                    defaultBuilder: (context, day, focusedDay) {
+                      // 特定の日付リストに含まれていたら装飾変更
+                      if (highlightDays.any((d) => isSameDay(d, day))) {
+                        return Center(
+                          child: Icon(
+                            Icons.check,
+                            color: const Color.fromARGB(255, 212, 255, 95),
+                            size: 50,
+                          ),
+                        );
+                      }
+                      return null; // それ以外はデフォルト表示
+                    },
+                  ),
                   firstDay: DateTime.utc(2000, 1, 1), // カレンダーの開始日
                   lastDay: DateTime.utc(2200, 12, 31), // カレンダーの終了日
                   focusedDay: _focusedDay, // 現在フォーカスされている日付
@@ -644,6 +664,9 @@ class _ResultScreenState extends State<ResultScreen> { // 状態管理クラス
                 ),
               ),
               onPressed: () { // ボタン押下時の処理 // データ保存sinai
+                highlightDays.add(DateTime.now());
+                box.put("highlight",highlightDays);
+                debugPrint("$highlightDays");
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => Calendar()), // カレンダー画面へ戻る

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart'; // FlutterのUI部品を使うためのパッケージをインポート
 import 'package:intl/date_time_patterns.dart';
 import 'package:intl/intl.dart'; // 日付フォーマット用パッケージをインポート
+import 'package:flutter/cupertino.dart';
 
 import 'package:proximity_sensor/proximity_sensor.dart'; // 近接センサーを使うためのパッケージをインポート
 import 'package:table_calendar/table_calendar.dart'; // カレンダー表示用パッケージをインポート
@@ -526,6 +527,8 @@ class _SelectScreenState extends State<SelectScreen> {
   bool _isChecked1 = true; // 1つ目のチェック状
   bool _isChecked2 = false;
   late String subject;
+  final List<String> exercisestype = ["Count", "Timer"];
+  int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -535,15 +538,28 @@ class _SelectScreenState extends State<SelectScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center, // 中央揃え,
         children: [
-          const Text(
-            'Select Exercise', // タイトル表示
-            style: TextStyle(
-              fontSize: 32,
-              color: Colors.black,
-              fontWeight: FontWeight.w700,
-            ), // 文字サイズと色
+          SizedBox(
+            height: 200,
+            child: CupertinoPicker(
+              //iOS風の縦スクロールホイールを作るウィジェット
+              scrollController: FixedExtentScrollController(
+                initialItem: selectedIndex,
+              ),
+              itemExtent: 50,
+              onSelectedItemChanged: (index) {
+                setState(() {
+                  selectedIndex = index;
+                });
+              },
+              children: exercisestype
+                  .map(
+                    (exercise) => Center(
+                      child: Text(exercise, style: TextStyle(fontSize: 24)),
+                    ),
+                  )
+                  .toList(),
+            ),
           ),
-          const SizedBox(height: 40),
           Theme(
             data: Theme.of(context).copyWith(
               splashColor: const Color.fromARGB(19, 0, 0, 0), // チェックボックスの枠線の色

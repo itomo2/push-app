@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart'; // FlutterのUI部品を使うためのパッケージをインポート
-import 'package:intl/date_time_patterns.dart';
 import 'package:intl/intl.dart'; // 日付フォーマット用パッケージをインポート
 import 'package:flutter/cupertino.dart';
 
@@ -527,7 +526,7 @@ class _SelectScreenState extends State<SelectScreen> {
   bool _isChecked1 = true; // 1つ目のチェック状
   bool _isChecked2 = false;
   late String subject;
-  final List<String> exercisestype = ["Count", "Timer"];
+  final List<String> exercisestype = ["Counter", "Stopwatch"];
   int selectedIndex = 0;
 
   @override
@@ -610,7 +609,7 @@ class _SelectScreenState extends State<SelectScreen> {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CounterScreen(subject),
+                  builder: (context) => CounterScreen(subject, selectedIndex),
                 ), // カウンター画面へ遷移
                 (Route<dynamic> route) => false, // 履歴を全て消す
               );
@@ -628,27 +627,42 @@ class _SelectScreenState extends State<SelectScreen> {
 
 class CounterScreen extends StatefulWidget {
   // 腕立てカウンター画面（状態を持つ）
-  CounterScreen(this.subject);
+  CounterScreen(this.subject, this.selectedIndex);
   String subject; // コンストラクタ
+  int selectedIndex;
 
   @override
-  State<CounterScreen> createState() => _CounterScreenState(subject); // 状態管理クラスを生成
+  State<CounterScreen> createState() =>
+      _CounterScreenState(subject, selectedIndex); // 状態管理クラスを生成
 }
 
 class _CounterScreenState extends State<CounterScreen> {
   // 状態管理クラス
-  _CounterScreenState(this.subject);
+  _CounterScreenState(this.subject, this.selectedIndex);
   String subject;
+  int selectedIndex;
+
   late int count, goalcount;
 
   bool _isNear = false; // 近接センサーが近いかどうかを保持
   late Stream<bool> _proximityStream; // 近接センサーの状態を監視するストリーム
   late StreamSubscription<bool> _proximitySubscription; // 購読用変数
 
+  final Stopwatch _stopwatch = Stopwatch();
+  late Timer _timer;
+  String elapsedTime = "00:00";
+
   @override
   void initState() {
     super.initState();
     _startListening();
+
+    _stopwatch.start();
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        elapsedTime = _formatDuration(_stopwatch.elapsed);
+      });
+    });
   }
 
   void _startListening() {
@@ -668,6 +682,16 @@ class _CounterScreenState extends State<CounterScreen> {
   void dispose() {
     _proximitySubscription.cancel(); // センサー購読を停止
     super.dispose();
+    _proximitySubscription.cancel();
+    _timer.cancel();
+    _stopwatch.stop();
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    return "$minutes:$seconds";
   }
 
   Future<void> setdata() async {
@@ -724,77 +748,94 @@ class _CounterScreenState extends State<CounterScreen> {
               ), // 文字サイズと色
             ),
             const SizedBox(height: 20), // 余白
-            SizedBox(
-              width: double.infinity,
-              child: Text(
-                '$count', // 回数を表示
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: const Color(0xFFD5FF5F), // メインテーマ色
-                  fontSize: 128, // 文字サイズ
-                  fontFamily: 'Inter', // フォント
-                  fontWeight: FontWeight.w600, // 太字
-                ),
-              ),
-            ),
-            const SizedBox(height: 40), // 余白
-            SizedBox(
-              width: 304,
-              height: 69,
-              child: subject == 'Push-up'
-                  ? Text(
-                      'スマホを地面に置いて、\n胸を近づけるとカウントされます', // 説明文
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white, // 文字色
-                        fontSize: 14, // 文字サイズ
-                        fontFamily: 'Inter', // フォント
-                        fontWeight: FontWeight.w600, // 太字
-                      ),
-                    )
-                  : Text(
-                      'スマホを地面に置いて、\n背中を近づけるとカウントされます', // 説明文
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white, // 文字色
-                        fontSize: 14, // 文字サイズ
-                        fontFamily: 'Inter', // フォント
-                        fontWeight: FontWeight.w600, // 太字
-                      ),
-                    ),
-            ),
-            if (count >= goalcount)
-              ElevatedButton(
-                // ボタンウィジェット
-                onPressed: () {
-                  // ボタン押下時の処理
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ResultScreen(),
-                    ), // 結果画面へ遷移
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(
-                    255,
-                    212,
-                    255,
-                    95,
-                  ), // ボタンの背景色
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 100,
-                    vertical: 15,
-                  ), // ボタンの内側の余白
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50), // ボタンの角を丸くする
+            if (selectedIndex == 0) ...[
+              SizedBox(
+                width: double.infinity,
+                child: Text(
+                  '$count', // 回数を表示
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color(0xFFD5FF5F), // メインテーマ色
+                    fontSize: 128, // 文字サイズ
+                    fontFamily: 'Inter', // フォント
+                    fontWeight: FontWeight.w600, // 太字
                   ),
                 ),
-                child: const Text(
-                  'Finish',
-                  style: TextStyle(fontSize: 30.0, color: Colors.black),
-                ), // ボタンのラベル
               ),
+              const SizedBox(height: 40), // 余白
+              SizedBox(
+                width: 304,
+                height: 69,
+                child: subject == 'Push-up'
+                    ? Text(
+                        'スマホを地面に置いて、\n胸を近づけるとカウントされます', // 説明文
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white, // 文字色
+                          fontSize: 14, // 文字サイズ
+                          fontFamily: 'Inter', // フォント
+                          fontWeight: FontWeight.w600, // 太字
+                        ),
+                      )
+                    : Text(
+                        'スマホを地面に置いて、\n背中を近づけるとカウントされます', // 説明文
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white, // 文字色
+                          fontSize: 14, // 文字サイズ
+                          fontFamily: 'Inter', // フォント
+                          fontWeight: FontWeight.w600, // 太字
+                        ),
+                      ),
+              ),
+              if (count >= goalcount)
+                ElevatedButton(
+                  // ボタンウィジェット
+                  onPressed: () {
+                    // ボタン押下時の処理
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ResultScreen(),
+                      ), // 結果画面へ遷移
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(
+                      255,
+                      212,
+                      255,
+                      95,
+                    ), // ボタンの背景色
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 100,
+                      vertical: 15,
+                    ), // ボタンの内側の余白
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50), // ボタンの角を丸くする
+                    ),
+                  ),
+                  child: const Text(
+                    'Finish',
+                    style: TextStyle(fontSize: 30.0, color: Colors.black),
+                  ), // ボタンのラベル
+                ),
+            ] else ...[
+              SizedBox(
+                width: double.infinity,
+                child: Text(
+                  elapsedTime,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color(0xFFD5FF5F), // メインテーマ色
+                    fontSize: 128, // 文字サイズ
+                    fontFamily: 'Inter', // フォント
+                    fontWeight: FontWeight.w600, // 太字
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40), // 余白
+            ],
           ],
         ),
       ),

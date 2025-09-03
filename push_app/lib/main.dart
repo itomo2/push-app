@@ -648,19 +648,24 @@ class _CounterScreenState extends State<CounterScreen> {
   late Stream<bool> _proximityStream; // 近接センサーの状態を監視するストリーム
   late StreamSubscription<bool> _proximitySubscription; // 購読用変数
 
-  final Stopwatch _stopwatch = Stopwatch();
-  late Timer _timer;
-  String elapsedTime = "00:00";
+  final Stopwatch _stopwatch = Stopwatch(); //経過時間を測る
+  late Timer _timer; //１秒ごとにUI更新
+  String elapsedTime = "00:00"; //表示用の文字列
 
   @override
   void initState() {
+    //ページを開いた時に一度だけ実行する関数
     super.initState();
     _startListening();
 
-    _stopwatch.start();
+    _stopwatch.start(); //ストップウォッチ開始
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      //１秒ごとに実行
       setState(() {
-        elapsedTime = _formatDuration(_stopwatch.elapsed);
+        elapsedTime = _formatDuration(
+          _stopwatch.elapsed,
+        ); /*elapsedTimeを更新（１秒ごと）、_stopwatch.elapsedを_formatDurationに渡して
+              mm:ss形式の文字列に変換、そしてelapsedTime（文字列型）に代入*/
       });
     });
   }
@@ -688,10 +693,13 @@ class _CounterScreenState extends State<CounterScreen> {
   }
 
   String _formatDuration(Duration duration) {
+    //渡されたDuration型の変数を受け取る
     String twoDigits(int n) => n.toString().padLeft(2, "0");
+    //数字を二桁の文字列に直す関数、padLeftは「二桁になるように左を0で埋める」役割
     final minutes = twoDigits(duration.inMinutes.remainder(60));
     final seconds = twoDigits(duration.inSeconds.remainder(60));
-    return "$minutes:$seconds";
+    //duration.inSecondsは経過時間の合計秒（分も同じ）、remainder(60)で0から59秒に制限する
+    return "$minutes:$seconds"; //この形で返す
   }
 
   Future<void> setdata() async {

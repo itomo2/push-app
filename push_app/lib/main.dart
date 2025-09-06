@@ -17,8 +17,16 @@ class info {
   int pushupcount; // 運動名（例：腕立て伏せ）
   @HiveField(1) // Hiveで保存するフィールド番号
   int situpcount; // 回数
-
-  info(this.pushupcount, this.situpcount); // コンストラクタ
+  @HiveField(2)
+  Duration pushuptime;
+  @HiveField(3)
+  Duration situptime;
+  info(
+    this.pushupcount,
+    this.situpcount,
+    this.pushuptime,
+    this.situptime,
+  ); // コンストラクタ
 }
 
 late Box box; // HiveのBox（データ保存領域）をグローバル変数として宣言
@@ -41,15 +49,30 @@ class AlertDialogSample extends StatelessWidget {
   Widget build(BuildContext context) {
     // ダイアログのUIを構築
     int pushupcount, situpcount;
+    String pushuptime, situptime;
+
+    String _formatDuration(Duration duration) {
+      //渡されたDuration型の変数を受け取る
+      String twoDigits(int n) => n.toString().padLeft(2, "0");
+      //数字を二桁の文字列に直す関数、padLeftは「二桁になるように左を0で埋める」役割
+      final minutes = twoDigits(duration.inMinutes.remainder(60));
+      final seconds = twoDigits(duration.inSeconds.remainder(60));
+      //duration.inSecondsは経過時間の合計秒（分も同じ）、remainder(60)で0から59秒に制限する
+      return "$minutes:$seconds"; //この形で返す
+    }
 
     try {
       final key = DateFormat('yyyy-MM-dd').format(selectedDay); // 日付をキーに変換
       final infoData = box.get(key); // Hiveからデータ取得
       pushupcount = infoData?.pushupcount ?? 0;
       situpcount = infoData?.situpcount ?? 0; // データがなければ0
+      pushuptime = _formatDuration(infoData?.situptime ?? Duration.zero);
+      situptime = _formatDuration(infoData?.situptime ?? Duration.zero);
     } catch (e) {
       pushupcount = 0;
       situpcount = 0;
+      pushuptime = "00:00";
+      situptime = "00:00";
     }
     return AlertDialog(
       backgroundColor: const Color(0xFFD5FF5F), // ダイアログの背景色
@@ -68,7 +91,7 @@ class AlertDialogSample extends StatelessWidget {
         Align(
           alignment: Alignment.topLeft,
           child: Text(
-            '  Push-up：$pushupcount回\n  Sit-up    ：$situpcount回', // サンプルデータ（本来は保存データを表示する）
+            '  Push-up：$pushupcount回　$pushuptime\n  Sit-up    ：$situpcount回　$situptime', // サンプルデータ（本来は保存データを表示する）
             style: TextStyle(
               color: const Color(0xFF14151A), // 文字色
               fontSize: 20, // 文字サイズ
@@ -641,7 +664,7 @@ class _CounterScreenState extends State<CounterScreen> {
   _CounterScreenState(this.subject, this.selectedIndex);
   String subject;
   int selectedIndex;
-
+  late Duration time, goaltime;
   late int count, goalcount;
 
   bool _isNear = false; // 近接センサーが近いかどうかを保持
@@ -705,13 +728,16 @@ class _CounterScreenState extends State<CounterScreen> {
   Future<void> setdata() async {
     // データ保存処理
     late int anotherCount;
+    late Duration anotherTime;
     final key = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 日付をキーに変換
     try {
       final infoData = box.get(key); // Hiveからデータ取得
       if (subject == 'Push-up') {
         anotherCount = infoData?.situpcount ?? 0;
+        anotherTime = infoData?.situptime ?? Duration.zero;
       } else {
         anotherCount = infoData?.pushupcount ?? 0; // データがなければ0
+        anotherCount = infoData?.pushuptime ?? Duration.zero; // データがなければ0
       }
     } catch (e) {
       anotherCount = 0;
@@ -719,9 +745,9 @@ class _CounterScreenState extends State<CounterScreen> {
 
     late info infoObject;
     if (subject == 'Push-up') {
-      infoObject = info(count, anotherCount);
+      infoObject = info(count, anotherCount, time, anotherTime);
     } else {
-      infoObject = info(anotherCount, count);
+      infoObject = info(anotherCount, count, time, anotherTime);
     }
     box.put(key, infoObject); // Hiveに保存
   }
@@ -739,8 +765,19 @@ class _CounterScreenState extends State<CounterScreen> {
 
     // 目標回数取得（subjectによって分岐、なければ20）
     goalcount =
-        box.get(subject == 'Push-up' ? "pushUpGoalCount" : "sitUpGoalCount") ??
+        box.get(
+          subject == 'Push-up' && selectedIndex == 0
+              ? "pushUpGoalCount"
+              : "sitUpGoalCount",
+        ) ??
         20;
+    goaltime =
+        box.get(
+          subject == 'Push-up' && selectedIndex == 1
+              ? "pushUpGoalTime"
+              : "sitUpGoalTime",
+        ) ??
+        Duration(minutes: 5);
 
     return Scaffold(
       backgroundColor: Colors.black, // 背景色を黒に設定
@@ -842,6 +879,38 @@ class _CounterScreenState extends State<CounterScreen> {
                   ),
                 ),
               ),
+              if (_stopwatch.elapsed >= goaltime)
+                ElevatedButton(
+                  // ボタンウィジェット
+                  onPressed: () {
+                    // ボタン押下時の処理
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ResultScreen(),
+                      ), // 結果画面へ遷移
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(
+                      255,
+                      212,
+                      255,
+                      95,
+                    ), // ボタンの背景色
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 100,
+                      vertical: 15,
+                    ), // ボタンの内側の余白
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50), // ボタンの角を丸くする
+                    ),
+                  ),
+                  child: const Text(
+                    'Finish',
+                    style: TextStyle(fontSize: 30.0, color: Colors.black),
+                  ), // ボタンのラベル
+                ),
               const SizedBox(height: 40), // 余白
             ],
           ],

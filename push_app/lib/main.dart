@@ -18,9 +18,9 @@ class info {
   @HiveField(1) // Hiveで保存するフィールド番号
   int situpcount; // 回数
   @HiveField(2)
-  Duration pushuptime;
+  Duration? pushuptime;
   @HiveField(3)
-  Duration situptime;
+  Duration? situptime;
   info(
     this.pushupcount,
     this.situpcount,
@@ -66,7 +66,7 @@ class AlertDialogSample extends StatelessWidget {
       final infoData = box.get(key); // Hiveからデータ取得
       pushupcount = infoData?.pushupcount ?? 0;
       situpcount = infoData?.situpcount ?? 0; // データがなければ0
-      pushuptime = _formatDuration(infoData?.situptime ?? Duration.zero);
+      pushuptime = _formatDuration(infoData?.pushuptime ?? Duration.zero);
       situptime = _formatDuration(infoData?.situptime ?? Duration.zero);
     } catch (e) {
       pushupcount = 0;
@@ -664,7 +664,7 @@ class _CounterScreenState extends State<CounterScreen> {
   _CounterScreenState(this.subject, this.selectedIndex);
   String subject;
   int selectedIndex;
-  late Duration time, goaltime;
+  late Duration time = Duration.zero, goaltime;
   late int count, goalcount;
 
   bool _isNear = false; // 近接センサーが近いかどうかを保持
@@ -699,7 +699,6 @@ class _CounterScreenState extends State<CounterScreen> {
       if (isNear && !_isNear) {
         setState(() {
           count++;
-          setdata();
         });
       }
       _isNear = isNear;
@@ -737,7 +736,7 @@ class _CounterScreenState extends State<CounterScreen> {
         anotherTime = infoData?.situptime ?? Duration.zero;
       } else {
         anotherCount = infoData?.pushupcount ?? 0; // データがなければ0
-        anotherCount = infoData?.pushuptime ?? Duration.zero; // データがなければ0
+        anotherTime = infoData?.pushuptime ?? Duration.zero; // データがなければ0
       }
     } catch (e) {
       anotherCount = 0;
@@ -747,7 +746,7 @@ class _CounterScreenState extends State<CounterScreen> {
     if (subject == 'Push-up') {
       infoObject = info(count, anotherCount, time, anotherTime);
     } else {
-      infoObject = info(anotherCount, count, time, anotherTime);
+      infoObject = info(anotherCount, count, anotherTime, time);
     }
     box.put(key, infoObject); // Hiveに保存
   }
@@ -759,9 +758,13 @@ class _CounterScreenState extends State<CounterScreen> {
     final infoData = box.get(key); // Hiveからデータ取得
 
     // カウント取得（subjectによって分岐）
-    count = (subject == 'Push-up')
-        ? (infoData?.pushupcount ?? 0)
-        : (infoData?.situpcount ?? 0);
+    if (subject == 'Push-up') {
+      count = infoData?.pushupcount ?? 0;
+      time = infoData?.pushuptime ?? Duration.zero;
+    } else {
+      count = infoData?.situpcount ?? 0;
+      time = infoData?.situptime ?? Duration.zero;
+    }
 
     // 目標回数取得（subjectによって分岐、なければ20）
     goalcount =
@@ -777,7 +780,7 @@ class _CounterScreenState extends State<CounterScreen> {
               ? "pushUpGoalTime"
               : "sitUpGoalTime",
         ) ??
-        Duration(minutes: 5);
+        Duration(seconds: 5);
 
     return Scaffold(
       backgroundColor: Colors.black, // 背景色を黒に設定
@@ -837,6 +840,7 @@ class _CounterScreenState extends State<CounterScreen> {
                 ElevatedButton(
                   // ボタンウィジェット
                   onPressed: () {
+                    setdata();
                     // ボタン押下時の処理
                     Navigator.push(
                       context,
@@ -879,10 +883,12 @@ class _CounterScreenState extends State<CounterScreen> {
                   ),
                 ),
               ),
-              if (_stopwatch.elapsed >= goaltime)
+              if (_stopwatch.elapsed + time >= goaltime)
                 ElevatedButton(
                   // ボタンウィジェット
                   onPressed: () {
+                    time += _stopwatch.elapsed;
+                    setdata();
                     // ボタン押下時の処理
                     Navigator.push(
                       context,

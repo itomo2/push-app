@@ -19,6 +19,8 @@ class infoAdapter extends TypeAdapter<info> {
     return info(
       fields[0] as int,
       fields[1] as int,
+      fields[2] as Duration?,
+      fields[3] as Duration?,
     );
   }
 

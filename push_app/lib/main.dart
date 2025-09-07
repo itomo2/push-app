@@ -812,6 +812,7 @@ class _CounterScreenState extends State<CounterScreen> {
               ),
               const SizedBox(height: 40), // 余白
               SizedBox(
+                //説明文
                 width: 304,
                 height: 69,
                 child: subject == 'Push-up'

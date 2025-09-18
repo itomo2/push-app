@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart'; // FlutterのUI部品を使うためのパッケージをインポート
+import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'package:intl/intl.dart'; // 日付フォーマット用パッケージをインポート
 import 'package:flutter/cupertino.dart';
 
@@ -40,6 +43,16 @@ void main() async {
   runApp(const PushApp()); // アプリのエントリーポイント。PushAppウィジェットを起動
 }
 
+String formatDuration(Duration duration) {
+  //渡されたDuration型の変数を受け取る
+  String twoDigits(int n) => n.toString().padLeft(2, "0");
+  //数字を二桁の文字列に直す関数、padLeftは「二桁になるように左を0で埋める」役割
+  final minutes = twoDigits(duration.inMinutes.remainder(60));
+  final seconds = twoDigits(duration.inSeconds.remainder(60));
+  //duration.inSecondsは経過時間の合計秒（分も同じ）、remainder(60)で0から59秒に制限する
+  return "$minutes:$seconds"; //この形で返す
+}
+
 class AlertDialogSample extends StatelessWidget {
   // 日付選択時に表示するダイアログ
   const AlertDialogSample(this.selectedDay); // コンストラクタ
@@ -51,23 +64,13 @@ class AlertDialogSample extends StatelessWidget {
     int pushupcount, situpcount;
     String pushuptime, situptime;
 
-    String _formatDuration(Duration duration) {
-      //渡されたDuration型の変数を受け取る
-      String twoDigits(int n) => n.toString().padLeft(2, "0");
-      //数字を二桁の文字列に直す関数、padLeftは「二桁になるように左を0で埋める」役割
-      final minutes = twoDigits(duration.inMinutes.remainder(60));
-      final seconds = twoDigits(duration.inSeconds.remainder(60));
-      //duration.inSecondsは経過時間の合計秒（分も同じ）、remainder(60)で0から59秒に制限する
-      return "$minutes:$seconds"; //この形で返す
-    }
-
     try {
       final key = DateFormat('yyyy-MM-dd').format(selectedDay); // 日付をキーに変換
       final infoData = box.get(key); // Hiveからデータ取得
       pushupcount = infoData?.pushupcount ?? 0;
       situpcount = infoData?.situpcount ?? 0; // データがなければ0
-      pushuptime = _formatDuration(infoData?.pushuptime ?? Duration.zero);
-      situptime = _formatDuration(infoData?.situptime ?? Duration.zero);
+      pushuptime = formatDuration(infoData?.pushuptime ?? Duration.zero);
+      situptime = formatDuration(infoData?.situptime ?? Duration.zero);
     } catch (e) {
       pushupcount = 0;
       situpcount = 0;
@@ -139,6 +142,8 @@ class _CalendarState extends State<Calendar> {
     defaultValue: 20,
   ); // 腕立て伏せの目標回数
   int _sitUpGoalCount = box.get('sitUpGoalCount', defaultValue: 20); // 腹筋の目標回数
+  late Duration _pushUpGoalTime; //それぞれの目標タイム
+  late Duration _sitUpGoalTime;
 
   bool _isPushUpEditing = false; // 腕立て伏せ編集モード
   bool _isSitUpEditing = false; // 腹筋編集モード
@@ -147,6 +152,24 @@ class _CalendarState extends State<Calendar> {
       TextEditingController(); // 腕立て伏せ編集用コントローラー
   TextEditingController _sitUpController =
       TextEditingController(); // 腹筋編集用コントローラー
+
+  String pushupt = "00:00";
+  String situpt = "00:00";
+
+  Duration _nwduration = Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _pushUpGoalTime = box.get(
+      'pushUpGoalTime',
+      defaultValue: Duration(seconds: 2),
+    );
+    _sitUpGoalTime = box.get(
+      'sitUpGoalTime',
+      defaultValue: Duration(seconds: 2),
+    );
+  }
 
   @override
   void dispose() {
@@ -176,17 +199,35 @@ class _CalendarState extends State<Calendar> {
     });
   }
 
+  void _startPushUpTEditing() {
+    setState(() {
+      _isSitUpEditing = false; // 編集モードON
+      _isPushUpEditing = false; // 腕立て伏せ編集モードOFF
+    });
+  }
+
+  void _startSitUpTEditing() {
+    setState(() {
+      _isSitUpEditing = false; // 編集モードON
+      _isPushUpEditing = false; // 腕立て伏せ編集モードOFF
+    });
+  }
+
   void _submitPushUpEditing() {
     // 編集内容を確定
     final input = _pushUpController.text; // 入力値取得
     final parsed = int.tryParse(input); // 整数に変換
+    final inputt = _nwduration == Duration.zero ? _pushUpGoalTime : _nwduration;
+
     if (parsed != null && parsed > 0) {
       // 正の整数なら
       setState(() {
         _pushUpGoalCount = parsed; // 目標回数を更新
-        box.put('pushUpGoalCount', parsed);
         _isPushUpEditing = false; // 編集モードOFF
       });
+      box.put('pushUpGoalCount', parsed);
+      // box.put('pushUpGoalTime', inputt);
+      pushupt = formatDuration(inputt);
     } else {
       // 無効な入力の場合、アラート表示（SnackBar）
       ScaffoldMessenger.of(
@@ -199,13 +240,17 @@ class _CalendarState extends State<Calendar> {
     // 編集内容を確定
     final input = _sitUpController.text; // 入力値取得
     final parsed = int.tryParse(input); // 整数に変換
+    final inputt = _nwduration == Duration.zero ? _sitUpGoalTime : _nwduration;
+
     if (parsed != null && parsed > 0) {
       // 正の整数なら
       setState(() {
         _sitUpGoalCount = parsed; // 目標回数を更新
-        box.put('sitUpGoalCount', parsed);
         _isSitUpEditing = false; // 編集モードOFF
       });
+      box.put('sitUpGoalCount', parsed);
+      // box.put('sitUpGoalTime', inputt);
+      situpt = formatDuration(inputt);
     } else {
       // 無効な入力の場合、アラート表示（SnackBar）
       ScaffoldMessenger.of(
@@ -213,6 +258,10 @@ class _CalendarState extends State<Calendar> {
       ).showSnackBar(SnackBar(content: Text('正の整数を入力してください')));
     }
   }
+
+  void _submitPushUpTEditing() {}
+
+  void _submitSitUpTEditing() {}
 
   @override
   Widget build(BuildContext context) {
@@ -231,83 +280,121 @@ class _CalendarState extends State<Calendar> {
               crossAxisAlignment: CrossAxisAlignment.start, // 左寄せ
               children: [
                 Text(
-                  'Target number of reps', // 目標回数ラベル
+                  "This month's goal", // 目標回数ラベル
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 25,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                _isPushUpEditing // 編集モードかどうかで表示切替
-                    ? Row(
-                        children: [
-                          Text(
-                            "Push-up:  ",
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 20,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 60,
-                            child: TextField(
-                              controller: _pushUpController, // 入力コントローラー
-                              autofocus: true, // 自動フォーカス
-                              keyboardType: TextInputType.number, // 数値入力
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 20,
-                              ), // テキストスタイル
-                              decoration: InputDecoration(
-                                border: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white70),
-                                ), // 下線
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white70),
-                                ), // フォーカス時の下線
-                                isDense: true, // コンパクト表示
-                                contentPadding: EdgeInsets.symmetric(
-                                  vertical: 8,
-                                ), // パディング
+                Row(
+                  children: [
+                    _isPushUpEditing // 編集モードかどうかで表示切替
+                        ? Row(
+                            children: [
+                              Icon(Icons.circle, color: Colors.white, size: 10),
+                              Text(
+                                "  Push-up:  ",
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 20,
+                                ),
                               ),
-                              onSubmitted: (_) =>
-                                  _submitPushUpEditing(), // Enterで確定
-                            ),
+                              SizedBox(
+                                width: 30,
+                                child: TextField(
+                                  controller: _pushUpController, // 入力コントローラー
+                                  autofocus: true, // 自動フォーカス
+                                  keyboardType: TextInputType.number, // 数値入力
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 20,
+                                  ),
+                                  decoration: InputDecoration(
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.white70,
+                                      ),
+                                    ), // フォーカス時の下線
+                                    isDense: true, // コンパクト表示
+                                    contentPadding: EdgeInsets.symmetric(
+                                      vertical: 8, //上下に８px
+                                    ), //余白
+                                  ),
+                                  onSubmitted: (_) =>
+                                      _submitPushUpEditing(), // Enterで確定
+                                ),
+                              ),
+                              Text(
+                                'reps',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.check,
+                                  color: Colors.white,
+                                ), // 確定ボタン
+                                onPressed: () {
+                                  _submitPushUpEditing();
+                                  // box.put("pushUpGoalTime", _nwduration);
+                                }, // 確定処理
+                              ),
+                              SizedBox(
+                                height: 150,
+                                width: 170,
+                                child: DefaultTextStyle(
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 20,
+                                  ),
+                                  child: CupertinoTimerPicker(
+                                    mode: CupertinoTimerPickerMode.ms,
+                                    initialTimerDuration: box.get(
+                                      "pushUpGoalTime",
+                                      defaultValue: Duration.zero,
+                                    ),
+                                    onTimerDurationChanged:
+                                        (Duration newDuration) {
+                                          setState(() {
+                                            _nwduration = newDuration;
+                                          });
+                                        },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : Row(
+                            children: [
+                              Icon(Icons.circle, color: Colors.white, size: 10),
+                              Text(
+                                '  Push-up:  $_pushUpGoalCount reps', // 目標回数表示
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              Text(
+                                '    $pushupt',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                ), // 編集ボタン
+                                onPressed: _startPushUpEditing, // 編集開始
+                              ),
+                            ],
                           ),
-                          Text(
-                            'reps',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 20,
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.check,
-                              color: Colors.white,
-                            ), // 確定ボタン
-                            onPressed: _submitPushUpEditing, // 確定処理
-                          ),
-                        ],
-                      )
-                    : Row(
-                        children: [
-                          Text(
-                            'Push-up:  $_pushUpGoalCount reps', // 目標回数表示
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 20,
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.edit,
-                              color: Colors.white,
-                            ), // 編集ボタン
-                            onPressed: _startPushUpEditing, // 編集開始
-                          ),
-                        ],
-                      ),
+                  ],
+                ),
                 _isSitUpEditing // 編集モードかどうかで表示切替
                     ? Row(
                         children: [
@@ -319,7 +406,7 @@ class _CalendarState extends State<Calendar> {
                             ),
                           ),
                           SizedBox(
-                            width: 60,
+                            width: 30,
                             child: TextField(
                               controller: _sitUpController, // 入力コントローラー
                               autofocus: true, // 自動フォーカス
@@ -341,7 +428,7 @@ class _CalendarState extends State<Calendar> {
                                 ), // パディング
                               ),
                               onSubmitted: (_) =>
-                                  _submitSitUpEditing(), // Enterで確定
+                                  _submitSitUpEditing(), // Enterで確定っっ
                             ),
                           ),
                           Text(
@@ -356,14 +443,38 @@ class _CalendarState extends State<Calendar> {
                               Icons.check,
                               color: Colors.white,
                             ), // 確定ボタン
-                            onPressed: _submitSitUpEditing, // 確定処理
+                            onPressed: () {
+                              _submitSitUpEditing(); // 確定処理
+                            },
+                          ),
+                          SizedBox(
+                            height: 150,
+                            width: 170,
+                            child: CupertinoTimerPicker(
+                              mode: CupertinoTimerPickerMode.ms, //分と秒を表示するモード
+                              initialTimerDuration: box.get(
+                                "situptime",
+                                defaultValue: Duration.zero,
+                              ),
+                              onTimerDurationChanged: (Duration newDration) {
+                                _nwduration = newDration;
+                              },
+                            ),
                           ),
                         ],
                       )
                     : Row(
                         children: [
+                          Icon(Icons.circle, color: Colors.white, size: 10),
                           Text(
-                            'Sit-up:  $_sitUpGoalCount reps', // 目標回数表示
+                            '  Sit-up:  $_sitUpGoalCount reps', // 目標回数表示
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 20,
+                            ),
+                          ),
+                          Text(
+                            '    $situpt',
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 20,
@@ -685,7 +796,7 @@ class _CounterScreenState extends State<CounterScreen> {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       //１秒ごとに実行
       setState(() {
-        elapsedTime = _formatDuration(
+        elapsedTime = formatDuration(
           _stopwatch.elapsed,
         ); /*elapsedTimeを更新（１秒ごと）、_stopwatch.elapsedを_formatDurationに渡して
               mm:ss形式の文字列に変換、そしてelapsedTime（文字列型）に代入*/
@@ -714,7 +825,7 @@ class _CounterScreenState extends State<CounterScreen> {
     _stopwatch.stop();
   }
 
-  String _formatDuration(Duration duration) {
+  String formatDuration(Duration duration) {
     //渡されたDuration型の変数を受け取る
     String twoDigits(int n) => n.toString().padLeft(2, "0");
     //数字を二桁の文字列に直す関数、padLeftは「二桁になるように左を0で埋める」役割

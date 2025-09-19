@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'screens.dart';
-import 'package:push_app/main.dart';
 
 class SelectScreen extends StatefulWidget {
   // 運動選択画面（状態を持つ）

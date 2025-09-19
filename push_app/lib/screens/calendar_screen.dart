@@ -127,10 +127,6 @@ class _CalendarState extends State<Calendar> {
     }
   }
 
-  void _submitPushUpTEditing() {}
-
-  void _submitSitUpTEditing() {}
-
   @override
   Widget build(BuildContext context) {
     highlightDays = box.get("highlight") ?? []; // 画面のUI構築

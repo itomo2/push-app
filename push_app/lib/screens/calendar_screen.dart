@@ -83,6 +83,10 @@ class _CalendarState extends State<Calendar> {
 
     if (parsed != null && parsed > 0) {
       // 正の整数なら
+      situpt = formatDuration(_nwdurationsit);
+      box.put("sitUpGoalTime", situpt);
+      pushupt = formatDuration(_nwdurationpush);
+      box.put("pushUpGoalTime", pushupt);
       setState(() {
         _pushUpGoalCount = parsed; // 目標回数を更新
         _isPushUpEditing = false; // 編集モードOFF
@@ -191,8 +195,6 @@ class _CalendarState extends State<Calendar> {
                                   color: Colors.white,
                                 ), // 確定ボタン
                                 onPressed: () {
-                                  pushupt = formatDuration(_nwdurationpush);
-                                  box.put("pushUpGoalTime", pushupt);
                                   _submitPushUpEditing();
                                 }, // 確定処理
                               ),
@@ -294,8 +296,6 @@ class _CalendarState extends State<Calendar> {
                           IconButton(
                             icon: Icon(Icons.check, color: Colors.white),
                             onPressed: () {
-                              situpt = formatDuration(_nwdurationsit);
-                              box.put("sitUpGoalTime", situpt);
                               _submitSitUpEditing();
                             },
                           ),

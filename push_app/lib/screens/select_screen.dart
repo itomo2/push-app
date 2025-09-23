@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:push_app/main.dart';
 import 'screens.dart';
 
 class SelectScreen extends StatefulWidget {
@@ -16,7 +17,12 @@ class _SelectScreenState extends State<SelectScreen> {
   bool _isChecked2 = false;
   late String subject;
   final List<String> exercisestype = ["Counter", "Stopwatch"];
-  int selectedIndex = 0;
+  late int selectedIndex;
+
+  void initState() {
+    super.initState();
+    selectedIndex = box.get('kakotore', defaultValue: 0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,19 +35,27 @@ class _SelectScreenState extends State<SelectScreen> {
           SizedBox(
             height: 200,
             child: CupertinoPicker(
-              //iOS風の縦スクロールホイールを作るウィジェット
+              // iOS風の縦スクロールホイールを作るウィジェット
+
+              // 初期表示位置を設定するコントローラ
               scrollController: FixedExtentScrollController(
-                initialItem: selectedIndex,
+                initialItem: selectedIndex, // 初期選択項目のインデックス
               ),
-              itemExtent: 50,
+
+              itemExtent: 50, // 各項目の高さ（ピクセル単位）
+              // ユーザーが選択項目を変更した時に呼ばれるコールバック
               onSelectedItemChanged: (index) {
                 setState(() {
-                  selectedIndex = index;
+                  selectedIndex = index; // 選択されたインデックスを更新
+                  box.put('kakotore', selectedIndex);
                 });
               },
+
+              // 表示する項目のリストを作成
               children: exercisestype
                   .map(
                     (exercise) => Center(
+                      //exerciseにリストの各要素が代入される
                       child: Text(exercise, style: TextStyle(fontSize: 24)),
                     ),
                   )

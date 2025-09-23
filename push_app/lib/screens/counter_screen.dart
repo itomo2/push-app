@@ -71,16 +71,6 @@ class _CounterScreenState extends State<CounterScreen> {
     _stopwatch.stop();
   }
 
-  String formatDuration(Duration duration) {
-    //渡されたDuration型の変数を受け取る
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-    //数字を二桁の文字列に直す関数、padLeftは「二桁になるように左を0で埋める」役割
-    final minutes = twoDigits(duration.inMinutes.remainder(60));
-    final seconds = twoDigits(duration.inSeconds.remainder(60));
-    //duration.inSecondsは経過時間の合計秒（分も同じ）、remainder(60)で0から59秒に制限する
-    return "$minutes:$seconds"; //この形で返す
-  }
-
   Future<void> setdata() async {
     // データ保存処理
     late int anotherCount;
@@ -131,13 +121,13 @@ class _CounterScreenState extends State<CounterScreen> {
               : "sitUpGoalCount",
         ) ??
         20;
-    goaltime =
-        box.get(
-          subject == 'Push-up' && selectedIndex == 1
-              ? "pushUpGoalTime"
-              : "sitUpGoalTime",
-        ) ??
-        Duration(seconds: 5);
+    goaltime = parseDuration(
+      box.get(
+        subject == 'Push-up' && selectedIndex == 1
+            ? "pushUpGoalTime"
+            : "sitUpGoalTime",
+      ),
+    );
 
     return Scaffold(
       backgroundColor: Colors.black, // 背景色を黒に設定

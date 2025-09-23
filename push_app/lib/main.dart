@@ -1,26 +1,9 @@
 import 'package:flutter/material.dart'; // FlutterのUI部品を使うためのパッケージをインポート
 import 'screens/screens.dart';
 import 'package:hive_flutter/hive_flutter.dart'; // HiveのFlutter用パッケージをインポート
+import 'package:push_app/models/models.dart';
+export 'package:push_app/models/models.dart';
 part 'main.g.dart'; // Hive Generator用（TypeAdapter自動生成ファイル）
-
-// infoクラス: 運動名(subject)と回数(count)を保持するデータモデル
-@HiveType(typeId: 0) // Hive用の型IDを指
-class info {
-  @HiveField(0) // Hiveで保存するフィールド番号
-  int pushupcount; // 運動名（例：腕立て伏せ）
-  @HiveField(1) // Hiveで保存するフィールド番号
-  int situpcount; // 回数
-  @HiveField(2)
-  Duration? pushuptime;
-  @HiveField(3)
-  Duration? situptime;
-  info(
-    this.pushupcount,
-    this.situpcount,
-    this.pushuptime,
-    this.situptime,
-  ); // コンストラクタ
-}
 
 late Box box; // HiveのBox（データ保存領域）をグローバル変数として宣言
 late List<dynamic> highlightDays = [];

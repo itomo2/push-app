@@ -56,3 +56,19 @@ String formatDuration(Duration duration) {
   //duration.inSecondsは経過時間の合計秒（分も同じ）、remainder(60)で0から59秒に制限する
   return "$minutes:$seconds"; //この形で返す
 }
+
+Duration parseDuration(String formatted) {
+  // 文字列形式の時間（"MM:SS"）を受け取る関数
+  final parts = formatted.split(':');
+  // ':'で文字列を分割し、分と秒の部分を取得
+  if (parts.length != 2) {
+    // 分と秒の形式でない場合はゼロのDurationを返す
+    return Duration.zero;
+  }
+  final minutes = int.tryParse(parts[0]) ?? 0;
+  // 分の文字列を整数に変換。変換できなければ0とする
+  final seconds = int.tryParse(parts[1]) ?? 0;
+  // 秒の文字列を整数に変換。変換できなければ0とする
+  return Duration(minutes: minutes, seconds: seconds);
+  // 変換した分と秒からDurationオブジェクトを作成し返す
+}

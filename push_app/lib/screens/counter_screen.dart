@@ -8,8 +8,8 @@ import 'package:push_app/screens/screens.dart';
 class CounterScreen extends StatefulWidget {
   // 腕立てカウンター画面（状態を持つ）
   CounterScreen(this.subject, this.selectedIndex);
-  String subject; // コンストラクタ
-  int selectedIndex;
+  final String subject; // コンストラクタ
+  final int selectedIndex;
 
   @override
   State<CounterScreen> createState() =>

@@ -24,8 +24,6 @@ class _CalendarState extends State<Calendar> {
     defaultValue: 20,
   ); // 腕立て伏せの目標回数
   int _sitUpGoalCount = box.get('sitUpGoalCount', defaultValue: 20); // 腹筋の目標回数
-  late Duration _pushUpGoalTime; //それぞれの目標タイム
-  late Duration _sitUpGoalTime;
 
   bool _isPushUpEditing = false; // 腕立て伏せ編集モード
   bool _isSitUpEditing = false; // 腹筋編集モード
@@ -35,22 +33,19 @@ class _CalendarState extends State<Calendar> {
   TextEditingController _sitUpController =
       TextEditingController(); // 腹筋編集用コントローラー
 
-  String pushupt = "00:00";
-  String situpt = "00:00";
+  late String pushupt;
+  late String situpt;
 
-  Duration _nwduration = Duration.zero;
+  late Duration _nwdurationpush;
+  late Duration _nwdurationsit;
 
   @override
   void initState() {
     super.initState();
-    _pushUpGoalTime = box.get(
-      'pushUpGoalTime',
-      defaultValue: Duration(seconds: 2),
-    );
-    _sitUpGoalTime = box.get(
-      'sitUpGoalTime',
-      defaultValue: Duration(seconds: 2),
-    );
+    pushupt = box.get('pushUpGoalTime');
+    situpt = box.get('sitUpGoalTime');
+    _nwdurationpush = parseDuration(pushupt);
+    _nwdurationsit = parseDuration(situpt);
   }
 
   @override
@@ -85,7 +80,6 @@ class _CalendarState extends State<Calendar> {
     // 編集内容を確定
     final input = _pushUpController.text; // 入力値取得
     final parsed = int.tryParse(input); // 整数に変換
-    final inputt = _nwduration == Duration.zero ? _pushUpGoalTime : _nwduration;
 
     if (parsed != null && parsed > 0) {
       // 正の整数なら
@@ -94,8 +88,6 @@ class _CalendarState extends State<Calendar> {
         _isPushUpEditing = false; // 編集モードOFF
       });
       box.put('pushUpGoalCount', parsed);
-      // box.put('pushUpGoalTime', inputt);
-      pushupt = formatDuration(inputt);
     } else {
       // 無効な入力の場合、アラート表示（SnackBar）
       ScaffoldMessenger.of(
@@ -108,7 +100,6 @@ class _CalendarState extends State<Calendar> {
     // 編集内容を確定
     final input = _sitUpController.text; // 入力値取得
     final parsed = int.tryParse(input); // 整数に変換
-    final inputt = _nwduration == Duration.zero ? _sitUpGoalTime : _nwduration;
 
     if (parsed != null && parsed > 0) {
       // 正の整数なら
@@ -117,8 +108,6 @@ class _CalendarState extends State<Calendar> {
         _isSitUpEditing = false; // 編集モードOFF
       });
       box.put('sitUpGoalCount', parsed);
-      // box.put('sitUpGoalTime', inputt);
-      situpt = formatDuration(inputt);
     } else {
       // 無効な入力の場合、アラート表示（SnackBar）
       ScaffoldMessenger.of(
@@ -202,8 +191,9 @@ class _CalendarState extends State<Calendar> {
                                   color: Colors.white,
                                 ), // 確定ボタン
                                 onPressed: () {
+                                  pushupt = formatDuration(_nwdurationpush);
+                                  box.put("pushUpGoalTime", pushupt);
                                   _submitPushUpEditing();
-                                  // box.put("pushUpGoalTime", _nwduration);
                                 }, // 確定処理
                               ),
                               SizedBox(
@@ -216,14 +206,16 @@ class _CalendarState extends State<Calendar> {
                                   ),
                                   child: CupertinoTimerPicker(
                                     mode: CupertinoTimerPickerMode.ms,
-                                    initialTimerDuration: box.get(
-                                      "pushUpGoalTime",
-                                      defaultValue: Duration.zero,
+                                    initialTimerDuration: parseDuration(
+                                      box.get(
+                                        "pushUpGoalTime",
+                                        defaultValue: "00:00",
+                                      ),
                                     ),
                                     onTimerDurationChanged:
                                         (Duration newDuration) {
                                           setState(() {
-                                            _nwduration = newDuration;
+                                            _nwdurationpush = newDuration;
                                           });
                                         },
                                   ),
@@ -262,8 +254,9 @@ class _CalendarState extends State<Calendar> {
                 _isSitUpEditing // 編集モードかどうかで表示切替
                     ? Row(
                         children: [
+                          Icon(Icons.circle, color: Colors.white, size: 10),
                           Text(
-                            'Sit-up:  ',
+                            "  Sit-up:  ",
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 20,
@@ -278,21 +271,17 @@ class _CalendarState extends State<Calendar> {
                               style: TextStyle(
                                 color: Colors.white70,
                                 fontSize: 20,
-                              ), // テキストスタイル
+                              ),
                               decoration: InputDecoration(
-                                border: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white70),
-                                ), // 下線
                                 focusedBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(color: Colors.white70),
-                                ), // フォーカス時の下線
-                                isDense: true, // コンパクト表示
+                                ),
+                                isDense: true,
                                 contentPadding: EdgeInsets.symmetric(
                                   vertical: 8,
-                                ), // パディング
+                                ),
                               ),
-                              onSubmitted: (_) =>
-                                  _submitSitUpEditing(), // Enterで確定っっ
+                              onSubmitted: (_) => _submitSitUpEditing(),
                             ),
                           ),
                           Text(
@@ -303,26 +292,35 @@ class _CalendarState extends State<Calendar> {
                             ),
                           ),
                           IconButton(
-                            icon: Icon(
-                              Icons.check,
-                              color: Colors.white,
-                            ), // 確定ボタン
+                            icon: Icon(Icons.check, color: Colors.white),
                             onPressed: () {
-                              _submitSitUpEditing(); // 確定処理
+                              situpt = formatDuration(_nwdurationsit);
+                              box.put("sitUpGoalTime", situpt);
+                              _submitSitUpEditing();
                             },
                           ),
                           SizedBox(
                             height: 150,
                             width: 170,
-                            child: CupertinoTimerPicker(
-                              mode: CupertinoTimerPickerMode.ms, //分と秒を表示するモード
-                              initialTimerDuration: box.get(
-                                "situptime",
-                                defaultValue: Duration.zero,
+                            child: DefaultTextStyle(
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontSize: 20,
                               ),
-                              onTimerDurationChanged: (Duration newDration) {
-                                _nwduration = newDration;
-                              },
+                              child: CupertinoTimerPicker(
+                                mode: CupertinoTimerPickerMode.ms,
+                                initialTimerDuration: parseDuration(
+                                  box.get(
+                                    "sitUpGoalTime",
+                                    defaultValue: "00:00",
+                                  ),
+                                ),
+                                onTimerDurationChanged: (Duration newDuration) {
+                                  setState(() {
+                                    _nwdurationsit = newDuration;
+                                  });
+                                },
+                              ),
                             ),
                           ),
                         ],

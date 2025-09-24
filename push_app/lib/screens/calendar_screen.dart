@@ -16,7 +16,9 @@ class Calendar extends StatefulWidget {
 class _CalendarState extends State<Calendar> {
   // Calendar画面の状態管理クラス
 
+  // _focusedDayは、カレンダーで表示している月の基準日（どの月を表示するかを決める日付）。
   DateTime _focusedDay = DateTime.now(); // 現在フォーカスされている日付
+  // _selectedDayは、ユーザーが実際に選択した日付。
   DateTime? _selectedDay; // 選択された日付（未選択ならnull）
 
   int _pushUpGoalCount = box.get(
@@ -38,6 +40,8 @@ class _CalendarState extends State<Calendar> {
 
   late Duration _nwdurationpush;
   late Duration _nwdurationsit;
+
+  int month = DateTime.now().month;
 
   @override
   void initState() {
@@ -131,41 +135,53 @@ class _CalendarState extends State<Calendar> {
         titleSpacing: 0, // タイトルの余白
         title: Padding(
           padding: const EdgeInsets.only(left: 30), // 左に余白追加
-          child: Align(
-            alignment: Alignment.centerLeft, // 左寄せ
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // 左寄せ
-              children: [
-                Text(
-                  "This month's goal", // 目標回数ラベル
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                  ),
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                right: 30,
+                child: IconButton(
+                  icon: Icon(Icons.bar_chart, color: Colors.white, size: 30),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => GraphScreen(month),
+                      ),
+                    );
+                  },
                 ),
-                Row(
+              ),
+              Align(
+                alignment: Alignment.centerLeft, // 左寄せ
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start, // 左寄せ
                   children: [
-                    _isPushUpEditing // 編集モードかどうかで表示切替
-                        ? Row(
-                            children: [
-                              Icon(Icons.circle, color: Colors.white, size: 10),
-                              Text(
-                                "  Push-up:  ",
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 20,
-                                ),
-                              ),
-                              SizedBox(
-                                width: 30,
+                    Text(
+                      "This month's goal", // 目標回数ラベル
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.circle, color: Colors.white, size: 10),
+                        Text(
+                          "  Push-up:  ",
+                          style: TextStyle(color: Colors.white70, fontSize: 20),
+                        ),
+                        _isPushUpEditing
+                            ? SizedBox(
+                                width: 25,
                                 child: TextField(
                                   controller: _pushUpController, // 入力コントローラー
                                   autofocus: true, // 自動フォーカス
                                   keyboardType: TextInputType.number, // 数値入力
                                   style: TextStyle(
                                     color: Colors.white70,
-                                    fontSize: 20,
+                                    fontSize: 19,
                                   ),
                                   decoration: InputDecoration(
                                     focusedBorder: UnderlineInputBorder(
@@ -181,15 +197,29 @@ class _CalendarState extends State<Calendar> {
                                   onSubmitted: (_) =>
                                       _submitPushUpEditing(), // Enterで確定
                                 ),
-                              ),
-                              Text(
-                                'reps',
+                              )
+                            : Text(
+                                '$_pushUpGoalCount', // 目標回数表示
                                 style: TextStyle(
                                   color: Colors.white70,
                                   fontSize: 20,
                                 ),
                               ),
-                              IconButton(
+                        Text(
+                          ' reps    ',
+                          style: TextStyle(color: Colors.white70, fontSize: 20),
+                        ),
+                        _isPushUpEditing
+                            ? SizedBox.shrink()
+                            : Text(
+                                '$pushupt',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 20,
+                                ),
+                              ),
+                        _isPushUpEditing
+                            ? IconButton(
                                 icon: Icon(
                                   Icons.check,
                                   color: Colors.white,
@@ -197,162 +227,291 @@ class _CalendarState extends State<Calendar> {
                                 onPressed: () {
                                   _submitPushUpEditing();
                                 }, // 確定処理
-                              ),
-                              SizedBox(
-                                height: 150,
-                                width: 170,
-                                child: DefaultTextStyle(
-                                  style: TextStyle(
-                                    color: Colors.green,
-                                    fontSize: 20,
-                                  ),
-                                  child: CupertinoTimerPicker(
-                                    mode: CupertinoTimerPickerMode.ms,
-                                    initialTimerDuration: parseDuration(
-                                      box.get(
-                                        "pushUpGoalTime",
-                                        defaultValue: "00:00",
-                                      ),
-                                    ),
-                                    onTimerDurationChanged:
-                                        (Duration newDuration) {
-                                          setState(() {
-                                            _nwdurationpush = newDuration;
-                                          });
-                                        },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        : Row(
-                            children: [
-                              Icon(Icons.circle, color: Colors.white, size: 10),
-                              Text(
-                                '  Push-up:  $_pushUpGoalCount reps', // 目標回数表示
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 20,
-                                ),
-                              ),
-                              Text(
-                                '    $pushupt',
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 20,
-                                ),
-                              ),
-                              IconButton(
+                              )
+                            : IconButton(
                                 icon: Icon(
                                   Icons.edit,
                                   color: Colors.white,
                                 ), // 編集ボタン
                                 onPressed: _startPushUpEditing, // 編集開始
                               ),
-                            ],
-                          ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.circle, color: Colors.white, size: 10),
+                        Text(
+                          "  Sit-up:  ",
+                          style: TextStyle(color: Colors.white70, fontSize: 20),
+                        ),
+                        _isSitUpEditing
+                            ? SizedBox(
+                                width: 25,
+                                child: TextField(
+                                  controller: _sitUpController, // 入力コントローラー
+                                  autofocus: true,
+                                  keyboardType: TextInputType.number,
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 19,
+                                  ),
+                                  decoration: InputDecoration(
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.white70,
+                                      ),
+                                    ),
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      vertical: 8,
+                                    ),
+                                  ),
+                                  onSubmitted: (_) =>
+                                      _submitSitUpEditing(), // Enterで確定
+                                ),
+                              )
+                            : Text(
+                                '$_sitUpGoalCount',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 20,
+                                ),
+                              ),
+                        Text(
+                          ' reps    ',
+                          style: TextStyle(color: Colors.white70, fontSize: 20),
+                        ),
+                        _isSitUpEditing
+                            ? SizedBox.shrink()
+                            : Text(
+                                '$situpt',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 20,
+                                ),
+                              ),
+                        _isSitUpEditing
+                            ? IconButton(
+                                icon: Icon(Icons.check, color: Colors.white),
+                                onPressed: _submitSitUpEditing,
+                              )
+                            : IconButton(
+                                icon: Icon(Icons.edit, color: Colors.white),
+                                onPressed: _startSitUpEditing,
+                              ),
+                      ],
+                    ),
+
+                    //             _isPushUpEditing // 編集モードかどうかで表示切替
+                    //                 ? Row(
+                    //                     children: [
+                    //                       Icon(Icons.circle, color: Colors.white, size: 10),
+                    //                       Text(
+                    //                         "  Push-up:  ",
+                    //                         style: TextStyle(
+                    //                           color: Colors.white70,
+                    //                           fontSize: 20,
+                    //                         ),
+                    //                       ),
+                    //                       SizedBox(
+                    //                         width: 30,
+                    //                         child: TextField(
+                    //                           controller: _pushUpController, // 入力コントローラー
+                    //                           autofocus: true, // 自動フォーカス
+                    //                           keyboardType: TextInputType.number, // 数値入力
+                    //                           style: TextStyle(
+                    //                             color: Colors.white70,
+                    //                             fontSize: 20,
+                    //                           ),
+                    //                           decoration: InputDecoration(
+                    //                             focusedBorder: UnderlineInputBorder(
+                    //                               borderSide: BorderSide(
+                    //                                 color: Colors.white70,
+                    //                               ),
+                    //                             ), // フォーカス時の下線
+                    //                             isDense: true, // コンパクト表示
+                    //                             contentPadding: EdgeInsets.symmetric(
+                    //                               vertical: 8, //上下に８px
+                    //                             ), //余白
+                    //                           ),
+                    //                           onSubmitted: (_) =>
+                    //                               _submitPushUpEditing(), // Enterで確定
+                    //                         ),
+                    //                       ),
+                    //                       Text(
+                    //                         'reps',
+                    //                         style: TextStyle(
+                    //                           color: Colors.white70,
+                    //                           fontSize: 20,
+                    //                         ),
+                    //                       ),
+                    //                       IconButton(
+                    //                         icon: Icon(
+                    //                           Icons.check,
+                    //                           color: Colors.white,
+                    //                         ), // 確定ボタン
+                    //                         onPressed: () {
+                    //                           _submitPushUpEditing();
+                    //                         }, // 確定処理
+                    //                       ),
+                    //                       SizedBox(
+                    //                         height: 150,
+                    //                         width: 170,
+                    //                         child: DefaultTextStyle(
+                    //                           style: TextStyle(
+                    //                             color: Colors.green,
+                    //                             fontSize: 20,
+                    //                           ),
+                    //                           child: CupertinoTimerPicker(
+                    //                             mode: CupertinoTimerPickerMode.ms,
+                    //                             initialTimerDuration: parseDuration(
+                    //                               box.get(
+                    //                                 "pushUpGoalTime",
+                    //                                 defaultValue: "00:00",
+                    //                               ),
+                    //                             ),
+                    //                             onTimerDurationChanged:
+                    //                                 (Duration newDuration) {
+                    //                                   setState(() {
+                    //                                     _nwdurationpush = newDuration;
+                    //                                   });
+                    //                                 },
+                    //                           ),
+                    //                         ),
+                    //                       ),
+                    //                     ],
+                    //                   )
+                    //                 : Row(
+                    //                     children: [
+                    //                       Icon(Icons.circle, color: Colors.white, size: 10),
+                    //                       Text(
+                    //                         '  Push-up:  $_pushUpGoalCount reps', // 目標回数表示
+                    //                         style: TextStyle(
+                    //                           color: Colors.white70,
+                    //                           fontSize: 20,
+                    //                         ),
+                    //                       ),
+                    //                       Text(
+                    //                         '    $pushupt',
+                    //                         style: TextStyle(
+                    //                           color: Colors.white70,
+                    //                           fontSize: 20,
+                    //                         ),
+                    //                       ),
+                    //                       IconButton(
+                    //                         icon: Icon(
+                    //                           Icons.edit,
+                    //                           color: Colors.white,
+                    //                         ), // 編集ボタン
+                    //                         onPressed: _startPushUpEditing, // 編集開始
+                    //                       ),
+                    //                     ],
+                    //                   ),
+                    //             _isSitUpEditing // 編集モードかどうかで表示切替
+                    //                 ? Row(
+                    //                     children: [
+                    //                       Icon(Icons.circle, color: Colors.white, size: 10),
+                    //                       Text(
+                    //                         "  Sit-up:  ",
+                    //                         style: TextStyle(
+                    //                           color: Colors.white70,
+                    //                           fontSize: 20,
+                    //                         ),
+                    //                       ),
+                    //                       SizedBox(
+                    //                         width: 30,
+                    //                         child: TextField(
+                    //                           controller: _sitUpController, // 入力コントローラー
+                    //                           autofocus: true, // 自動フォーカス
+                    //                           keyboardType: TextInputType.number, // 数値入力
+                    //                           style: TextStyle(
+                    //                             color: Colors.white70,
+                    //                             fontSize: 20,
+                    //                           ),
+                    //                           decoration: InputDecoration(
+                    //                             focusedBorder: UnderlineInputBorder(
+                    //                               borderSide: BorderSide(
+                    //                                 color: Colors.white70,
+                    //                               ),
+                    //                             ),
+                    //                             isDense: true,
+                    //                             contentPadding: EdgeInsets.symmetric(
+                    //                               vertical: 8,
+                    //                             ),
+                    //                           ),
+                    //                           onSubmitted: (_) => _submitSitUpEditing(),
+                    //                         ),
+                    //                       ),
+                    //                       Text(
+                    //                         'reps',
+                    //                         style: TextStyle(
+                    //                           color: Colors.white70,
+                    //                           fontSize: 20,
+                    //                         ),
+                    //                       ),
+                    //                       IconButton(
+                    //                         icon: Icon(Icons.check, color: Colors.white),
+                    //                         onPressed: () {
+                    //                           _submitSitUpEditing();
+                    //                         },
+                    //                       ),
+                    //                       SizedBox(
+                    //                         height: 150,
+                    //                         width: 170,
+                    //                         child: DefaultTextStyle(
+                    //                           style: TextStyle(
+                    //                             color: Colors.green,
+                    //                             fontSize: 20,
+                    //                           ),
+                    //                           child: CupertinoTimerPicker(
+                    //                             mode: CupertinoTimerPickerMode.ms,
+                    //                             initialTimerDuration: parseDuration(
+                    //                               box.get(
+                    //                                 "sitUpGoalTime",
+                    //                                 defaultValue: "00:00",
+                    //                               ),
+                    //                             ),
+                    //                             onTimerDurationChanged:
+                    //                                 (Duration newDuration) {
+                    //                                   setState(() {
+                    //                                     _nwdurationsit = newDuration;
+                    //                                   });
+                    //                                 },
+                    //                           ),
+                    //                         ),
+                    //                       ),
+                    //                     ],
+                    //                   )
+                    //                 : Row(
+                    //                     children: [
+                    //                       Icon(Icons.circle, color: Colors.white, size: 10),
+                    //                       Text(
+                    //                         '  Sit-up:  $_sitUpGoalCount reps', // 目標回数表示
+                    //                         style: TextStyle(
+                    //                           color: Colors.white70,
+                    //                           fontSize: 20,
+                    //                         ),
+                    //                       ),
+                    //                       Text(
+                    //                         '    $situpt',
+                    //                         style: TextStyle(
+                    //                           color: Colors.white70,
+                    //                           fontSize: 20,
+                    //                         ),
+                    //                       ),
+                    //                       IconButton(
+                    //                         icon: Icon(
+                    //                           Icons.edit,
+                    //                           color: Colors.white,
+                    //                         ), // 編集ボタン
+                    //                         onPressed: _startSitUpEditing, // 編集開始
+                    //                       ),
+                    //                     ],
+                    //                   ),
                   ],
                 ),
-                _isSitUpEditing // 編集モードかどうかで表示切替
-                    ? Row(
-                        children: [
-                          Icon(Icons.circle, color: Colors.white, size: 10),
-                          Text(
-                            "  Sit-up:  ",
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 20,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 30,
-                            child: TextField(
-                              controller: _sitUpController, // 入力コントローラー
-                              autofocus: true, // 自動フォーカス
-                              keyboardType: TextInputType.number, // 数値入力
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 20,
-                              ),
-                              decoration: InputDecoration(
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white70),
-                                ),
-                                isDense: true,
-                                contentPadding: EdgeInsets.symmetric(
-                                  vertical: 8,
-                                ),
-                              ),
-                              onSubmitted: (_) => _submitSitUpEditing(),
-                            ),
-                          ),
-                          Text(
-                            'reps',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 20,
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.check, color: Colors.white),
-                            onPressed: () {
-                              _submitSitUpEditing();
-                            },
-                          ),
-                          SizedBox(
-                            height: 150,
-                            width: 170,
-                            child: DefaultTextStyle(
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontSize: 20,
-                              ),
-                              child: CupertinoTimerPicker(
-                                mode: CupertinoTimerPickerMode.ms,
-                                initialTimerDuration: parseDuration(
-                                  box.get(
-                                    "sitUpGoalTime",
-                                    defaultValue: "00:00",
-                                  ),
-                                ),
-                                onTimerDurationChanged: (Duration newDuration) {
-                                  setState(() {
-                                    _nwdurationsit = newDuration;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    : Row(
-                        children: [
-                          Icon(Icons.circle, color: Colors.white, size: 10),
-                          Text(
-                            '  Sit-up:  $_sitUpGoalCount reps', // 目標回数表示
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 20,
-                            ),
-                          ),
-                          Text(
-                            '    $situpt',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 20,
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.edit,
-                              color: Colors.white,
-                            ), // 編集ボタン
-                            onPressed: _startSitUpEditing, // 編集開始
-                          ),
-                        ],
-                      ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -389,7 +548,7 @@ class _CalendarState extends State<Calendar> {
                     },
                   ),
                   firstDay: DateTime.utc(2000, 1, 1), // カレンダーの開始日
-                  lastDay: DateTime.utc(2200, 12, 31), // カレンダーの終了日
+                  lastDay: DateTime.utc(2100, 12, 31), // カレンダーの終了日
                   focusedDay: _focusedDay, // 現在フォーカスされている日付
                   selectedDayPredicate: (day) =>
                       isSameDay(_selectedDay, day), // 選択判定
@@ -398,6 +557,7 @@ class _CalendarState extends State<Calendar> {
                     setState(() {
                       _selectedDay = selectedDay; // 選択日を更新
                       _focusedDay = focusedDay; // フォーカス日を更新
+                      month = focusedDay.month;
                     });
                     showDialog<void>(
                       context: context,
@@ -405,6 +565,12 @@ class _CalendarState extends State<Calendar> {
                         return AlertDialogSample(selectedDay); // ダイアログ表示
                       },
                     );
+                  },
+                  onPageChanged: (focusedDay) {
+                    setState(() {
+                      month = focusedDay.month;
+                      _focusedDay = focusedDay;
+                    });
                   },
                   calendarStyle: CalendarStyle(
                     defaultTextStyle: TextStyle(
@@ -475,8 +641,7 @@ class _CalendarState extends State<Calendar> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            const SelectScreen(), // PushUpCounterScreenへ遷移
+                        builder: (context) => const SelectScreen(),
                       ),
                     );
                   },

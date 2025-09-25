@@ -144,7 +144,7 @@ class _CalendarState extends State<Calendar> {
               _isPushUpEditing || _isSitUpEditing
                   ? SizedBox.shrink()
                   : Positioned(
-                      bottom: 0,
+                      bottom: 4,
                       right: 10,
                       child: IconButton(
                         icon: Icon(
@@ -163,7 +163,7 @@ class _CalendarState extends State<Calendar> {
                       ),
                     ),
               SizedBox(
-                height: 150,
+                height: 140,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start, // 左寄せ
                   children: [
@@ -391,7 +391,8 @@ class _CalendarState extends State<Calendar> {
                   calendarBuilders: CalendarBuilders(
                     defaultBuilder: (context, day, focusedDay) {
                       // 特定の日付リストに含まれていたら装飾変更
-                      if (highlightDays.any((d) => isSameDay(d, day))) {
+                      if (highlightDays.any((d) => isSameDay(d, day)))
+                        //.anyはリストの要素のうち一つでも条件を満たせばtrueを返す、
                         return Center(
                           child: Icon(
                             Icons.check,
@@ -399,8 +400,18 @@ class _CalendarState extends State<Calendar> {
                             size: 50,
                           ),
                         );
-                      }
                       return null; // それ以外はデフォルト表示
+                    },
+                    selectedBuilder: (context, day, focusedDay) {
+                      if (highlightDays.any((d) => isSameDay(d, focusedDay)))
+                        return Center(
+                          child: Icon(
+                            Icons.check,
+                            color: const Color.fromARGB(255, 212, 255, 95),
+                            size: 50,
+                          ),
+                        );
+                      return null;
                     },
                   ),
                   firstDay: DateTime.utc(2000, 1, 1), // カレンダーの開始日

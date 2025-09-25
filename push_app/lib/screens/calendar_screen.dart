@@ -162,8 +162,8 @@ class _CalendarState extends State<Calendar> {
                         },
                       ),
                     ),
-              Align(
-                alignment: Alignment.topLeft, // 左寄せ
+              SizedBox(
+                height: 150,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start, // 左寄せ
                   children: [
@@ -175,145 +175,163 @@ class _CalendarState extends State<Calendar> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Row(
-                      children: [
-                        Icon(Icons.circle, color: Colors.white, size: 10),
-                        Text(
-                          "  Push-up:  ",
-                          style: TextStyle(color: Colors.white70, fontSize: 20),
-                        ),
-                        _isPushUpEditing
-                            ? SizedBox(
-                                width: 25,
-                                child: TextField(
-                                  controller: _pushUpController, // 入力コントローラー
-                                  autofocus: true, // 自動フォーカス
-                                  keyboardType: TextInputType.number, // 数値入力
+                    SizedBox(
+                      height: 50,
+                      child: Row(
+                        children: [
+                          Icon(Icons.circle, color: Colors.white, size: 10),
+                          Text(
+                            "  Push-up:  ",
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 20,
+                            ),
+                          ),
+                          _isPushUpEditing
+                              ? SizedBox(
+                                  width: 25,
+                                  child: TextField(
+                                    controller: _pushUpController, // 入力コントローラー
+                                    autofocus: true, // 自動フォーカス
+                                    keyboardType: TextInputType.number, // 数値入力
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 20,
+                                    ),
+                                    decoration: InputDecoration(
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.white70,
+                                        ),
+                                      ), // フォーカス時の下線
+                                      isDense: true, // コンパクト表示
+                                      contentPadding: EdgeInsets.symmetric(
+                                        vertical: 8, //上下に８px
+                                      ), //余白
+                                    ),
+                                    onSubmitted: (_) =>
+                                        _submitPushUpEditing(), // Enterで確定
+                                  ),
+                                )
+                              : Text(
+                                  '$_pushUpGoalCount', // 目標回数表示
                                   style: TextStyle(
                                     color: Colors.white70,
                                     fontSize: 20,
                                   ),
-                                  decoration: InputDecoration(
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.white70,
-                                      ),
-                                    ), // フォーカス時の下線
-                                    isDense: true, // コンパクト表示
-                                    contentPadding: EdgeInsets.symmetric(
-                                      vertical: 8, //上下に８px
-                                    ), //余白
+                                ),
+                          Text(
+                            ' reps    ',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 20,
+                            ),
+                          ),
+                          _isPushUpEditing
+                              ? SizedBox.shrink()
+                              : Text(
+                                  '$pushupt',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 20,
                                   ),
-                                  onSubmitted: (_) =>
-                                      _submitPushUpEditing(), // Enterで確定
                                 ),
-                              )
-                            : Text(
-                                '$_pushUpGoalCount', // 目標回数表示
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 20,
+                          _isPushUpEditing
+                              ? IconButton(
+                                  icon: Icon(
+                                    Icons.check,
+                                    color: Colors.white,
+                                  ), // 確定ボタン
+                                  onPressed: () {
+                                    _submitPushUpEditing();
+                                  }, // 確定処理
+                                )
+                              : _isSitUpEditing
+                              ? SizedBox.shrink()
+                              : IconButton(
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: Colors.white,
+                                  ), // 編集ボタン
+                                  onPressed: _startPushUpEditing, // 編集開始
                                 ),
-                              ),
-                        Text(
-                          ' reps    ',
-                          style: TextStyle(color: Colors.white70, fontSize: 20),
-                        ),
-                        _isPushUpEditing
-                            ? SizedBox.shrink()
-                            : Text(
-                                '$pushupt',
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 20,
-                                ),
-                              ),
-                        _isPushUpEditing
-                            ? IconButton(
-                                icon: Icon(
-                                  Icons.check,
-                                  color: Colors.white,
-                                ), // 確定ボタン
-                                onPressed: () {
-                                  _submitPushUpEditing();
-                                }, // 確定処理
-                              )
-                            : _isSitUpEditing
-                            ? SizedBox.shrink()
-                            : IconButton(
-                                icon: Icon(
-                                  Icons.edit,
-                                  color: Colors.white,
-                                ), // 編集ボタン
-                                onPressed: _startPushUpEditing, // 編集開始
-                              ),
-                      ],
+                        ],
+                      ),
                     ),
-                    Row(
-                      children: [
-                        Icon(Icons.circle, color: Colors.white, size: 10),
-                        Text(
-                          "  Sit-up:  ",
-                          style: TextStyle(color: Colors.white70, fontSize: 20),
-                        ),
-                        _isSitUpEditing
-                            ? SizedBox(
-                                width: 25,
-                                child: TextField(
-                                  controller: _sitUpController, // 入力コントローラー
-                                  autofocus: true,
-                                  keyboardType: TextInputType.number,
+                    SizedBox(
+                      height: 50,
+                      child: Row(
+                        children: [
+                          Icon(Icons.circle, color: Colors.white, size: 10),
+                          Text(
+                            "  Sit-up:  ",
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 20,
+                            ),
+                          ),
+                          _isSitUpEditing
+                              ? SizedBox(
+                                  width: 25,
+                                  child: TextField(
+                                    controller: _sitUpController, // 入力コントローラー
+                                    autofocus: true,
+                                    keyboardType: TextInputType.number,
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 20,
+                                    ),
+                                    decoration: InputDecoration(
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.white70,
+                                        ),
+                                      ),
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.symmetric(
+                                        vertical: 8,
+                                      ),
+                                    ),
+                                    onSubmitted: (_) =>
+                                        _submitSitUpEditing(), // Enterで確定
+                                  ),
+                                )
+                              : Text(
+                                  '$_sitUpGoalCount',
                                   style: TextStyle(
                                     color: Colors.white70,
                                     fontSize: 20,
                                   ),
-                                  decoration: InputDecoration(
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.white70,
-                                      ),
-                                    ),
-                                    isDense: true,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      vertical: 8,
-                                    ),
+                                ),
+                          Text(
+                            ' reps    ',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 20,
+                            ),
+                          ),
+                          _isSitUpEditing
+                              ? SizedBox.shrink()
+                              : Text(
+                                  '$situpt',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 20,
                                   ),
-                                  onSubmitted: (_) =>
-                                      _submitSitUpEditing(), // Enterで確定
                                 ),
-                              )
-                            : Text(
-                                '$_sitUpGoalCount',
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 20,
+                          _isSitUpEditing
+                              ? IconButton(
+                                  icon: Icon(Icons.check, color: Colors.white),
+                                  onPressed: _submitSitUpEditing,
+                                )
+                              : _isPushUpEditing
+                              ? SizedBox.shrink()
+                              : IconButton(
+                                  icon: Icon(Icons.edit, color: Colors.white),
+                                  onPressed: _startSitUpEditing,
                                 ),
-                              ),
-                        Text(
-                          ' reps    ',
-                          style: TextStyle(color: Colors.white70, fontSize: 20),
-                        ),
-                        _isSitUpEditing
-                            ? SizedBox.shrink()
-                            : Text(
-                                '$situpt',
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 20,
-                                ),
-                              ),
-                        _isSitUpEditing
-                            ? IconButton(
-                                icon: Icon(Icons.check, color: Colors.white),
-                                onPressed: _submitSitUpEditing,
-                              )
-                            : _isPushUpEditing
-                            ? SizedBox.shrink()
-                            : IconButton(
-                                icon: Icon(Icons.edit, color: Colors.white),
-                                onPressed: _startSitUpEditing,
-                              ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),

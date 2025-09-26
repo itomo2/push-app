@@ -190,6 +190,12 @@ class _GraphScreenState extends State<GraphScreen> {
               padding: const EdgeInsets.all(16.0),
               child: BarChart(
                 BarChartData(
+                  gridData: FlGridData(
+                    drawHorizontalLine: true, //水平線を描画
+                    drawVerticalLine: false, //垂直線を非表示
+                    getDrawingHorizontalLine: (_) =>
+                        FlLine(color: Colors.white, strokeWidth: 0.5),
+                  ),
                   alignment: BarChartAlignment.spaceAround,
                   //ぼうの間隔を均等に両端にも半分のスペースを設置
                   maxY: 20,

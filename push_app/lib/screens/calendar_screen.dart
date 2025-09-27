@@ -46,8 +46,8 @@ class _CalendarState extends State<Calendar> {
   @override
   void initState() {
     super.initState();
-    pushupt = box.get('pushUpGoalTime');
-    situpt = box.get('sitUpGoalTime');
+    pushupt = box.get('pushUpGoalTime') ?? "00:00";
+    situpt = box.get('sitUpGoalTime') ?? "00:00";
     _nwdurationpush = parseDuration(pushupt);
     _nwdurationsit = parseDuration(situpt);
   }
@@ -126,11 +126,11 @@ class _CalendarState extends State<Calendar> {
         context,
       ).showSnackBar(SnackBar(content: Text('正の整数を入力してください')));
     }
+    highlightDays = box.get("highlight") ?? []; // 画面のUI構築
   }
 
   @override
   Widget build(BuildContext context) {
-    highlightDays = box.get("highlight") ?? []; // 画面のUI構築
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -403,7 +403,10 @@ class _CalendarState extends State<Calendar> {
                       return null; // それ以外はデフォルト表示
                     },
                     selectedBuilder: (context, day, focusedDay) {
-                      if (highlightDays.any((d) => isSameDay(d, focusedDay)))
+                      debugPrint("hd = $highlightDays");
+                      debugPrint("fd = $focusedDay");
+                      if (highlightDays.any((d) => isSameDay(d, focusedDay)) &&
+                          !isSameDay(focusedDay, DateTime.now()))
                         return Center(
                           child: Icon(
                             Icons.check,

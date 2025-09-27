@@ -22,86 +22,14 @@ class _GraphScreenState extends State<GraphScreen> {
   final List<double> _targetValues = [8, 10, 14, 15, 13, 10, 6];
   //それぞれのグラフが到達する高さ
 
-  final List<BarChartGroupData> _allBarGroups = [
-    BarChartGroupData(
-      x: 0, //横軸位置
-      barRods: [
-        //ぼうの情報をもつ
-        BarChartRodData(
-          //棒一本を表すクラス
-          toY: 0, //棒の高さ(アニメーションのためとりあえず０)
-          color: Colors.lightBlueAccent,
-          width: 18,
-          borderRadius: BorderRadius.circular(4), //棒の角丸
-        ),
-      ],
-    ),
-    BarChartGroupData(
-      x: 1,
-      barRods: [
-        BarChartRodData(
-          toY: 0,
-          color: Colors.orangeAccent,
-          width: 18,
-          borderRadius: BorderRadius.circular(4),
-        ),
-      ],
-    ),
-    BarChartGroupData(
-      x: 2,
-      barRods: [
-        BarChartRodData(
-          toY: 0,
-          color: Colors.greenAccent,
-          width: 18,
-          borderRadius: BorderRadius.circular(4),
-        ),
-      ],
-    ),
-    BarChartGroupData(
-      x: 3,
-      barRods: [
-        BarChartRodData(
-          toY: 0,
-          color: Colors.purpleAccent,
-          width: 18,
-          borderRadius: BorderRadius.circular(4),
-        ),
-      ],
-    ),
-    BarChartGroupData(
-      x: 4,
-      barRods: [
-        BarChartRodData(
-          toY: 0,
-          color: Colors.yellowAccent,
-          width: 18,
-          borderRadius: BorderRadius.circular(4),
-        ),
-      ],
-    ),
-    BarChartGroupData(
-      x: 5,
-      barRods: [
-        BarChartRodData(
-          toY: 0,
-          color: Colors.redAccent,
-          width: 18,
-          borderRadius: BorderRadius.circular(4),
-        ),
-      ],
-    ),
-    BarChartGroupData(
-      x: 6,
-      barRods: [
-        BarChartRodData(
-          toY: 0,
-          color: Colors.tealAccent,
-          width: 18,
-          borderRadius: BorderRadius.circular(4),
-        ),
-      ],
-    ),
+  final List<Color> weekColors = [
+    Colors.blueAccent,
+    Colors.orangeAccent,
+    Colors.greenAccent,
+    Colors.purpleAccent,
+    Colors.yellowAccent,
+    Colors.pinkAccent,
+    Colors.cyanAccent,
   ];
 
   String monthName(int k) {
@@ -139,29 +67,51 @@ class _GraphScreenState extends State<GraphScreen> {
     super.initState();
     monthname = monthName(month);
 
-    _barGroups = List.from(_allBarGroups);
-    //_allBarGroupsの内容を_barGroupsにコピー、allBarGroupsに影響を与えない代入（浅いコピー）
+    final List<BarChartGroupData> _zeroBarGroups = List.generate(
+      7,
+      (i) =>
+          //generateは指定した個数の要素を持つリストを作る。長さは_allBarGroupsに依存
+          //iはリストのインデックス、０からlengthよりも1少ない数まで増える
+          BarChartGroupData(
+            x: i, //横軸位置
+            barRods: [
+              //ぼうの情報をもつ
+              BarChartRodData(
+                //棒一本を表すクラス
+                toY: 0, //棒の高さ(アニメーションのためとりあえず０)
+                color: Color.fromARGB(255, 212, 255, 95),
+                width: 18,
+                borderRadius: BorderRadius.circular(2), //棒の角丸
+              ),
+            ],
+          ),
+    );
+
+    _barGroups = List.from(_zeroBarGroups);
+    //_zeroBarGroupsの内容を_barGroupsにコピー、zeroBarGroupsに影響を与えない代入（浅いコピー）
 
     Future.delayed(Duration(milliseconds: 250), () {
       //アニメーション
       //delayedを使うと指定した時間だけ待つ、この場合だとinit終わった後に実行させるようになってる
       setState(() {
-        _barGroups = List.generate(_allBarGroups.length, (i) {
-          //generateは指定した個数の要素を持つリストを作る。長さは_allBarGroupsに依存
-          //iはリストのインデックス、length-1まで増える
-          return BarChartGroupData(
-            x: i,
-            barRods: [
-              BarChartRodData(
-                toY: _targetValues[i], //前で作った目標長さ
-                color: _allBarGroups[i].barRods[0].color,
-                //barRodsリストの一つ目のデータ（今回は各グループに棒が一本しかないので0)
-                width: 30,
-                borderRadius: BorderRadius.circular(4),
+        _barGroups = List.generate(
+          _zeroBarGroups.length,
+          (i) =>
+              //generateは指定した個数の要素を持つリストを作る。長さは_allBarGroupsに依存
+              //iはリストのインデックス、length-1まで増える
+              BarChartGroupData(
+                x: i,
+                barRods: [
+                  BarChartRodData(
+                    toY: _targetValues[i], //前で作った目標長さ
+                    color: weekColors[i],
+                    //barRodsリストの一つ目のデータ（今回は各グループに棒が一本しかないので0)
+                    width: _zeroBarGroups[i].barRods[0].width,
+                    borderRadius: _zeroBarGroups[i].barRods[0].borderRadius,
+                  ),
+                ],
               ),
-            ],
-          );
-        });
+        );
       });
     });
   }
@@ -187,7 +137,12 @@ class _GraphScreenState extends State<GraphScreen> {
           Container(color: Colors.black),
           Center(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(
+                right: 16.0,
+                left: 16.0,
+                top: 16.0,
+                bottom: 150.0,
+              ),
               child: BarChart(
                 BarChartData(
                   gridData: FlGridData(
@@ -205,7 +160,7 @@ class _GraphScreenState extends State<GraphScreen> {
                     //titlesDataはグラフの軸ラベルやタイトルの表示方法をまとめた設定
                     leftTitles: AxisTitles(
                       //Y軸らべる
-                      sideTitles: SideTitles(showTitles: true), //数字ラベルを表示
+                      sideTitles: SideTitles(showTitles: false), //数字ラベルを表示
                     ),
                     bottomTitles: AxisTitles(
                       //X軸ラベル
@@ -245,6 +200,7 @@ class _GraphScreenState extends State<GraphScreen> {
                 ),
                 swapAnimationDuration: Duration(milliseconds: 1200),
                 swapAnimationCurve: Curves.easeOutCubic,
+                //アニメーション時の動きを決める
               ),
             ),
           ),

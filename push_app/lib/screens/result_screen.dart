@@ -43,9 +43,9 @@ class _ResultScreenState extends State<ResultScreen> {
               ),
               onPressed: () {
                 // ボタン押下時の処理 // データ保存sinai
-                highlightDays.add(DateTime.now());
+                final now = DateTime.now();
+                highlightDays.add(DateTime(now.year, now.month, now.day));
                 box.put("highlight", highlightDays);
-                debugPrint("$highlightDays");
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(

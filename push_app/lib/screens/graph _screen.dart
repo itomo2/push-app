@@ -1,6 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:intl/intl.dart'; // 日付フォーマット用パッケージをインポート
+import 'package:push_app/main.dart';
 
 class GraphScreen extends StatefulWidget {
   GraphScreen(this.month);
@@ -19,9 +21,6 @@ class _GraphScreenState extends State<GraphScreen> {
   List<BarChartGroupData> _barGroups = [];
   //BarChartGroupDataはfl_chartの棒グラフで一つのグループを表すクラス。一つ一つのグラフの情報が入ってる
 
-  final List<double> _targetValues = [8, 10, 14, 15, 13, 10, 6];
-  //それぞれのグラフが到達する高さ
-
   final List<Color> weekColors = [
     Colors.blueAccent,
     Colors.orangeAccent,
@@ -31,6 +30,49 @@ class _GraphScreenState extends State<GraphScreen> {
     Colors.pinkAccent,
     Colors.cyanAccent,
   ];
+
+  late List<double> situpcount;
+  late List<double> pushupcount;
+  late List<String> pushuptime;
+  late List<String> situptime;
+
+  void _loadData() {
+    try {
+      print('Start _loadData');
+      final keys = List.generate(
+        7,
+        (i) => DateFormat(
+          'yyyy-MM-dd',
+        ).format(DateTime.now().subtract(Duration(days: i))),
+      );
+      final infoData = keys.map((k) => box.get(k)).toList();
+      print('infoData: $infoData');
+      //infoDataがnullでなければinfoData.pushupcount、nullならnullを返す
+      //??でnullなら０を返すのでnullは返らない
+      pushupcount = List.generate(
+        7,
+        (i) => (infoData[i]?.pushupcount ?? 0).toDouble(),
+      );
+      print("pushupcount:$pushupcount");
+      situpcount = List.generate(
+        7,
+        (i) => (infoData[i]?.situpcount ?? 0).toDouble(),
+      );
+      pushuptime = List.generate(
+        7,
+        (i) => formatDuration(infoData[i]?.pushuptime ?? Duration.zero),
+      );
+      situptime = List.generate(
+        7,
+        (i) => formatDuration(infoData[i]?.situptime ?? Duration.zero),
+      );
+    } catch (e) {
+      pushupcount = List.filled(7, 0);
+      situpcount = List.filled(7, 0);
+      pushuptime = List.filled(7, '00:00');
+      situptime = List.filled(7, '00:00');
+    }
+  }
 
   String monthName(int k) {
     switch (k) {
@@ -66,7 +108,7 @@ class _GraphScreenState extends State<GraphScreen> {
   void initState() {
     super.initState();
     monthname = monthName(month);
-
+    _loadData();
     final List<BarChartGroupData> _zeroBarGroups = List.generate(
       7,
       (i) =>
@@ -100,10 +142,10 @@ class _GraphScreenState extends State<GraphScreen> {
               //generateは指定した個数の要素を持つリストを作る。長さは_allBarGroupsに依存
               //iはリストのインデックス、length-1まで増える
               BarChartGroupData(
-                x: i,
+                x: DateTime.now().weekday + i - 1,
                 barRods: [
                   BarChartRodData(
-                    toY: _targetValues[i], //前で作った目標長さ
+                    toY: pushupcount[i], //前で作った目標長さ
                     color: weekColors[i],
                     //barRodsリストの一つ目のデータ（今回は各グループに棒が一本しかないので0)
                     width: _zeroBarGroups[i].barRods[0].width,

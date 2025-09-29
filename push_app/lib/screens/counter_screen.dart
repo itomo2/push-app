@@ -38,6 +38,34 @@ class _CounterScreenState extends State<CounterScreen> {
     super.initState();
     _startListening();
 
+    final key = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 日付をキーに変換
+    final infoData = box.get(key); // Hiveからデータ取得
+
+    // カウント取得（subjectによって分岐）
+    if (subject == 'Push-up') {
+      count = infoData?.pushupcount ?? 0;
+      time = infoData?.pushuptime ?? Duration.zero;
+    } else {
+      count = infoData?.situpcount ?? 0;
+      time = infoData?.situptime ?? Duration.zero;
+    }
+
+    // 目標回数取得（subjectによって分岐、なければ20）
+    goalcount =
+        box.get(
+          subject == 'Push-up' && selectedIndex == 0
+              ? "pushUpGoalCount"
+              : "sitUpGoalCount",
+        ) ??
+        20;
+    goaltime = parseDuration(
+      box.get(
+        subject == 'Push-up' && selectedIndex == 1
+            ? "pushUpGoalTime"
+            : "sitUpGoalTime",
+      ),
+    );
+
     _stopwatch.start(); //ストップウォッチ開始
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       //１秒ごとに実行
@@ -53,12 +81,13 @@ class _CounterScreenState extends State<CounterScreen> {
   void _startListening() {
     _proximityStream = ProximitySensor.events.map((event) => event > 0);
     _proximitySubscription = _proximityStream.listen((isNear) {
+      print('proximity event: $isNear, before _isNear=$_isNear, count=$count');
       if (isNear && !_isNear) {
         setState(() {
           count++;
         });
       }
-      _isNear = isNear;
+      _isNear = isNear; //過去データ
     });
   }
 
@@ -100,35 +129,6 @@ class _CounterScreenState extends State<CounterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 画面のUI構築
-    final key = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 日付をキーに変換
-    final infoData = box.get(key); // Hiveからデータ取得
-
-    // カウント取得（subjectによって分岐）
-    if (subject == 'Push-up') {
-      count = infoData?.pushupcount ?? 0;
-      time = infoData?.pushuptime ?? Duration.zero;
-    } else {
-      count = infoData?.situpcount ?? 0;
-      time = infoData?.situptime ?? Duration.zero;
-    }
-
-    // 目標回数取得（subjectによって分岐、なければ20）
-    goalcount =
-        box.get(
-          subject == 'Push-up' && selectedIndex == 0
-              ? "pushUpGoalCount"
-              : "sitUpGoalCount",
-        ) ??
-        20;
-    goaltime = parseDuration(
-      box.get(
-        subject == 'Push-up' && selectedIndex == 1
-            ? "pushUpGoalTime"
-            : "sitUpGoalTime",
-      ),
-    );
-
     return Scaffold(
       backgroundColor: Colors.black, // 背景色を黒に設定
       body: Center(

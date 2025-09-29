@@ -17,6 +17,8 @@ class AlertDialogSample extends StatelessWidget {
       final key = DateFormat('yyyy-MM-dd').format(selectedDay); // 日付をキーに変換
       final infoData = box.get(key); // Hiveからデータ取得
       pushupcount = infoData?.pushupcount ?? 0;
+      //infoDataがnullでなければinfoData.pushupcount、nullならnullを返す
+      //??でnullなら０を返すのでnullは返らない
       situpcount = infoData?.situpcount ?? 0; // データがなければ0
       pushuptime = formatDuration(infoData?.pushuptime ?? Duration.zero);
       situptime = formatDuration(infoData?.situptime ?? Duration.zero);

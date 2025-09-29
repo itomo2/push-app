@@ -138,7 +138,7 @@ class _CalendarState extends State<Calendar> {
         backgroundColor: Color(0xFF2D2D35), // AppBarの背景色
         titleSpacing: 0, // タイトルの余白
         title: Padding(
-          padding: const EdgeInsets.only(left: 30), // 左に余白追加
+          padding: const EdgeInsets.only(left: 20), // 左に余白追加
           child: Stack(
             children: [
               _isPushUpEditing || _isSitUpEditing
@@ -221,7 +221,7 @@ class _CalendarState extends State<Calendar> {
                                   ),
                                 ),
                           Text(
-                            ' reps    ',
+                            ' reps  ',
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 20,
@@ -304,7 +304,7 @@ class _CalendarState extends State<Calendar> {
                                   ),
                                 ),
                           Text(
-                            ' reps    ',
+                            ' reps  ',
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 20,

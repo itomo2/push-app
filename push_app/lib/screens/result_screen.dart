@@ -15,6 +15,12 @@ class _ResultScreenState extends State<ResultScreen> {
   // _ResultScreenState({super.key}); // コンストラクタ
 
   @override
+  void initState() {
+    super.initState();
+    highlightDays = box.get('highlight') ?? [];
+  }
+
+  @override
   Widget build(BuildContext context) {
     // 画面のUI構築
     return Scaffold(

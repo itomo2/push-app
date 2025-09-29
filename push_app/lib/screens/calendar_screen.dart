@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:push_app/widgets/widgets.dart';
 import 'package:push_app/screens/screens.dart';
+import 'package:intl/intl.dart'; // 日付フォーマット用パッケージをインポート
 
 class Calendar extends StatefulWidget {
   // カレンダー画面（状態を持つ）
@@ -15,6 +16,8 @@ class Calendar extends StatefulWidget {
 
 class _CalendarState extends State<Calendar> {
   // Calendar画面の状態管理クラス
+
+  late List<dynamic> highlightDays;
 
   // _focusedDayは、カレンダーで表示している月の基準日（どの月を表示するかを決める日付）。
   DateTime _focusedDay = DateTime.now(); // 現在フォーカスされている日付
@@ -43,6 +46,25 @@ class _CalendarState extends State<Calendar> {
 
   int month = DateTime.now().month;
 
+  void _demohighlight() {
+    DateTime now = DateTime.now();
+    List<dynamic> demoDays = [];
+    int pushupc;
+    int situpc;
+    for (int ii = 0; ii < 30; ii += 2) {
+      DateTime ago = now.subtract(Duration(days: ii));
+      String key = DateFormat('yyyy-MM-dd').format(ago); // 日付をキーに変
+      demoDays.add(DateTime(ago.year, ago.month, ago.day));
+      pushupc = ii;
+      situpc = 30 - ii;
+      late info infoObject;
+      infoObject = info(pushupc, situpc, Duration.zero, Duration.zero);
+      box.put(key, infoObject); // Hiveに保存
+    }
+
+    box.put('highlight', demoDays);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +72,9 @@ class _CalendarState extends State<Calendar> {
     situpt = box.get('sitUpGoalTime') ?? "00:00";
     _nwdurationpush = parseDuration(pushupt);
     _nwdurationsit = parseDuration(situpt);
+    _demohighlight();
+    highlightDays = box.get("highlight") ?? []; // 画面のUI構築
+    // box.put("highlight", highlightDays);
   }
 
   @override
@@ -126,7 +151,6 @@ class _CalendarState extends State<Calendar> {
         context,
       ).showSnackBar(SnackBar(content: Text('正の整数を入力してください')));
     }
-    highlightDays = box.get("highlight") ?? []; // 画面のUI構築
   }
 
   @override
@@ -403,8 +427,6 @@ class _CalendarState extends State<Calendar> {
                       return null; // それ以外はデフォルト表示
                     },
                     selectedBuilder: (context, day, focusedDay) {
-                      debugPrint("hd = $highlightDays");
-                      debugPrint("fd = $focusedDay");
                       if (highlightDays.any((d) => isSameDay(d, focusedDay)) &&
                           !isSameDay(focusedDay, DateTime.now()))
                         return Center(

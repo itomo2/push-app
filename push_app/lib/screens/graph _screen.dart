@@ -35,15 +35,22 @@ class _GraphScreenState extends State<GraphScreen> {
   late List<double> pushupcount;
   late List<String> pushuptime;
   late List<String> situptime;
+  late List<String> date;
+
+  DateTime monday = DateTime.now().subtract(
+    Duration(days: DateTime.now().weekday - 1),
+  );
 
   void _loadData() {
     try {
       print('Start _loadData');
       final keys = List.generate(
         7,
-        (i) => DateFormat(
-          'yyyy-MM-dd',
-        ).format(DateTime.now().subtract(Duration(days: i))),
+        (i) => DateFormat('yyyy-MM-dd').format(monday.add(Duration(days: i))),
+      );
+      date = List.generate(
+        7,
+        (i) => DateFormat('dd').format(monday.add(Duration(days: i))),
       );
       final infoData = keys.map((k) => box.get(k)).toList();
       print('infoData: $infoData');
@@ -142,10 +149,10 @@ class _GraphScreenState extends State<GraphScreen> {
               //generateは指定した個数の要素を持つリストを作る。長さは_allBarGroupsに依存
               //iはリストのインデックス、length-1まで増える
               BarChartGroupData(
-                x: DateTime.now().weekday + i - 1,
+                x: i,
                 barRods: [
                   BarChartRodData(
-                    toY: pushupcount[i], //前で作った目標長さ
+                    toY: pushupcount[i],
                     color: weekColors[i],
                     //barRodsリストの一つ目のデータ（今回は各グループに棒が一本しかないので0)
                     width: _zeroBarGroups[i].barRods[0].width,
@@ -212,17 +219,11 @@ class _GraphScreenState extends State<GraphScreen> {
                           //titlemetaは軸ラベル生成関数
                           //metaはラベル描画に関する補助情報
                           //valueは軸上の位置(0,1,2,~)
-                          const days = [
-                            'Mon',
-                            'Tue',
-                            'Wed',
-                            'Thu',
-                            'Fri',
-                            'Sat',
-                            'Sun',
-                          ];
+                          final daynow = monday.add(
+                            Duration(days: value.toInt()),
+                          );
                           return Text(
-                            days[value.toInt() % days.length], //days.lengthは７
+                            "${DateFormat("dd").format(daynow)}(${DateFormat('E').format(daynow)})", //days.lengthは７
                             //value.toIntで小数を正数に変換
                             style: TextStyle(color: Colors.white, fontSize: 12),
                           );

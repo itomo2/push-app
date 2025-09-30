@@ -37,8 +37,8 @@ class _GraphScreenState extends State<GraphScreen> {
   late List<String> situptime;
   late List<String> date;
 
-  DateTime monday = DateTime.now().subtract(
-    Duration(days: DateTime.now().weekday - 1),
+  DateTime sunday = DateTime.now().subtract(
+    Duration(days: DateTime.now().weekday % 7),
   );
 
   void _loadData() {
@@ -46,11 +46,11 @@ class _GraphScreenState extends State<GraphScreen> {
       print('Start _loadData');
       final keys = List.generate(
         7,
-        (i) => DateFormat('yyyy-MM-dd').format(monday.add(Duration(days: i))),
+        (i) => DateFormat('yyyy-MM-dd').format(sunday.add(Duration(days: i))),
       );
       date = List.generate(
         7,
-        (i) => DateFormat('dd').format(monday.add(Duration(days: i))),
+        (i) => DateFormat('dd').format(sunday.add(Duration(days: i))),
       );
       final infoData = keys.map((k) => box.get(k)).toList();
       print('infoData: $infoData');
@@ -202,7 +202,11 @@ class _GraphScreenState extends State<GraphScreen> {
                   ),
                   alignment: BarChartAlignment.spaceAround,
                   //ぼうの間隔を均等に両端にも半分のスペースを設置
-                  maxY: 20,
+                  maxY:
+                      (pushupcount.isNotEmpty
+                          ? pushupcount.reduce((a, b) => a > b ? a : b)
+                          : 0) +
+                      5,
                   barTouchData: BarTouchData(enabled: true),
                   //棒のタッチが有効になる
                   titlesData: FlTitlesData(
@@ -219,7 +223,7 @@ class _GraphScreenState extends State<GraphScreen> {
                           //titlemetaは軸ラベル生成関数
                           //metaはラベル描画に関する補助情報
                           //valueは軸上の位置(0,1,2,~)
-                          final daynow = monday.add(
+                          final daynow = sunday.add(
                             Duration(days: value.toInt()),
                           );
                           return Text(

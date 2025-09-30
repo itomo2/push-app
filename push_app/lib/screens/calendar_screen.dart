@@ -51,7 +51,7 @@ class _CalendarState extends State<Calendar> {
     List<dynamic> demoDays = [];
     int pushupc;
     int situpc;
-    for (int ii = 0; ii < 30; ii += 2) {
+    for (int ii = 0; ii < 50; ii += 2) {
       DateTime ago = now.subtract(Duration(days: ii));
       String key = DateFormat('yyyy-MM-dd').format(ago); // 日付をキーに変
       demoDays.add(DateTime(ago.year, ago.month, ago.day));
@@ -159,7 +159,7 @@ class _CalendarState extends State<Calendar> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         toolbarHeight: 150, // AppBarの高さ
-        backgroundColor: Color(0xFF2D2D35), // AppBarの背景色
+        backgroundColor: Color(0xFF2D2D35), // AppBar背景色
         titleSpacing: 0, // タイトルの余白
         title: Padding(
           padding: const EdgeInsets.only(left: 20), // 左に余白追加

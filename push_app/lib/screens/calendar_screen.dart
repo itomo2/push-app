@@ -55,8 +55,8 @@ class _CalendarState extends State<Calendar> {
       DateTime ago = now.subtract(Duration(days: ii));
       String key = DateFormat('yyyy-MM-dd').format(ago); // 日付をキーに変
       demoDays.add(DateTime(ago.year, ago.month, ago.day));
-      pushupc = ii;
-      situpc = 30 - ii;
+      pushupc = ii + 50;
+      situpc = 50 - ii;
       late info infoObject;
       infoObject = info(pushupc, situpc, Duration.zero, Duration.zero);
       box.put(key, infoObject); // Hiveに保存

@@ -185,70 +185,107 @@ class _GraphScreenState extends State<GraphScreen> {
         children: [
           Container(color: Colors.black),
           Center(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                right: 16.0,
-                left: 16.0,
-                top: 16.0,
-                bottom: 150.0,
-              ),
-              child: BarChart(
-                BarChartData(
-                  gridData: FlGridData(
-                    drawHorizontalLine: true, //水平線を描画
-                    drawVerticalLine: false, //垂直線を非表示
-                    getDrawingHorizontalLine: (_) =>
-                        FlLine(color: Colors.white, strokeWidth: 0.5),
+            child: Column(
+              children: [
+                SizedBox(height: 30),
+                Flexible(
+                  flex: 1,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+                        onPressed: () {},
+                      ),
+                      SizedBox(
+                        width: 200,
+                        child: Text(
+                          "${DateFormat("dd").format(sunday)}~${DateFormat("dd").format(sunday.add(Duration(days: 6)))}",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
-                  alignment: BarChartAlignment.spaceAround,
-                  //ぼうの間隔を均等に両端にも半分のスペースを設置
-                  maxY:
-                      (pushupcount.isNotEmpty
-                          ? pushupcount.reduce((a, b) => a > b ? a : b)
-                          : 0) +
-                      5,
-                  barTouchData: BarTouchData(enabled: true),
-                  //棒のタッチが有効になる
-                  titlesData: FlTitlesData(
-                    //titlesDataはグラフの軸ラベルやタイトルの表示方法をまとめた設定
-                    leftTitles: AxisTitles(
-                      //Y軸らべる
-                      sideTitles: SideTitles(showTitles: false), //数字ラベルを表示
-                    ),
-                    bottomTitles: AxisTitles(
-                      //X軸ラベル
-                      sideTitles: SideTitles(
-                        showTitles: true, //ラベルを表示
-                        getTitlesWidget: (double value, _) {
-                          //titlemetaは軸ラベル生成関数
-                          //metaはラベル描画に関する補助情報
-                          //valueは軸上の位置(0,1,2,~)
-                          final daynow = sunday.add(
-                            Duration(days: value.toInt()),
-                          );
-                          return Text(
-                            "${DateFormat("dd").format(daynow)}(${DateFormat('E').format(daynow)})", //days.lengthは７
-                            //value.toIntで小数を正数に変換
-                            style: TextStyle(color: Colors.white, fontSize: 12),
-                          );
-                        },
-                        interval: 1, //１ずつラベルを表示
+                ),
+                Flexible(
+                  flex: 4,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: BarChart(
+                        BarChartData(
+                          gridData: FlGridData(
+                            drawHorizontalLine: true, //水平線を描画
+                            drawVerticalLine: false, //垂直線を非表示
+                            getDrawingHorizontalLine: (_) =>
+                                FlLine(color: Colors.white, strokeWidth: 0.5),
+                          ),
+                          alignment: BarChartAlignment.spaceAround,
+                          //ぼうの間隔を均等に両端にも半分のスペースを設置
+                          maxY:
+                              (pushupcount.isNotEmpty
+                                  ? pushupcount.reduce((a, b) => a > b ? a : b)
+                                  : 0) +
+                              5,
+                          barTouchData: BarTouchData(enabled: true),
+                          //棒のタッチが有効になる
+                          titlesData: FlTitlesData(
+                            //titlesDataはグラフの軸ラベルやタイトルの表示方法をまとめた設定
+                            leftTitles: AxisTitles(
+                              //Y軸らべる
+                              sideTitles: SideTitles(
+                                showTitles: false,
+                              ), //数字ラベルを表示
+                            ),
+                            bottomTitles: AxisTitles(
+                              //X軸ラベル
+                              sideTitles: SideTitles(
+                                showTitles: true, //ラベルを表示
+                                getTitlesWidget: (double value, _) {
+                                  //titlemetaは軸ラベル生成関数
+                                  //metaはラベル描画に関する補助情報
+                                  //valueは軸上の位置(0,1,2,~)
+                                  final daynow = sunday.add(
+                                    Duration(days: value.toInt()),
+                                  );
+                                  return Text(
+                                    "${DateFormat("dd").format(daynow)}(${DateFormat('E').format(daynow)})", //days.lengthは７
+                                    //value.toIntで小数を正数に変換
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                  );
+                                },
+                                interval: 1, //１ずつラベルを表示
+                              ),
+                            ),
+                            topTitles: AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                            rightTitles: AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                          ),
+                          borderData: FlBorderData(show: false),
+                          barGroups: _barGroups,
+                        ),
+                        swapAnimationDuration: Duration(milliseconds: 1200),
+                        swapAnimationCurve: Curves.easeOutCubic,
+                        //アニメーション時の動きを決める
                       ),
                     ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
                   ),
-                  borderData: FlBorderData(show: false),
-                  barGroups: _barGroups,
                 ),
-                swapAnimationDuration: Duration(milliseconds: 1200),
-                swapAnimationCurve: Curves.easeOutCubic,
-                //アニメーション時の動きを決める
-              ),
+              ],
             ),
           ),
         ],

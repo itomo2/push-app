@@ -31,11 +31,25 @@ class _GraphScreenState extends State<GraphScreen> {
     Colors.cyanAccent,
   ];
 
+  void _changeweek(int yy) {
+    setState(() {
+      sunday = sunday.add(Duration(days: 7 * yy));
+      _checkweek();
+      _loadData();
+      _barGroups = List.from(_zeroBarGroups);
+      _updateBarGroups();
+    });
+  }
+
   late List<double> situpcount;
   late List<double> pushupcount;
   late List<String> pushuptime;
   late List<String> situptime;
   late List<String> date;
+
+  late bool othermonth;
+
+  late String isSelectedValue = "Push up";
 
   DateTime sunday = DateTime.now().subtract(
     Duration(days: DateTime.now().weekday % 7),
@@ -53,8 +67,8 @@ class _GraphScreenState extends State<GraphScreen> {
             BarChartRodData(
               //棒一本を表すクラス
               toY: 0, //棒の高さ(アニメーションのためとりあえず０)
-              color: weekColors[i],
-              width: 18,
+              color: Color.fromARGB(255, 212, 255, 95),
+              width: 50,
               borderRadius: BorderRadius.circular(2), //棒の角丸
             ),
           ],
@@ -92,9 +106,16 @@ class _GraphScreenState extends State<GraphScreen> {
     }
   }
 
+  void _checkweek() {
+    if (sunday.day > sunday.add(Duration(days: 7)).day)
+      othermonth = true;
+    else
+      othermonth = false;
+    print(othermonth);
+  }
+
   void _loadData() {
     try {
-      print('Start _loadData');
       final keys = List.generate(
         7,
         (i) => DateFormat('yyyy-MM-dd').format(sunday.add(Duration(days: i))),
@@ -104,14 +125,12 @@ class _GraphScreenState extends State<GraphScreen> {
         (i) => DateFormat('dd').format(sunday.add(Duration(days: i))),
       );
       final infoData = keys.map((k) => box.get(k)).toList();
-      print('infoData: $infoData');
       //infoDataがnullでなければinfoData.pushupcount、nullならnullを返す
       //??でnullなら０を返すのでnullは返らない
       pushupcount = List.generate(
         7,
         (i) => (infoData[i]?.pushupcount ?? 0).toDouble(),
       );
-      print("pushupcount:$pushupcount");
       situpcount = List.generate(
         7,
         (i) => (infoData[i]?.situpcount ?? 0).toDouble(),
@@ -133,7 +152,7 @@ class _GraphScreenState extends State<GraphScreen> {
   }
 
   void _updateBarGroups() {
-    Future.delayed(Duration(milliseconds: 250), () {
+    Future.delayed(Duration(milliseconds: 0), () {
       setState(() {
         _barGroups = List.generate(
           _zeroBarGroups.length,
@@ -142,7 +161,7 @@ class _GraphScreenState extends State<GraphScreen> {
             barRods: [
               BarChartRodData(
                 toY: pushupcount[i],
-                color: weekColors[i],
+                color: _zeroBarGroups[i].barRods[0].color,
                 width: _zeroBarGroups[i].barRods[0].width,
                 borderRadius: _zeroBarGroups[i].barRods[0].borderRadius,
               ),
@@ -153,14 +172,14 @@ class _GraphScreenState extends State<GraphScreen> {
     });
   }
 
+  double maxValue(List<double> list) {
+    if (list.isEmpty) return 0; // 空なら0を返す
+    return list.reduce((a, b) => a > b ? a : b);
+  }
+
   void initState() {
     super.initState();
-    monthname = monthName(month);
-    _loadData();
-    _barGroups = List.from(_zeroBarGroups);
-    //_zeroBarGroupsの内容を_barGroupsにコピー、zeroBarGroupsに影響を与えない代入（浅いコピー）
-    _updateBarGroups();
-    //delayedを使うと指定した時間だけ待つ、この場合だとinit終わった後に実行させるようになってる
+    _changeweek(0);
   }
 
   @override
@@ -171,7 +190,7 @@ class _GraphScreenState extends State<GraphScreen> {
         titleSpacing: 0, // タイトルの余白
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
-          "$monthname Achievements", // 目標回数ラベル
+          "${monthName(sunday.month)}-${sunday.year}", // 目標回数ラベル
           style: TextStyle(
             color: Colors.white,
             fontSize: 25,
@@ -186,6 +205,44 @@ class _GraphScreenState extends State<GraphScreen> {
             child: Column(
               children: [
                 SizedBox(height: 30),
+
+                // SizedBox(
+                //   height: 80,
+                //   child: Align(
+                //     alignment: Alignment.topCenter,
+                //     child: DropdownButton(
+                //       value: isSelectedValue,
+                //       dropdownColor: Colors.transparent,
+                //       items: [
+                //         DropdownMenuItem(
+                //           value: 'Push up',
+                //           child: SizedBox(
+                //             height: 20,
+                //             child: Text(
+                //               'Push up',
+                //               style: TextStyle(color: Colors.white),
+                //             ),
+                //           ),
+                //         ),
+                //         DropdownMenuItem(
+                //           value: 'Sit up',
+                //           child: SizedBox(
+                //             height: 20,
+                //             child: Text(
+                //               'Sit up',
+                //               style: TextStyle(color: Colors.white),
+                //             ),
+                //           ),
+                //         ),
+                //       ],
+                //       onChanged: (String? value) {
+                //         setState(() {
+                //           isSelectedValue = value!;
+                //         });
+                //       },
+                //     ),
+                //   ),
+                // ),
                 Flexible(
                   flex: 1,
                   child: Row(
@@ -193,7 +250,7 @@ class _GraphScreenState extends State<GraphScreen> {
                     children: [
                       IconButton(
                         icon: Icon(Icons.arrow_back_ios, color: Colors.white),
-                        onPressed: () {},
+                        onPressed: () => _changeweek(-1),
                       ),
                       SizedBox(
                         width: 200,
@@ -204,7 +261,7 @@ class _GraphScreenState extends State<GraphScreen> {
                         ),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () => _changeweek(1),
                         icon: Icon(
                           Icons.arrow_forward_ios,
                           color: Colors.white,
@@ -215,9 +272,18 @@ class _GraphScreenState extends State<GraphScreen> {
                 ),
                 Flexible(
                   flex: 4,
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+
+                  child: SizedBox(
+                    // padding: const EdgeInsets.symmetric(horizontal: 20),
+                    height: 500,
+                    child: GestureDetector(
+                      onHorizontalDragEnd: (details) {
+                        if (details.primaryVelocity! > 0) {
+                          _changeweek(-1);
+                        } else if (details.primaryVelocity! < 0) {
+                          _changeweek(1);
+                        }
+                      },
                       child: BarChart(
                         BarChartData(
                           gridData: FlGridData(
@@ -228,11 +294,7 @@ class _GraphScreenState extends State<GraphScreen> {
                           ),
                           alignment: BarChartAlignment.spaceAround,
                           //ぼうの間隔を均等に両端にも半分のスペースを設置
-                          maxY:
-                              (pushupcount.isNotEmpty
-                                  ? pushupcount.reduce((a, b) => a > b ? a : b)
-                                  : 0) +
-                              5,
+                          maxY: maxValue(pushupcount) + 5,
                           barTouchData: BarTouchData(enabled: true),
                           //棒のタッチが有効になる
                           titlesData: FlTitlesData(
@@ -240,7 +302,21 @@ class _GraphScreenState extends State<GraphScreen> {
                             leftTitles: AxisTitles(
                               //Y軸らべる
                               sideTitles: SideTitles(
-                                showTitles: false,
+                                showTitles: true,
+                                reservedSize: 30, //左側の余白
+                                getTitlesWidget: (double value, _) {
+                                  int tt = value.toInt();
+                                  int kk = maxValue(pushupcount) > 110
+                                      ? 100
+                                      : 10;
+                                  if (tt % kk == 0 && tt != 0)
+                                    return Text(
+                                      '${tt}',
+                                      style: TextStyle(color: Colors.white),
+                                    );
+                                  else
+                                    return SizedBox.shrink();
+                                },
                               ), //数字ラベルを表示
                             ),
                             bottomTitles: AxisTitles(
@@ -255,7 +331,7 @@ class _GraphScreenState extends State<GraphScreen> {
                                     Duration(days: value.toInt()),
                                   );
                                   return Text(
-                                    "${DateFormat("dd").format(daynow)}(${DateFormat('E').format(daynow)})", //days.lengthは７
+                                    "${DateFormat("dd").format(daynow)}.${DateFormat('E').format(daynow)}", //days.lengthは７
                                     //value.toIntで小数を正数に変換
                                     style: TextStyle(
                                       color: Colors.white,

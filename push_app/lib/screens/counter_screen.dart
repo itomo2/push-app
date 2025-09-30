@@ -81,7 +81,6 @@ class _CounterScreenState extends State<CounterScreen> {
   void _startListening() {
     _proximityStream = ProximitySensor.events.map((event) => event > 0);
     _proximitySubscription = _proximityStream.listen((isNear) {
-      print('proximity event: $isNear, before _isNear=$_isNear, count=$count');
       if (isNear && !_isNear) {
         setState(() {
           count++;

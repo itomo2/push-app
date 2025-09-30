@@ -416,7 +416,6 @@ class _CalendarState extends State<Calendar> {
                     defaultBuilder: (context, day, focusedDay) {
                       // 特定の日付リストに含まれていたら装飾変更
                       if (highlightDays.any((d) => isSameDay(d, day)))
-                        //.anyはリストの要素のうち一つでも条件を満たせばtrueを返す、
                         return Center(
                           child: Icon(
                             Icons.check,

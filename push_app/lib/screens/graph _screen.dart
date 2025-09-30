@@ -21,7 +21,7 @@ class _GraphScreenState extends State<GraphScreen> {
   List<BarChartGroupData> _barGroups = [];
   //BarChartGroupDataはfl_chartの棒グラフで一つのグループを表すクラス。一つ一つのグラフの情報が入ってる
 
-  final List<Color> weekColors = [
+  static const List<Color> weekColors = [
     Colors.blueAccent,
     Colors.orangeAccent,
     Colors.greenAccent,
@@ -40,6 +40,57 @@ class _GraphScreenState extends State<GraphScreen> {
   DateTime sunday = DateTime.now().subtract(
     Duration(days: DateTime.now().weekday % 7),
   );
+
+  final List<BarChartGroupData> _zeroBarGroups = List.generate(
+    7,
+    (i) =>
+        //generateは指定した個数の要素を持つリストを作る。長さは_allBarGroupsに依存
+        //iはリストのインデックス、０からlengthよりも1少ない数まで増える
+        BarChartGroupData(
+          x: i, //横軸位置
+          barRods: [
+            //ぼうの情報をもつ
+            BarChartRodData(
+              //棒一本を表すクラス
+              toY: 0, //棒の高さ(アニメーションのためとりあえず０)
+              color: weekColors[i],
+              width: 18,
+              borderRadius: BorderRadius.circular(2), //棒の角丸
+            ),
+          ],
+        ),
+  );
+
+  String monthName(int k) {
+    switch (k) {
+      case 1:
+        return 'January';
+      case 2:
+        return 'February';
+      case 3:
+        return 'March';
+      case 4:
+        return 'April';
+      case 5:
+        return 'May';
+      case 6:
+        return 'June';
+      case 7:
+        return 'July';
+      case 8:
+        return 'August';
+      case 9:
+        return 'September';
+      case 10:
+        return 'October';
+      case 11:
+        return 'November';
+      case 12:
+        return 'December';
+      default:
+        return 'Unknown';
+    }
+  }
 
   void _loadData() {
     try {
@@ -81,88 +132,35 @@ class _GraphScreenState extends State<GraphScreen> {
     }
   }
 
-  String monthName(int k) {
-    switch (k) {
-      case 1:
-        return 'January';
-      case 2:
-        return 'February';
-      case 3:
-        return 'March';
-      case 4:
-        return 'April';
-      case 5:
-        return 'May';
-      case 6:
-        return 'June';
-      case 7:
-        return 'July';
-      case 8:
-        return 'August';
-      case 9:
-        return 'September';
-      case 10:
-        return 'October';
-      case 11:
-        return 'November';
-      case 12:
-        return 'December';
-      default:
-        return 'Unknown';
-    }
+  void _updateBarGroups() {
+    Future.delayed(Duration(milliseconds: 250), () {
+      setState(() {
+        _barGroups = List.generate(
+          _zeroBarGroups.length,
+          (i) => BarChartGroupData(
+            x: i,
+            barRods: [
+              BarChartRodData(
+                toY: pushupcount[i],
+                color: weekColors[i],
+                width: _zeroBarGroups[i].barRods[0].width,
+                borderRadius: _zeroBarGroups[i].barRods[0].borderRadius,
+              ),
+            ],
+          ),
+        );
+      });
+    });
   }
 
   void initState() {
     super.initState();
     monthname = monthName(month);
     _loadData();
-    final List<BarChartGroupData> _zeroBarGroups = List.generate(
-      7,
-      (i) =>
-          //generateは指定した個数の要素を持つリストを作る。長さは_allBarGroupsに依存
-          //iはリストのインデックス、０からlengthよりも1少ない数まで増える
-          BarChartGroupData(
-            x: i, //横軸位置
-            barRods: [
-              //ぼうの情報をもつ
-              BarChartRodData(
-                //棒一本を表すクラス
-                toY: 0, //棒の高さ(アニメーションのためとりあえず０)
-                color: Color.fromARGB(255, 212, 255, 95),
-                width: 18,
-                borderRadius: BorderRadius.circular(2), //棒の角丸
-              ),
-            ],
-          ),
-    );
-
     _barGroups = List.from(_zeroBarGroups);
     //_zeroBarGroupsの内容を_barGroupsにコピー、zeroBarGroupsに影響を与えない代入（浅いコピー）
-
-    Future.delayed(Duration(milliseconds: 250), () {
-      //アニメーション
-      //delayedを使うと指定した時間だけ待つ、この場合だとinit終わった後に実行させるようになってる
-      setState(() {
-        _barGroups = List.generate(
-          _zeroBarGroups.length,
-          (i) =>
-              //generateは指定した個数の要素を持つリストを作る。長さは_allBarGroupsに依存
-              //iはリストのインデックス、length-1まで増える
-              BarChartGroupData(
-                x: i,
-                barRods: [
-                  BarChartRodData(
-                    toY: pushupcount[i],
-                    color: weekColors[i],
-                    //barRodsリストの一つ目のデータ（今回は各グループに棒が一本しかないので0)
-                    width: _zeroBarGroups[i].barRods[0].width,
-                    borderRadius: _zeroBarGroups[i].barRods[0].borderRadius,
-                  ),
-                ],
-              ),
-        );
-      });
-    });
+    _updateBarGroups();
+    //delayedを使うと指定した時間だけ待つ、この場合だとinit終わった後に実行させるようになってる
   }
 
   @override

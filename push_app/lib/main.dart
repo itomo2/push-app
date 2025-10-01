@@ -8,6 +8,92 @@ part 'main.g.dart'; // Hive Generator用（TypeAdapter自動生成ファイル�
 late Box box; // HiveのBox（データ保存領域）をグローバル変数として宣言
 late List<dynamic> highlightDays = [];
 
+int month = DateTime.now().month;
+
+void showMenuDialog(BuildContext context, int month) {
+  showGeneralDialog(
+    context: context, // ダイアログの表示に使うBuildContext
+    barrierDismissible: true, // ダイアログ外のタップで閉じるか
+    barrierLabel: 'Menu', // アクセシビリティ用のラベル
+    barrierColor: Colors.black54, // ダイアログ表示時の背景色
+    transitionDuration: Duration(milliseconds: 300), // ダイアログの表示/非表示アニメーションの時間
+    // ダイアログの中身を構築するコールバック
+    pageBuilder: (context, animation, secondaryAnimation) {
+      // Alignで右側に寄せて表示
+      return Align(
+        alignment: Alignment.centerRight, // 右端中央に配置
+        child: Material(
+          color: Color.fromARGB(255, 212, 255, 95), // ダイアログの背景色
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            bottomLeft: Radius.circular(20),
+          ), // 左側を丸くする
+          child: SizedBox(
+            width: 150, // ダイアログの幅
+            height: 300, // ダイアログの高さ
+            child: Column(
+              children: [
+                // Homeメニュー
+                ListTile(
+                  title: Text("Home"),
+                  leading: Icon(Icons.home),
+                  onTap: () {
+                    Navigator.popUntil(context, (route) => route.isFirst);
+                  },
+                  splashColor: Colors.transparent,
+                  hoverColor: Colors.transparent,
+                ),
+                // Activityメニュー
+                ListTile(
+                  title: Text("Activity"),
+                  leading: Icon(Icons.bar_chart),
+                  onTap: () {
+                    // Activityはグラフ画面に遷移
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => GraphScreen(month),
+                      ),
+                    );
+                  },
+                  splashColor: Colors.transparent,
+                  hoverColor: Colors.transparent,
+                ),
+                // Settingsメニュー
+                ListTile(
+                  title: Text("Settings"),
+                  leading: Icon(Icons.settings),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SettingsScreen()),
+                    ); // Settings画面に遷移
+                  },
+                  splashColor: Colors.transparent,
+                  hoverColor: Colors.transparent,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+    // ダイアログの表示アニメーションを定義
+    transitionBuilder: (context, animation, secondaryAnimation, child) {
+      // 右からスライドインするアニメーション
+      final offsetAnimation = Tween<Offset>(
+        //Tweenは滑らかに変化させる仕組み
+        begin: Offset(1, 0), // 画面右端からOffsetの単位は自分の幅
+        end: Offset(0, 0), // 画面中央へ
+      ).animate(animation);
+      return SlideTransition(
+        position: offsetAnimation, // アニメーション位置
+        child: child, // アニメーションさせるダイアログ本体
+      );
+    },
+  );
+}
+
 void main() async {
   // Hive初期化 & info型の保存を可能にする
   await Hive.initFlutter(); // Hiveの初期化（Flutter用）

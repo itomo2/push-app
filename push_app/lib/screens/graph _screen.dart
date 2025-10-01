@@ -178,6 +178,13 @@ class _GraphScreenState extends State<GraphScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () {
+            Navigator.popUntil(context, (route) => route.isFirst);
+          },
+        ),
+        toolbarHeight: 70,
         backgroundColor: Color(0xFF2D2D35), // AppBarの背景色
         titleSpacing: 0, // タイトルの余白
         iconTheme: IconThemeData(color: Colors.white),

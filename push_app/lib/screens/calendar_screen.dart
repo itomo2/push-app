@@ -44,8 +44,6 @@ class _CalendarState extends State<Calendar> {
   late Duration _nwdurationpush;
   late Duration _nwdurationsit;
 
-  int month = DateTime.now().month;
-
   void _demohighlight() {
     DateTime now = DateTime.now();
     List<dynamic> demoDays = [];
@@ -168,22 +166,12 @@ class _CalendarState extends State<Calendar> {
               _isPushUpEditing || _isSitUpEditing
                   ? SizedBox.shrink()
                   : Positioned(
-                      bottom: 4,
-                      right: 10,
+                      right: 20,
+                      top: 10,
                       child: IconButton(
-                        icon: Icon(
-                          Icons.bar_chart,
-                          color: Colors.white,
-                          size: 50,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => GraphScreen(month),
-                            ),
-                          );
-                        },
+                        icon: Icon(Icons.menu, size: 40, color: Colors.white),
+                        // メニューボタンが押されたときにカスタムダイアログを表示
+                        onPressed: () => showMenuDialog(context, month),
                       ),
                     ),
               SizedBox(

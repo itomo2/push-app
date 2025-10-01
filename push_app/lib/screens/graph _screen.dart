@@ -21,16 +21,6 @@ class _GraphScreenState extends State<GraphScreen> {
   List<BarChartGroupData> _barGroups = [];
   //BarChartGroupDataはfl_chartの棒グラフで一つのグループを表すクラス。一つ一つのグラフの情報が入ってる
 
-  static const List<Color> weekColors = [
-    Colors.blueAccent,
-    Colors.orangeAccent,
-    Colors.greenAccent,
-    Colors.purpleAccent,
-    Colors.yellowAccent,
-    Colors.pinkAccent,
-    Colors.cyanAccent,
-  ];
-
   void _changeweek(int yy) {
     setState(() {
       sunday = sunday.add(Duration(days: 7 * yy));
@@ -49,7 +39,8 @@ class _GraphScreenState extends State<GraphScreen> {
 
   late bool othermonth;
 
-  late String isSelectedValue = "Push up";
+  late List<bool> _togglelist;
+  int oldindex = 0;
 
   DateTime sunday = DateTime.now().subtract(
     Duration(days: DateTime.now().weekday % 7),
@@ -111,7 +102,6 @@ class _GraphScreenState extends State<GraphScreen> {
       othermonth = true;
     else
       othermonth = false;
-    print(othermonth);
   }
 
   void _loadData() {
@@ -160,7 +150,7 @@ class _GraphScreenState extends State<GraphScreen> {
             x: i,
             barRods: [
               BarChartRodData(
-                toY: pushupcount[i],
+                toY: _togglelist[0] ? pushupcount[i] : situpcount[i],
                 color: _zeroBarGroups[i].barRods[0].color,
                 width: _zeroBarGroups[i].barRods[0].width,
                 borderRadius: _zeroBarGroups[i].barRods[0].borderRadius,
@@ -179,6 +169,8 @@ class _GraphScreenState extends State<GraphScreen> {
 
   void initState() {
     super.initState();
+    _togglelist = box.get("kakotoggle", defaultValue: [true, false]);
+    oldindex = _togglelist[0] ? 0 : 1;
     _changeweek(0);
   }
 
@@ -205,44 +197,65 @@ class _GraphScreenState extends State<GraphScreen> {
             child: Column(
               children: [
                 SizedBox(height: 30),
-
-                // SizedBox(
-                //   height: 80,
-                //   child: Align(
-                //     alignment: Alignment.topCenter,
-                //     child: DropdownButton(
-                //       value: isSelectedValue,
-                //       dropdownColor: Colors.transparent,
-                //       items: [
-                //         DropdownMenuItem(
-                //           value: 'Push up',
-                //           child: SizedBox(
-                //             height: 20,
-                //             child: Text(
-                //               'Push up',
-                //               style: TextStyle(color: Colors.white),
-                //             ),
-                //           ),
-                //         ),
-                //         DropdownMenuItem(
-                //           value: 'Sit up',
-                //           child: SizedBox(
-                //             height: 20,
-                //             child: Text(
-                //               'Sit up',
-                //               style: TextStyle(color: Colors.white),
-                //             ),
-                //           ),
-                //         ),
-                //       ],
-                //       onChanged: (String? value) {
-                //         setState(() {
-                //           isSelectedValue = value!;
-                //         });
-                //       },
-                //     ),
-                //   ),
-                // ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    height: 35,
+                    width: 365,
+                    color: Color(0xFF2D2D35),
+                    child: Center(
+                      child: ToggleButtons(
+                        splashColor: Colors.transparent,
+                        constraints: BoxConstraints(
+                          minWidth: 180,
+                          minHeight: 30,
+                        ),
+                        renderBorder: false,
+                        onPressed: (index) {
+                          setState(() {
+                            if (oldindex != index) {
+                              _togglelist = List.generate(
+                                _togglelist.length,
+                                (i) => i == index,
+                              );
+                              box.put("kakotoggle", _togglelist);
+                              oldindex = index;
+                              _changeweek(0);
+                            }
+                          });
+                        },
+                        isSelected: _togglelist,
+                        borderRadius: BorderRadius.circular(10),
+                        fillColor: Color.fromARGB(255, 212, 255, 95),
+                        children: [
+                          Text(
+                            'Push up',
+                            style: TextStyle(
+                              color: Colors.black /* Labels-Primary */,
+                              fontSize: 13,
+                              fontFamily: 'SF Pro',
+                              fontWeight: _togglelist[0]
+                                  ? FontWeight.w600
+                                  : FontWeight.w400,
+                            ),
+                          ),
+                          Text(
+                            'Sit up',
+                            style: TextStyle(
+                              color: Colors.black /* Labels-Primary */,
+                              fontSize: 13,
+                              fontFamily: 'SF Pro',
+                              fontWeight: _togglelist[1]
+                                  ? FontWeight.w600
+                                  : FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
                 Flexible(
                   flex: 1,
                   child: Row(
@@ -294,7 +307,11 @@ class _GraphScreenState extends State<GraphScreen> {
                           ),
                           alignment: BarChartAlignment.spaceAround,
                           //ぼうの間隔を均等に両端にも半分のスペースを設置
-                          maxY: maxValue(pushupcount) + 5,
+                          maxY:
+                              maxValue(
+                                _togglelist[0] ? pushupcount : situpcount,
+                              ) +
+                              5,
                           barTouchData: BarTouchData(enabled: true),
                           //棒のタッチが有効になる
                           titlesData: FlTitlesData(
@@ -306,7 +323,13 @@ class _GraphScreenState extends State<GraphScreen> {
                                 reservedSize: 30, //左側の余白
                                 getTitlesWidget: (double value, _) {
                                   int tt = value.toInt();
-                                  int kk = maxValue(pushupcount) > 110
+                                  int kk =
+                                      maxValue(
+                                            _togglelist[0]
+                                                ? pushupcount
+                                                : situpcount,
+                                          ) >
+                                          110
                                       ? 100
                                       : 10;
                                   if (tt % kk == 0 && tt != 0)
@@ -352,7 +375,7 @@ class _GraphScreenState extends State<GraphScreen> {
                           borderData: FlBorderData(show: false),
                           barGroups: _barGroups,
                         ),
-                        swapAnimationDuration: Duration(milliseconds: 1200),
+                        swapAnimationDuration: Duration(milliseconds: 1000),
                         swapAnimationCurve: Curves.easeOutCubic,
                         //アニメーション時の動きを決める
                       ),

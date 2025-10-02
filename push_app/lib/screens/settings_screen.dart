@@ -56,18 +56,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             tiles: <SettingsTile>[
               SettingsTile.navigation(
                 leading: const Icon(Icons.language),
-                title: const Text('Language'),
+                title: Text('Language'),
                 value: Text('$language'),
                 onPressed: (context) {
                   box.put('language', language);
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => LanguagePage()),
-                  ).then((selectedLanguage) {
-                    if (selectedLanguage != null) {
+                  ).then((_) {
+                    if (box.get('language') != null) {
                       setState(() {
-                        language = selectedLanguage;
-                        box.put('language', selectedLanguage); // Hive に保存
+                        language = box.get('language');
                       });
                     }
                   });

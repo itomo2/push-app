@@ -33,7 +33,7 @@ class _LanguagePageState extends State<LanguagePage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context, language);
+            Navigator.pop(context);
           },
         ),
         backgroundColor: Color(0xFF2D2D35), // AppBar背景色

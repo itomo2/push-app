@@ -3,10 +3,13 @@ import 'screens/screens.dart';
 import 'package:hive_flutter/hive_flutter.dart'; // HiveのFlutter用パッケージをインポート
 import 'package:push_app/models/models.dart';
 export 'package:push_app/models/models.dart';
+
 part 'main.g.dart'; // Hive Generator用（TypeAdapter自動生成ファイル）
 
 late Box box; // HiveのBox（データ保存領域）をグローバル変数として宣言
 late List<dynamic> highlightDays = [];
+
+late String language;
 
 int month = DateTime.now().month;
 
@@ -99,6 +102,9 @@ void main() async {
   await Hive.initFlutter(); // Hiveの初期化（Flutter用）
   Hive.registerAdapter(infoAdapter()); // info型のアダプターを登録（これがないと保存時にクラッシュ）
   box = await Hive.openBox('app_info'); // 'pushup_info'という名前のBoxを開く（なければ作成）
+  box.get('language') == null
+      ? language = 'English'
+      : language = box.get('language');
   runApp(const PushApp()); // アプリのエントリーポイント。PushAppウィジェットを起動
 }
 

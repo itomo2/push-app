@@ -189,13 +189,22 @@ class _GraphScreenState extends State<GraphScreen> {
         titleSpacing: 0, // タイトルの余白
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
-          "${monthName(sunday.month)}-${sunday.year}", // 目標回数ラベル
+          "${monthName(sunday.month)}-${sunday.year}",
           style: TextStyle(
             color: Colors.white,
             fontSize: 25,
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: IconButton(
+              icon: Icon(Icons.menu, size: 40, color: Colors.white),
+              onPressed: () => showMenuDialog(context, month),
+            ),
+          ),
+        ],
       ),
       body: Stack(
         children: [

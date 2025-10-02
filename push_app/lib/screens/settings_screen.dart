@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:push_app/main.dart';
-import 'screens.dart';
+import 'package:settings_ui/settings_ui.dart';
+import 'package:push_app/settings/settings.dart';
 
 class SettingsScreen extends StatefulWidget {
   // 運動選択画面（状態を持つ）
@@ -11,6 +12,11 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  void initState() {
+    super.initState();
+    language = box.get('language', defaultValue: 'English');
+  }
+
   @override
   Widget build(BuildContext context) {
     // 画面のUI構築
@@ -34,20 +40,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
         actions: [
-          Positioned(
-            right: 20,
-            top: 10,
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
             child: IconButton(
               icon: Icon(Icons.menu, size: 40, color: Colors.white),
-              // メニューボタンが押されたときにカスタムダイアログを表示
               onPressed: () => showMenuDialog(context, month),
             ),
           ),
         ],
       ),
 
-      body: Center(
-        child: Text('Settings Screen', style: TextStyle(fontSize: 24)),
+      body: SettingsList(
+        sections: [
+          SettingsSection(
+            tiles: <SettingsTile>[
+              SettingsTile.navigation(
+                leading: const Icon(Icons.language),
+                title: const Text('Language'),
+                value: Text('$language'),
+                onPressed: (context) {
+                  box.put('language', language);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LanguagePage()),
+                  ).then((selectedLanguage) {
+                    if (selectedLanguage != null) {
+                      setState(() {
+                        language = selectedLanguage;
+                        box.put('language', selectedLanguage); // Hive に保存
+                      });
+                    }
+                  });
+                  ;
+                  // 画面遷移処理
+                },
+              ),
+              SettingsTile.switchTile(
+                onToggle: (value) {
+                  // トグル切り替え処理
+                },
+                initialValue: true,
+                leading: const Icon(Icons.format_paint),
+                title: const Text('Enable custom theme'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -116,6 +116,7 @@ class PushApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // アプリのUI構築
     return const MaterialApp(
+      debugShowCheckedModeBanner: false, // デバッグバナーを非表示
       title: 'PushApp', // アプリのタイトル
       home: Calendar(), // メイン画面としてCalendarウィジェットを表示
     );

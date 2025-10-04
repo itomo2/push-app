@@ -45,7 +45,7 @@ class AlertDialogSample extends StatelessWidget {
         Align(
           alignment: Alignment.topLeft,
           child: Text(
-            '  Push-up：$pushupcount回　$pushuptime\n  Sit-up    ：$situpcount回　$situptime', // サンプルデータ（本来は保存データを表示する）
+            '  ${t("push-up")}：$pushupcount回　$pushuptime\n  ${t("sit-up")}    ：$situpcount回　$situptime', // サンプルデータ（本来は保存データを表示する）
             style: TextStyle(
               color: const Color(0xFF14151A), // 文字色
               fontSize: 20, // 文字サイズ

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart'; // FlutterのUI部品を使うためのパッケージをインポート
+import 'package:flutter/services.dart';
 import 'screens/screens.dart';
 import 'package:hive_flutter/hive_flutter.dart'; // HiveのFlutter用パッケージをインポート
 import 'package:push_app/models/models.dart';
+import 'package:push_app/strings/strings.dart';
 export 'package:push_app/models/models.dart';
+export 'package:push_app/strings/strings.dart';
 
 part 'main.g.dart'; // Hive Generator用（TypeAdapter自動生成ファイル）
 
@@ -13,11 +16,15 @@ late String language;
 
 int month = DateTime.now().month;
 
+String t(String key) {
+  return appStrings[language]?[key] ?? key;
+}
+
 void showMenuDialog(BuildContext context, int month) {
   showGeneralDialog(
     context: context, // ダイアログの表示に使うBuildContext
     barrierDismissible: true, // ダイアログ外のタップで閉じるか
-    barrierLabel: 'Menu', // アクセシビリティ用のラベル
+    barrierLabel: t("menu"), // アクセシビリティ用のラベル
     barrierColor: Colors.black54, // ダイアログ表示時の背景色
     transitionDuration: Duration(milliseconds: 300), // ダイアログの表示/非表示アニメーションの時間
     // ダイアログの中身を構築するコールバック
@@ -38,7 +45,7 @@ void showMenuDialog(BuildContext context, int month) {
               children: [
                 // Homeメニュー
                 ListTile(
-                  title: Text("Home"),
+                  title: Text(t("home")),
                   leading: Icon(Icons.home),
                   onTap: () {
                     Navigator.popUntil(context, (route) => route.isFirst);
@@ -48,7 +55,7 @@ void showMenuDialog(BuildContext context, int month) {
                 ),
                 // Activityメニュー
                 ListTile(
-                  title: Text("Activity"),
+                  title: Text(t("activity")),
                   leading: Icon(Icons.bar_chart),
                   onTap: () {
                     // Activityはグラフ画面に遷移
@@ -64,7 +71,7 @@ void showMenuDialog(BuildContext context, int month) {
                 ),
                 // Settingsメニュー
                 ListTile(
-                  title: Text("Settings"),
+                  title: Text(t("settings")),
                   leading: Icon(Icons.settings),
                   onTap: () {
                     Navigator.push(
@@ -98,6 +105,13 @@ void showMenuDialog(BuildContext context, int month) {
 }
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 縦画面（portraitUp と portraitDown の両方）を許可
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   // Hive初期化 & info型の保存を可能にする
   await Hive.initFlutter(); // Hiveの初期化（Flutter用）
   Hive.registerAdapter(infoAdapter()); // info型のアダプターを登録（これがないと保存時にクラッシュ）
@@ -105,6 +119,7 @@ void main() async {
   box.get('language') == null
       ? language = 'English'
       : language = box.get('language');
+  print("this:${t("this month's goal")}");
   runApp(const PushApp()); // アプリのエントリーポイント。PushAppウィジェットを起動
 }
 

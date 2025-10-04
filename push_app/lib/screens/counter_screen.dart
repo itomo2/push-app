@@ -163,7 +163,7 @@ class _CounterScreenState extends State<CounterScreen> {
                 height: 69,
                 child: subject == 'Push-up'
                     ? Text(
-                        'スマホを地面に置いて、\n胸を近づけるとカウントされます', // 説明文
+                        t("push"), // 説明文
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white, // 文字色
@@ -173,7 +173,7 @@ class _CounterScreenState extends State<CounterScreen> {
                         ),
                       )
                     : Text(
-                        'スマホを地面に置いて、\n背中を近づけるとカウントされます', // 説明文
+                        t("sit"), // 説明文
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white, // 文字色

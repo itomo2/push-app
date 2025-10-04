@@ -16,7 +16,7 @@ class _SelectScreenState extends State<SelectScreen> {
   bool _isChecked1 = true; // 1つ目のチェック状
   bool _isChecked2 = false;
   late String subject;
-  final List<String> exercisestype = ["Counter", "Stopwatch"];
+  final List<String> exercisestype = [t('counter'), t('stopwatch')];
   late int selectedIndex;
 
   void initState() {
@@ -67,7 +67,7 @@ class _SelectScreenState extends State<SelectScreen> {
               splashColor: const Color.fromARGB(19, 0, 0, 0), // チェックボックスの枠線の色
             ),
             child: CheckboxListTile(
-              title: const Text("Push-up"),
+              title: Text(t("push-up")),
               activeColor: Colors.black,
               value: _isChecked1,
               onChanged: (bool? value) {
@@ -83,7 +83,7 @@ class _SelectScreenState extends State<SelectScreen> {
               splashColor: const Color.fromARGB(19, 0, 0, 0), // チェックボックスの枠線の色
             ),
             child: CheckboxListTile(
-              title: const Text("Sit-up"),
+              title: Text(t("sit-up")),
               activeColor: Colors.black,
               value: _isChecked2,
               onChanged: (bool? value) {

@@ -70,9 +70,9 @@ class _CalendarState extends State<Calendar> {
     situpt = box.get('sitUpGoalTime') ?? "00:00";
     _nwdurationpush = parseDuration(pushupt);
     _nwdurationsit = parseDuration(situpt);
+
     _demohighlight();
     highlightDays = box.get("highlight") ?? []; // 画面のUI構築
-    // box.put("highlight", highlightDays);
   }
 
   @override
@@ -180,7 +180,7 @@ class _CalendarState extends State<Calendar> {
                   crossAxisAlignment: CrossAxisAlignment.start, // 左寄せ
                   children: [
                     Text(
-                      "This month's goal", // 目標回数ラベル
+                      t("this month's goal"), // 目標回数ラベル
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 25,
@@ -193,7 +193,7 @@ class _CalendarState extends State<Calendar> {
                         children: [
                           Icon(Icons.circle, color: Colors.white, size: 10),
                           Text(
-                            "  Push-up:  ",
+                            "  ${t("push-up")}:  ",
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 20,
@@ -233,7 +233,7 @@ class _CalendarState extends State<Calendar> {
                                   ),
                                 ),
                           Text(
-                            ' reps  ',
+                            ' ${t("reps")}  ',
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 20,
@@ -276,7 +276,7 @@ class _CalendarState extends State<Calendar> {
                         children: [
                           Icon(Icons.circle, color: Colors.white, size: 10),
                           Text(
-                            "  Sit-up:  ",
+                            "  ${t("sit-up")}:  ",
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 20,
@@ -316,7 +316,7 @@ class _CalendarState extends State<Calendar> {
                                   ),
                                 ),
                           Text(
-                            ' reps  ',
+                            ' ${t("reps")}  ',
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 20,

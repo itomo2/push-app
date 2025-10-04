@@ -12,17 +12,7 @@ class LanguagePage extends StatefulWidget {
 
 class _LanguagePageState extends State<LanguagePage> {
   // 状態管理クラス
-  // _LanguagePageState({super.key}); // コンストラクタ
-  String language = "eigo";
-
-  _putdata(String language) {
-    box.put('language', language);
-  }
-
-  void initState() {
-    super.initState();
-    language = box.get('language', defaultValue: 'eigo');
-  }
+  // _LanguagePageState({super.key}); // コンストラクタ;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +30,7 @@ class _LanguagePageState extends State<LanguagePage> {
         titleSpacing: 0, // タイトルの余白
         toolbarHeight: 70,
         title: Text(
-          "Language",
+          t('language'),
           style: TextStyle(
             color: Colors.white,
             fontSize: 25,
@@ -53,29 +43,29 @@ class _LanguagePageState extends State<LanguagePage> {
           SettingsSection(
             tiles: <SettingsTile>[
               SettingsTile.navigation(
-                leading: language == 'eigo'
+                leading: language == 'English'
                     ? Icon(Icons.check, color: Colors.black)
                     : Icon(Icons.check, color: Colors.transparent),
-                title: const Text('eigo'),
+                title: const Text('English'),
                 trailing: SizedBox.shrink(),
                 onPressed: (context) {
                   setState(() {
-                    language = 'eigo';
+                    print("en");
+                    language = 'English';
                   });
-                  _putdata(language);
                 },
               ),
               SettingsTile.navigation(
-                leading: language == 'nihongo'
+                leading: language == '日本語'
                     ? Icon(Icons.check, color: Colors.black)
                     : Icon(Icons.check, color: Colors.transparent),
-                title: const Text('nihongo'),
+                title: const Text('日本語'),
                 trailing: SizedBox.shrink(),
                 onPressed: (context) {
                   setState(() {
-                    language = 'nihongo';
+                    print("jp");
+                    language = '日本語';
                   });
-                  _putdata(language);
                 },
               ),
             ],

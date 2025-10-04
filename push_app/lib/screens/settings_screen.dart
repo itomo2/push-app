@@ -32,7 +32,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         titleSpacing: 0, // タイトルの余白
         toolbarHeight: 70,
         title: Text(
-          "Settings",
+          t('settings'),
           style: TextStyle(
             color: Colors.white,
             fontSize: 25,
@@ -56,22 +56,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             tiles: <SettingsTile>[
               SettingsTile.navigation(
                 leading: const Icon(Icons.language),
-                title: Text('Language'),
+                title: Text('${t("language")}'),
                 value: Text('$language'),
                 onPressed: (context) {
-                  box.put('language', language);
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => LanguagePage()),
-                  ).then((_) {
-                    if (box.get('language') != null) {
-                      setState(() {
-                        language = box.get('language');
-                      });
-                    }
-                  });
-                  ;
-                  // 画面遷移処理
+                  );
                 },
               ),
               SettingsTile.switchTile(

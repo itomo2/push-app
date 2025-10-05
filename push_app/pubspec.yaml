@@ -48,6 +48,7 @@ dependencies:
   fl_chart: ^0.66.2
   flutter_local_notifications: ^19.4.2
   settings_ui: ^2.0.2
+  introduction_screen: ^4.0.0
 
 
 

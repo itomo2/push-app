@@ -13,7 +13,7 @@ const appStrings = {
     "push":
         "Place your phone on the ground,\nbring your chest close to smartphone to count",
     "sit":
-        "Place your phone on the ground,\nbring your back close to smartphone to count",
+        "Place your phone on the ground,bring your back close to smartphone to count",
     "back to Calendar": "Back to Calendar",
     "change language": "Change language?",
     "cancel": "Cancel",

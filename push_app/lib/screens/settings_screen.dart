@@ -72,6 +72,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   );
                 },
               ),
+              SettingsTile.navigation(
+                leading: const Icon(Icons.info_outline),
+                title: Text('${t("infomation")}'),
+                onPressed: (context) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => InfoPage()),
+                  );
+                },
+              ),
             ],
           ),
         ],

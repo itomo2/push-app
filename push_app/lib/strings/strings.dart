@@ -19,6 +19,8 @@ const appStrings = {
     "cancel": "Cancel",
     "ok": "OK",
     "restart app": "Return to the first screen",
+    "infomation": "Infomation",
+    "version": "Version",
   },
   "日本語": {
     "home": "Home",
@@ -38,5 +40,7 @@ const appStrings = {
     "cancel": "キャンセル",
     "ok": "はい",
     "restart app": "最初の画面に戻ります",
+    "infomation": "情報",
+    "version": "バージョン",
   },
 };

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:push_app/widgets/widgets.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:push_app/main.dart';
 
@@ -18,7 +19,6 @@ class _LanguagePageState extends State<LanguagePage> {
   Widget build(BuildContext context) {
     // 画面のUI構築
     return Scaffold(
-      backgroundColor: const Color(0xFFD5FF5F), // 背景色
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -39,6 +39,12 @@ class _LanguagePageState extends State<LanguagePage> {
         ),
       ),
       body: SettingsList(
+        darkTheme: const SettingsThemeData(
+          settingsListBackground: Color(0xFF2D2D35),
+          settingsSectionBackground: Color(0xFF3C3C45),
+          titleTextColor: Colors.white,
+          trailingTextColor: Colors.grey,
+        ),
         sections: [
           SettingsSection(
             tiles: <SettingsTile>[
@@ -48,11 +54,19 @@ class _LanguagePageState extends State<LanguagePage> {
                     : Icon(Icons.check, color: Colors.transparent),
                 title: const Text('English'),
                 trailing: SizedBox.shrink(),
-                onPressed: (context) {
-                  setState(() {
-                    print("en");
-                    language = 'English';
-                  });
+                onPressed: (context) async {
+                  print("en");
+                  if (language != 'English') {
+                    final flag = await showDialog(
+                      context: context,
+                      builder: (context) => AlertDialogSettings(),
+                    );
+                    if (flag == true) {
+                      setState(() {
+                        language = 'English';
+                      });
+                    }
+                  }
                 },
               ),
               SettingsTile.navigation(
@@ -61,11 +75,19 @@ class _LanguagePageState extends State<LanguagePage> {
                     : Icon(Icons.check, color: Colors.transparent),
                 title: const Text('日本語'),
                 trailing: SizedBox.shrink(),
-                onPressed: (context) {
-                  setState(() {
-                    print("jp");
-                    language = '日本語';
-                  });
+                onPressed: (context) async {
+                  print("jp");
+                  if (language != '日本語') {
+                    final flag = await showDialog(
+                      context: context,
+                      builder: (context) => AlertDialogSettings(),
+                    );
+                    if (flag == true) {
+                      setState(() {
+                        language = '日本語';
+                      });
+                    }
+                  }
                 },
               ),
             ],

@@ -51,6 +51,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
 
       body: SettingsList(
+        darkTheme: const SettingsThemeData(
+          settingsListBackground: Color(0xFF2D2D35),
+          settingsSectionBackground: Color(0xFF3C3C45),
+          titleTextColor: Colors.white,
+          trailingTextColor: Colors.grey,
+        ),
+        brightness: Brightness.dark, // ← ここでダークモード固定！
         sections: [
           SettingsSection(
             tiles: <SettingsTile>[

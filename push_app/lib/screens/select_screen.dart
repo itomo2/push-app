@@ -56,7 +56,10 @@ class _SelectScreenState extends State<SelectScreen> {
                   .map(
                     (exercise) => Center(
                       //exerciseにリストの各要素が代入される
-                      child: Text(exercise, style: TextStyle(fontSize: 24)),
+                      child: Text(
+                        exercise,
+                        style: TextStyle(fontSize: 24, color: Colors.black),
+                      ),
                     ),
                   )
                   .toList(),
@@ -65,10 +68,12 @@ class _SelectScreenState extends State<SelectScreen> {
           Theme(
             data: Theme.of(context).copyWith(
               splashColor: const Color.fromARGB(19, 0, 0, 0), // チェックボックスの枠線の色
+              unselectedWidgetColor: Colors.black,
             ),
             child: CheckboxListTile(
-              title: Text(t("push-up")),
+              title: Text(t("push-up"), style: TextStyle(color: Colors.black)),
               activeColor: Colors.black,
+              checkColor: Colors.white,
               value: _isChecked1,
               onChanged: (bool? value) {
                 setState(() {
@@ -81,10 +86,12 @@ class _SelectScreenState extends State<SelectScreen> {
           Theme(
             data: Theme.of(context).copyWith(
               splashColor: const Color.fromARGB(19, 0, 0, 0), // チェックボックスの枠線の色
+              unselectedWidgetColor: Colors.black,
             ),
             child: CheckboxListTile(
-              title: Text(t("sit-up")),
+              title: Text(t("sit-up"), style: TextStyle(color: Colors.black)),
               activeColor: Colors.black,
+              checkColor: Colors.white,
               value: _isChecked2,
               onChanged: (bool? value) {
                 setState(() {

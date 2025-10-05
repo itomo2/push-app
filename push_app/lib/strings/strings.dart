@@ -15,11 +15,16 @@ const appStrings = {
     "sit":
         "Place your phone on the ground,\nbring your back close to smartphone to count",
     "back to Calendar": "Back to Calendar",
+    "change language": "Change language?",
+    "cancel": "Cancel",
+    "ok": "OK",
+    "restart app":
+        "To fully apply the language settings,\nplease restart the app",
   },
   "日本語": {
-    "home": "ホーム",
-    "activity": "アクティビティ",
-    "settings": "設定",
+    "home": "Home",
+    "activity": "Activity",
+    "settings": "Settings",
     "language": "言語",
     "this month's goal": "今月の目標",
     "push-up": "腕立て伏せ",
@@ -30,5 +35,9 @@ const appStrings = {
     "push": "スマホを地面に置いて、\n胸を近づけるとカウントされます",
     "sit": "スマホを地面に置いて、\n背中を近づけるとカウントされます",
     "back to Calendar": "カレンダーに戻る",
+    "change language": "言語を変更しますか？",
+    "cancel": "キャンセル",
+    "ok": "はい",
+    "restart app": "完全に言語設定を適用させるには\nアプリを再起動してください",
   },
 };

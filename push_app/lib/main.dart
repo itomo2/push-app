@@ -45,8 +45,8 @@ void showMenuDialog(BuildContext context, int month) {
               children: [
                 // Homeメニュー
                 ListTile(
-                  title: Text(t("home")),
-                  leading: Icon(Icons.home),
+                  title: Text(t("home"), style: TextStyle(color: Colors.black)),
+                  leading: Icon(Icons.home, color: Colors.black),
                   onTap: () {
                     Navigator.popUntil(context, (route) => route.isFirst);
                   },
@@ -55,8 +55,11 @@ void showMenuDialog(BuildContext context, int month) {
                 ),
                 // Activityメニュー
                 ListTile(
-                  title: Text(t("activity")),
-                  leading: Icon(Icons.bar_chart),
+                  title: Text(
+                    t("activity"),
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  leading: Icon(Icons.bar_chart, color: Colors.black),
                   onTap: () {
                     // Activityはグラフ画面に遷移
                     Navigator.push(
@@ -71,8 +74,11 @@ void showMenuDialog(BuildContext context, int month) {
                 ),
                 // Settingsメニュー
                 ListTile(
-                  title: Text(t("settings")),
-                  leading: Icon(Icons.settings),
+                  title: Text(
+                    t("settings"),
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  leading: Icon(Icons.settings, color: Colors.black),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -130,10 +136,15 @@ class PushApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // アプリのUI構築
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false, // デバッグバナーを非表示
-      title: 'PushApp', // アプリのタイトル
-      home: Calendar(), // メイン画面としてCalendarウィジェットを表示
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'PushApp',
+      themeMode: ThemeMode.dark, // ダークモード固定
+      darkTheme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: const Color(0xFF2D2D35),
+        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF2D2D35)),
+      ),
+      home: const Calendar(),
     );
   }
 }

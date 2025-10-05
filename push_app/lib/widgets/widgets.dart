@@ -1,2 +1,2 @@
-export 'alert_dialog_sample.dart';
-export 'alert_dialog_settigs.dart';
+export 'calendar_alert.dart';
+export 'language_alert.dart';

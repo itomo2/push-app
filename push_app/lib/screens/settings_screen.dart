@@ -72,14 +72,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   );
                 },
               ),
-              SettingsTile.switchTile(
-                onToggle: (value) {
-                  // トグル切り替え処理
-                },
-                initialValue: true,
-                leading: const Icon(Icons.format_paint),
-                title: const Text('Enable custom theme'),
-              ),
             ],
           ),
         ],

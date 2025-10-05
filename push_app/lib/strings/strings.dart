@@ -18,8 +18,7 @@ const appStrings = {
     "change language": "Change language?",
     "cancel": "Cancel",
     "ok": "OK",
-    "restart app":
-        "To fully apply the language settings,\nplease restart the app",
+    "restart app": "Return to the first screen",
   },
   "日本語": {
     "home": "Home",
@@ -38,6 +37,6 @@ const appStrings = {
     "change language": "言語を変更しますか？",
     "cancel": "キャンセル",
     "ok": "はい",
-    "restart app": "完全に言語設定を適用させるには\nアプリを再起動してください",
+    "restart app": "最初の画面に戻ります",
   },
 };

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:push_app/widgets/widgets.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:push_app/main.dart';
+import 'package:push_app/screens/screens.dart';
 
 class LanguagePage extends StatefulWidget {
   // 結果画面（状態を持つ）
@@ -13,8 +14,6 @@ class LanguagePage extends StatefulWidget {
 
 class _LanguagePageState extends State<LanguagePage> {
   // 状態管理クラス
-  // _LanguagePageState({super.key}); // コンストラクタ;
-
   @override
   Widget build(BuildContext context) {
     // 画面のUI構築
@@ -64,6 +63,14 @@ class _LanguagePageState extends State<LanguagePage> {
                     if (flag == true) {
                       setState(() {
                         language = 'English';
+                        box.put("language", language);
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Calendar(),
+                          ), // カレンダー画面へ戻る
+                          (Route<dynamic> route) => false, // 履歴を全て消す
+                        );
                       });
                     }
                   }
@@ -85,6 +92,14 @@ class _LanguagePageState extends State<LanguagePage> {
                     if (flag == true) {
                       setState(() {
                         language = '日本語';
+                        box.put("language", language);
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Calendar(),
+                          ), // カレンダー画面へ戻る
+                          (Route<dynamic> route) => false, // 履歴を全て消す
+                        );
                       });
                     }
                   }

@@ -37,7 +37,6 @@ class _GraphScreenState extends State<GraphScreen> {
     setState(() {
       firstday = DateTime(firstday.year, firstday.month + mm, 1);
       graphlengh = DateTime(firstday.year, firstday.month + 1, 0).day;
-      _barGroups = zero();
       _loadData("month");
       _barGroups = List.from(zero());
       _updateBarGroups();

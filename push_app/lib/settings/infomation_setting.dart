@@ -1,6 +1,7 @@
 import 'package:push_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
+import '../screens/screens.dart';
 
 class InfoPage extends StatelessWidget {
   // 日付選択時に表示するダイアログ
@@ -41,6 +42,16 @@ class InfoPage extends StatelessWidget {
                 title: Text(t("version")),
                 trailing: SizedBox.shrink(),
                 onPressed: (context) {},
+              ),
+              SettingsTile.navigation(
+                title: Text(t("explanation")),
+                trailing: SizedBox.shrink(),
+                onPressed: (context) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Information()),
+                  );
+                },
               ),
             ],
           ),

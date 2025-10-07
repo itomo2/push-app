@@ -12,6 +12,8 @@ part 'main.g.dart'; // Hive Generator用（TypeAdapter自動生成ファイル�
 late Box box; // HiveのBox（データ保存領域）をグローバル変数として宣言
 late List<dynamic> highlightDays = [];
 
+late bool information;
+
 late String language;
 
 int month = DateTime.now().month;
@@ -125,26 +127,43 @@ void main() async {
   box.get('language') == null
       ? language = 'English'
       : language = box.get('language');
-  print("this:${t("this month's goal")}");
+  box.get('information') == null ? information = true : information = false;
   runApp(const PushApp()); // アプリのエントリーポイント。PushAppウィジェットを起動
 }
 
-class PushApp extends StatelessWidget {
-  // アプリ全体のウィジェット（Stateless: 状態を持たない）
-  const PushApp({super.key}); // コンストラクタ（keyはウィジェットの識別用）
+class PushApp extends StatefulWidget {
+  const PushApp({super.key});
+
+  @override
+  State<PushApp> createState() => _PushAppState();
+}
+
+class _PushAppState extends State<PushApp> {
+  late Widget startScreen;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // 条件で切り替え（例）
+    if (information == true) {
+      startScreen = const Information();
+    } else {
+      startScreen = const Calendar();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // アプリのUI構築
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'PushApp',
-      themeMode: ThemeMode.dark, // ダークモード固定
+      themeMode: ThemeMode.dark,
       darkTheme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF2D2D35),
         appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF2D2D35)),
       ),
-      home: const Calendar(),
+      home: startScreen,
     );
   }
 }

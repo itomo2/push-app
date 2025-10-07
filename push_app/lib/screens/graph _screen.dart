@@ -17,16 +17,29 @@ class _GraphScreenState extends State<GraphScreen> {
 
   int month;
   late String monthname;
+  int graphlengh = 0;
 
   List<BarChartGroupData> _barGroups = [];
   //BarChartGroupDataはfl_chartの棒グラフで一つのグループを表すクラス。一つ一つのグラフの情報が入ってる
 
   void _changeweek(int yy) {
     setState(() {
-      sunday = sunday.add(Duration(days: 7 * yy));
+      firstday = firstday.add(Duration(days: 7 * yy));
+      graphlengh = 7;
       _checkweek();
-      _loadData();
-      _barGroups = List.from(_zeroBarGroups);
+      _loadData("week");
+      _barGroups = List.from(zero());
+      _updateBarGroups();
+    });
+  }
+
+  void _changemonth(int mm) {
+    setState(() {
+      firstday = DateTime(firstday.year, firstday.month + mm, 1);
+      graphlengh = DateTime(firstday.year, firstday.month + 1, 0).day;
+      _barGroups = zero();
+      _loadData("month");
+      _barGroups = List.from(zero());
       _updateBarGroups();
     });
   }
@@ -42,29 +55,32 @@ class _GraphScreenState extends State<GraphScreen> {
   late List<bool> _togglelist;
   int oldindex = 0;
 
-  DateTime sunday = DateTime.now().subtract(
+  DateTime firstday = DateTime.now().subtract(
     Duration(days: DateTime.now().weekday % 7),
   );
 
-  final List<BarChartGroupData> _zeroBarGroups = List.generate(
-    7,
-    (i) =>
-        //generateは指定した個数の要素を持つリストを作る。長さは_allBarGroupsに依存
-        //iはリストのインデックス、０からlengthよりも1少ない数まで増える
-        BarChartGroupData(
-          x: i, //横軸位置
-          barRods: [
-            //ぼうの情報をもつ
-            BarChartRodData(
-              //棒一本を表すクラス
-              toY: 0, //棒の高さ(アニメーションのためとりあえず０)
-              color: Color.fromARGB(255, 212, 255, 95),
-              width: 50,
-              borderRadius: BorderRadius.circular(2), //棒の角丸
-            ),
-          ],
-        ),
-  );
+  List<BarChartGroupData> zero() {
+    List<BarChartGroupData> _zeroBarGroups = List.generate(
+      graphlengh,
+      (i) =>
+          //generateは指定した個数の要素を持つリストを作る。長さは_allBarGroupsに依存
+          //iはリストのインデックス、０からlengthよりも1少ない数まで増える
+          BarChartGroupData(
+            x: i, //横軸位置
+            barRods: [
+              //ぼうの情報をもつ
+              BarChartRodData(
+                //棒一本を表すクラス
+                toY: 0, //棒の高さ(アニメーションのためとりあえず０)
+                color: Color.fromARGB(255, 212, 255, 95),
+                width: 50,
+                borderRadius: BorderRadius.circular(2), //棒の角丸
+              ),
+            ],
+          ),
+    );
+    return _zeroBarGroups;
+  }
 
   String monthName(int k) {
     switch (k) {
@@ -98,39 +114,40 @@ class _GraphScreenState extends State<GraphScreen> {
   }
 
   void _checkweek() {
-    if (sunday.day > sunday.add(Duration(days: 7)).day)
+    if (firstday.day > firstday.add(Duration(days: 7)).day)
       othermonth = true;
     else
       othermonth = false;
   }
 
-  void _loadData() {
+  void _loadData(String ii) {
+    int gg = graphlengh;
     try {
       final keys = List.generate(
-        7,
-        (i) => DateFormat('yyyy-MM-dd').format(sunday.add(Duration(days: i))),
+        gg,
+        (i) => DateFormat('yyyy-MM-dd').format(firstday.add(Duration(days: i))),
       );
       date = List.generate(
-        7,
-        (i) => DateFormat('dd').format(sunday.add(Duration(days: i))),
+        gg,
+        (i) => DateFormat('dd').format(firstday.add(Duration(days: i))),
       );
       final infoData = keys.map((k) => box.get(k)).toList();
       //infoDataがnullでなければinfoData.pushupcount、nullならnullを返す
       //??でnullなら０を返すのでnullは返らない
       pushupcount = List.generate(
-        7,
+        gg,
         (i) => (infoData[i]?.pushupcount ?? 0).toDouble(),
       );
       situpcount = List.generate(
-        7,
+        gg,
         (i) => (infoData[i]?.situpcount ?? 0).toDouble(),
       );
       pushuptime = List.generate(
-        7,
+        gg,
         (i) => formatDuration(infoData[i]?.pushuptime ?? Duration.zero),
       );
       situptime = List.generate(
-        7,
+        gg,
         (i) => formatDuration(infoData[i]?.situptime ?? Duration.zero),
       );
     } catch (e) {
@@ -145,15 +162,15 @@ class _GraphScreenState extends State<GraphScreen> {
     Future.delayed(Duration(milliseconds: 0), () {
       setState(() {
         _barGroups = List.generate(
-          _zeroBarGroups.length,
+          zero().length,
           (i) => BarChartGroupData(
             x: i,
             barRods: [
               BarChartRodData(
                 toY: _togglelist[0] ? pushupcount[i] : situpcount[i],
-                color: _zeroBarGroups[i].barRods[0].color,
-                width: _zeroBarGroups[i].barRods[0].width,
-                borderRadius: _zeroBarGroups[i].barRods[0].borderRadius,
+                color: zero()[i].barRods[0].color,
+                width: zero()[i].barRods[0].width,
+                borderRadius: zero()[i].barRods[0].borderRadius,
               ),
             ],
           ),
@@ -189,7 +206,7 @@ class _GraphScreenState extends State<GraphScreen> {
         titleSpacing: 0, // タイトルの余白
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
-          "${monthName(sunday.month)}-${sunday.year}",
+          "${monthName(firstday.month)}-${firstday.year}",
           style: TextStyle(
             color: Colors.white,
             fontSize: 25,
@@ -284,7 +301,7 @@ class _GraphScreenState extends State<GraphScreen> {
                       SizedBox(
                         width: 200,
                         child: Text(
-                          "${DateFormat("dd").format(sunday)}~${DateFormat("dd").format(sunday.add(Duration(days: 6)))}",
+                          "${DateFormat("dd").format(firstday)}~${DateFormat("dd").format(firstday.add(Duration(days: 6)))}",
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
@@ -368,7 +385,7 @@ class _GraphScreenState extends State<GraphScreen> {
                                     //titlemetaは軸ラベル生成関数
                                     //metaはラベル描画に関する補助情報
                                     //valueは軸上の位置(0,1,2,~)
-                                    final daynow = sunday.add(
+                                    final daynow = firstday.add(
                                       Duration(days: value.toInt()),
                                     );
                                     return Text(

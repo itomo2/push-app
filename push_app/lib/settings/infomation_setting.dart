@@ -40,7 +40,7 @@ class InfoPage extends StatelessWidget {
             tiles: <SettingsTile>[
               SettingsTile.navigation(
                 title: Text(t("version")),
-                trailing: SizedBox.shrink(),
+                trailing: Text("1.0.0"),
                 onPressed: (context) {},
               ),
               SettingsTile.navigation(

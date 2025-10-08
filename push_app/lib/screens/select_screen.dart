@@ -36,12 +36,10 @@ class _SelectScreenState extends State<SelectScreen> {
             height: 200,
             child: CupertinoPicker(
               // iOS風の縦スクロールホイールを作るウィジェット
-
               // 初期表示位置を設定するコントローラ
               scrollController: FixedExtentScrollController(
                 initialItem: selectedIndex, // 初期選択項目のインデックス
               ),
-
               itemExtent: 50, // 各項目の高さ（ピクセル単位）
               // ユーザーが選択項目を変更した時に呼ばれるコールバック
               onSelectedItemChanged: (index) {
@@ -50,7 +48,6 @@ class _SelectScreenState extends State<SelectScreen> {
                   box.put('kakotore', selectedIndex);
                 });
               },
-
               // 表示する項目のリストを作成
               children: exercisestype
                   .map(
@@ -65,40 +62,66 @@ class _SelectScreenState extends State<SelectScreen> {
                   .toList(),
             ),
           ),
-          Theme(
-            data: Theme.of(context).copyWith(
-              splashColor: const Color.fromARGB(19, 0, 0, 0), // チェックボックスの枠線の色
-              unselectedWidgetColor: Colors.black,
-            ),
-            child: CheckboxListTile(
-              title: Text(t("push-up"), style: TextStyle(color: Colors.black)),
-              activeColor: Colors.black,
-              checkColor: Colors.white,
-              value: _isChecked1,
-              onChanged: (bool? value) {
-                setState(() {
-                  _isChecked1 = true;
-                  _isChecked2 = false;
-                });
-              },
-            ),
-          ),
-          Theme(
-            data: Theme.of(context).copyWith(
-              splashColor: const Color.fromARGB(19, 0, 0, 0), // チェックボックスの枠線の色
-              unselectedWidgetColor: Colors.black,
-            ),
-            child: CheckboxListTile(
-              title: Text(t("sit-up"), style: TextStyle(color: Colors.black)),
-              activeColor: Colors.black,
-              checkColor: Colors.white,
-              value: _isChecked2,
-              onChanged: (bool? value) {
-                setState(() {
-                  _isChecked2 = true;
-                  _isChecked1 = false;
-                });
-              },
+          SizedBox(
+            height: 100,
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  Theme(
+                    data: Theme.of(context).copyWith(
+                      splashColor: const Color.fromARGB(
+                        19,
+                        0,
+                        0,
+                        0,
+                      ), // チェックボックスの枠線の色
+                      unselectedWidgetColor: Colors.black,
+                    ),
+                    child: CheckboxListTile(
+                      title: Text(
+                        t("push-up"),
+                        style: TextStyle(color: Colors.black),
+                      ),
+                      activeColor: Colors.black,
+                      checkColor: Colors.white,
+                      value: _isChecked1,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          _isChecked1 = true;
+                          _isChecked2 = false;
+                        });
+                      },
+                    ),
+                  ),
+                  Theme(
+                    data: Theme.of(context).copyWith(
+                      splashColor: const Color.fromARGB(
+                        19,
+                        0,
+                        0,
+                        0,
+                      ), // チェックボックスの枠線の色
+                      unselectedWidgetColor: Colors.black,
+                    ),
+                    child: CheckboxListTile(
+                      title: Text(
+                        t("sit-up"),
+                        style: TextStyle(color: Colors.black),
+                      ),
+                      activeColor: Colors.black,
+                      checkColor: Colors.white,
+                      value: _isChecked2,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          _isChecked2 = true;
+                          _isChecked1 = false;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           SizedBox(height: 30),

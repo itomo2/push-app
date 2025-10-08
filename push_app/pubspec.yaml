@@ -49,6 +49,7 @@ dependencies:
   flutter_local_notifications: ^19.4.2
   settings_ui: ^2.0.2
   introduction_screen: ^4.0.0
+  flutter_keyboard_visibility_temp_fork:
 
 
 

@@ -134,7 +134,7 @@ void main() async {
   box.get('language') == null
       ? language = 'English'
       : language = box.get('language');
-  box.get('information') == null ? information = true : information = true;
+  box.get('information') == null ? information = true : information = false;
   runApp(const PushApp()); // アプリのエントリーポイント。PushAppウィジェットを起動
 }
 

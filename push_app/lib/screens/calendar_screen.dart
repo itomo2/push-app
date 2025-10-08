@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:push_app/widgets/widgets.dart';
 import 'package:push_app/screens/screens.dart';
-import 'package:intl/intl.dart'; // 日付フォーマット用パッケージをインポート
+// import 'package:intl/intl.dart'; // 日付フォーマット用パッケージをインポート
 
 class Calendar extends StatefulWidget {
   // カレンダー画面（状態を持つ）
@@ -44,24 +44,24 @@ class _CalendarState extends State<Calendar> {
   late Duration _nwdurationpush;
   late Duration _nwdurationsit;
 
-  void _demohighlight() {
-    DateTime now = DateTime.now();
-    List<dynamic> demoDays = [];
-    int pushupc = 30;
-    int situpc;
-    for (int ii = 0; ii < 50; ii += 3) {
-      DateTime ago = now.subtract(Duration(days: ii));
-      String key = DateFormat('yyyy-MM-dd').format(ago); // 日付をキーに変
-      demoDays.add(DateTime(ago.year, ago.month, ago.day));
-      pushupc += 4 * ii + 20;
-      situpc = 50 - ii;
-      late info infoObject;
-      infoObject = info(pushupc, situpc, Duration.zero, Duration.zero);
-      box.put(key, infoObject); // Hiveに保存
-    }
+  // void _demohighlight() {
+  //   DateTime now = DateTime.now();
+  //   List<dynamic> demoDays = [];
+  //   int pushupc = 30;
+  //   int situpc;
+  //   for (int ii = 0; ii < 50; ii += 3) {
+  //     DateTime ago = now.subtract(Duration(days: ii));
+  //     String key = DateFormat('yyyy-MM-dd').format(ago); // 日付をキーに変
+  //     demoDays.add(DateTime(ago.year, ago.month, ago.day));
+  //     pushupc += 4 * ii + 20;
+  //     situpc = 50 - ii;
+  //     late info infoObject;
+  //     infoObject = info(pushupc, situpc, Duration.zero, Duration.zero);
+  //     box.put(key, infoObject); // Hiveに保存
+  //   }
 
-    box.put('highlight', demoDays);
-  }
+  //   box.put('highlight', demoDays);
+  // }
 
   @override
   void initState() {
@@ -70,8 +70,7 @@ class _CalendarState extends State<Calendar> {
     situpt = box.get('sitUpGoalTime') ?? "00:00";
     _nwdurationpush = parseDuration(pushupt);
     _nwdurationsit = parseDuration(situpt);
-
-    _demohighlight();
+    // _demohighlight();
     highlightDays = box.get("highlight") ?? []; // 画面のUI構築
   }
 

@@ -21,7 +21,7 @@ const appStrings = {
     "restart app": "Return to the first screen",
     "infomation": "Infomation",
     "version": "Version",
-    "page1 title": "Welcome to Push App!!",
+    "page1 title": "Welcome to PushApp!!",
     "page2 title": "You’re Being Watched",
     "page2 body":
         "Show up. Train. Earn your mark. PushApp never forgets — only you decide what it remembers.",
@@ -29,8 +29,7 @@ const appStrings = {
     "page3 body":
         "In Count Mode, PushApp automatically counts your repetitions for you. Focus on your push-ups! If some reps aren’t counted, it’s because your push-ups were too shallow — PushApp doesn’t miss a thing.",
     "page4 title": "Ready to Start",
-    "page4 body":
-        "You’re all set! Start your first session and track your progress. Let’s make every rep count.",
+    "page4 body": "Set your goal and jump into your training!",
     "explanation": "Explanation",
     "privacy policy": "Privacy Policy",
     "privacy policy body":
@@ -59,14 +58,14 @@ const appStrings = {
     "restart app": "最初の画面に戻ります",
     "infomation": "情報",
     "version": "バージョン",
-    "page1 title": "Push Appへようこそ!",
+    "page1 title": "PushAppへようこそ!",
     "page2 title": "今日から変わりましょう",
-    "page2 body": "PushAppはあなたの努力を記録し、進捗を見逃しません。あなた次第で、未来が変わります。",
+    "page2 body": "PushAppはあなたの努力を記録し、進捗を見逃しません。\nあなた次第で、未来が変わります。",
     "page3 title": "カウントについて",
     "page3 body":
         "カウントモードでは、PushAppが自動で回数をカウントしてくれます。腕立て伏せに集中しましょう！カウントされない？ならさらに深くしっかりと行いましょう",
     "page4 title": "準備完了",
-    "page4 body": "準備ができました！最初のトレーニングを始めて進捗を記録しましょう。1回1回を大切に。",
+    "page4 body": "まずは目標を設定し、そしてトレーニングに取り組みましょう！！\n1回1回を大切に。",
     "explanation": "説明",
     "privacy policy": "プライバシーポリシー",
     "privacy policy body":

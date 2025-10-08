@@ -64,12 +64,18 @@ void showMenuDialog(BuildContext context, int month) {
                   leading: Icon(Icons.bar_chart, color: Colors.black),
                   onTap: () {
                     // Activityはグラフ画面に遷移
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => GraphScreen(month),
-                      ),
-                    );
+                    if (box.get('graph') != null)
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GraphScreen(month),
+                        ),
+                      );
+                    else
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => graphInfo()),
+                      );
                   },
                   splashColor: Colors.transparent,
                   hoverColor: Colors.transparent,

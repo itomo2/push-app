@@ -24,7 +24,11 @@ class _GraphScreenState extends State<GraphScreen> {
 
   void _changeweek(int yy) {
     setState(() {
-      firstday = firstday.add(Duration(days: 7 * yy));
+      firstday = graphlengh > 7
+          ? firstday.month == oldfirstday.month
+                ? oldfirstday
+                : firstday.subtract(Duration(days: firstday.weekday % 7))
+          : firstday.add(Duration(days: 7 * yy));
       graphlengh = 7;
       _checkweek();
       _loadData("week");
@@ -35,6 +39,9 @@ class _GraphScreenState extends State<GraphScreen> {
 
   void _changemonth(int mm) {
     setState(() {
+      if (graphlengh == 7) {
+        oldfirstday = firstday;
+      }
       firstday = DateTime(firstday.year, firstday.month + mm, 1);
       graphlengh = DateTime(firstday.year, firstday.month + 1, 0).day;
       _loadData("month");
@@ -51,6 +58,8 @@ class _GraphScreenState extends State<GraphScreen> {
 
   late bool othermonth;
 
+  DateTime oldfirstday = DateTime.now();
+
   late List<bool> _togglelist;
   int oldindex = 0;
 
@@ -59,26 +68,57 @@ class _GraphScreenState extends State<GraphScreen> {
   );
 
   List<BarChartGroupData> zero() {
-    List<BarChartGroupData> _zeroBarGroups = List.generate(
-      graphlengh,
-      (i) =>
-          //generateは指定した個数の要素を持つリストを作る。長さは_allBarGroupsに依存
-          //iはリストのインデックス、０からlengthよりも1少ない数まで増える
-          BarChartGroupData(
-            x: i, //横軸位置
-            barRods: [
-              //ぼうの情報をもつ
-              BarChartRodData(
-                //棒一本を表すクラス
-                toY: 0, //棒の高さ(アニメーションのためとりあえず０)
-                color: Color.fromARGB(255, 212, 255, 95),
-                width: 50,
-                borderRadius: BorderRadius.circular(2), //棒の角丸
-              ),
-            ],
+    List<BarChartGroupData> _zeroBarGroups = List.generate(graphlengh, (i) {
+      //generateは指定した個数の要素を持つリストを作る。長さは_allBarGroupsに依存
+      //iはリストのインデックス、０からlengthよりも1少ない数まで増える
+      final day = firstday.add(Duration(days: i));
+      Color barColor = monthColor(day.month);
+      return BarChartGroupData(
+        x: i, //横軸位置
+        barRods: [
+          //ぼうの情報をもつ
+          BarChartRodData(
+            //棒一本を表すクラス
+            toY: 0, //棒の高さ(アニメーションのためとりあえず０)
+            color: barColor,
+            width: graphlengh > 7 ? 8 : 50,
+            borderRadius: BorderRadius.circular(2), //棒の角丸
           ),
-    );
+        ],
+      );
+    });
     return _zeroBarGroups;
+  }
+
+  Color monthColor(int index) {
+    switch (index) {
+      case 1: // January - 冬の澄んだ青
+        return const Color(0xFF5DADE2);
+      case 2: // February - やわらかな藤色
+        return const Color(0xFFB39DDB);
+      case 3: // March - 若草の緑
+        return const Color(0xFF81C784);
+      case 4: // April - 桜のピンク
+        return const Color(0xFFF8BBD0);
+      case 5: // May - 新緑のグリーン
+        return const Color(0xFF66BB6A);
+      case 6: // June - 梅雨のアクアブルー
+        return const Color(0xFF4FC3F7);
+      case 7: // July - 夏の太陽イエロー
+        return const Color(0xFFFFCA28);
+      case 8: // August - 青空のスカイブルー
+        return const Color(0xFF29B6F6);
+      case 9: // September - 秋の黄金オレンジ
+        return const Color(0xFFFFB74D);
+      case 10: // October - 紅葉のディープオレンジ
+        return const Color(0xFFD84315);
+      case 11: // November - 木の温もりブラウン
+        return const Color(0xFF8D6E63);
+      case 12: // December - 冬夜のディープブルー
+        return const Color(0xFF1565C0);
+      default:
+        return const Color(0xFFE0E0E0);
+    }
   }
 
   String monthName(int k) {
@@ -150,10 +190,10 @@ class _GraphScreenState extends State<GraphScreen> {
         (i) => formatDuration(infoData[i]?.situptime ?? Duration.zero),
       );
     } catch (e) {
-      pushupcount = List.filled(7, 0);
-      situpcount = List.filled(7, 0);
-      pushuptime = List.filled(7, '00:00');
-      situptime = List.filled(7, '00:00');
+      pushupcount = List.filled(graphlengh, 0);
+      situpcount = List.filled(graphlengh, 0);
+      pushuptime = List.filled(graphlengh, '00:00');
+      situptime = List.filled(graphlengh, '00:00');
     }
   }
 
@@ -185,6 +225,9 @@ class _GraphScreenState extends State<GraphScreen> {
 
   void initState() {
     super.initState();
+    if (box.get("graph") == null) {
+      box.put("graph", false);
+    }
     _togglelist = box.get("kakotoggle", defaultValue: [true, false]);
     oldindex = _togglelist[0] ? 0 : 1;
     _changeweek(0);
@@ -225,6 +268,10 @@ class _GraphScreenState extends State<GraphScreen> {
       body: Stack(
         children: [
           Container(color: Colors.black),
+          IconButton(
+            icon: Icon(Icons.circle),
+            onPressed: () => _changemonth(0),
+          ),
           Center(
             child: Column(
               children: [
@@ -252,7 +299,7 @@ class _GraphScreenState extends State<GraphScreen> {
                               );
                               box.put("kakotoggle", _togglelist);
                               oldindex = index;
-                              _changeweek(0);
+                              graphlengh > 7 ? _changemonth(0) : _changeweek(0);
                             }
                           });
                         },
@@ -295,18 +342,20 @@ class _GraphScreenState extends State<GraphScreen> {
                     children: [
                       IconButton(
                         icon: Icon(Icons.arrow_back_ios, color: Colors.white),
-                        onPressed: () => _changeweek(-1),
+                        onPressed: () =>
+                            graphlengh > 7 ? _changemonth(-1) : _changeweek(-1),
                       ),
                       SizedBox(
                         width: 200,
                         child: Text(
-                          "${DateFormat("dd").format(firstday)}~${DateFormat("dd").format(firstday.add(Duration(days: 6)))}",
+                          "${DateFormat("dd").format(firstday)}~${DateFormat("dd").format(firstday.add(graphlengh > 7 ? Duration(days: graphlengh - 1) : (Duration(days: 6))))}",
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
                       ),
                       IconButton(
-                        onPressed: () => _changeweek(1),
+                        onPressed: () =>
+                            graphlengh > 7 ? _changemonth(1) : _changeweek(1),
                         icon: Icon(
                           Icons.arrow_forward_ios,
                           color: Colors.white,
@@ -317,9 +366,7 @@ class _GraphScreenState extends State<GraphScreen> {
                 ),
                 Flexible(
                   flex: 4,
-
                   child: SizedBox(
-                    // padding: const EdgeInsets.symmetric(horizontal: 20),
                     height: 500,
                     child: Padding(
                       padding: const EdgeInsets.only(right: 20),
@@ -330,6 +377,33 @@ class _GraphScreenState extends State<GraphScreen> {
                           } else if (details.primaryVelocity! < 0) {
                             _changeweek(1);
                           }
+                        },
+                        // --- ピンチジェスチャー検出ハンドラ ---
+                        onScaleStart: (details) {
+                          // ピンチ開始時のスケール値を保存
+                          _pinchStartScale = 1.0;
+                        },
+                        onScaleUpdate: (details) {
+                          // ジェスチャー開始からのスケール変化量を計算
+                          final double delta = details.scale - _pinchStartScale;
+                          //.scaleはピンチの拡大率、1.0が基準だからpinch開始時のscaleを引く
+                          // 1回のピンチで1回だけ処理（しきい値を使用）
+                          if (!_pinchHandled) {
+                            if (delta > 0.05) {
+                              //0.05はデッドゾーンを決めている
+                              // ピンチアウト（拡大）：次の週へ
+                              _pinchHandled = true;
+                              _changeweek(0);
+                            } else if (delta < -0.05) {
+                              // ピンチイン（縮小）：次の月へ
+                              _pinchHandled = true;
+                              _changemonth(0);
+                            }
+                          }
+                        },
+                        onScaleEnd: (details) {
+                          // 新しいピンチジェスチャーを許可するためフラグをリセット
+                          _pinchHandled = false;
                         },
                         child: BarChart(
                           BarChartData(
@@ -346,7 +420,20 @@ class _GraphScreenState extends State<GraphScreen> {
                                   _togglelist[0] ? pushupcount : situpcount,
                                 ) +
                                 5,
-                            barTouchData: BarTouchData(enabled: true),
+                            barTouchData: BarTouchData(
+                              enabled: true,
+                              touchTooltipData: BarTouchTooltipData(
+                                tooltipBgColor: Colors.black87,
+                                getTooltipItem:
+                                    (group, groupIndex, rod, rodIndex) {
+                                      return BarTooltipItem(
+                                        "${rod.toY.toInt()}${t("reps")}",
+                                        //rodは一本の棒を表すオブジェクト、そのtoYを引き出している
+                                        TextStyle(color: Colors.white),
+                                      );
+                                    },
+                              ),
+                            ),
                             //棒のタッチが有効になる
                             titlesData: FlTitlesData(
                               //titlesDataはグラフの軸ラベルやタイトルの表示方法をまとめた設定
@@ -384,17 +471,30 @@ class _GraphScreenState extends State<GraphScreen> {
                                     //titlemetaは軸ラベル生成関数
                                     //metaはラベル描画に関する補助情報
                                     //valueは軸上の位置(0,1,2,~)
-                                    final daynow = firstday.add(
+                                    DateTime daynow = firstday.add(
                                       Duration(days: value.toInt()),
                                     );
-                                    return Text(
-                                      "${DateFormat("dd").format(daynow)}.${DateFormat('E').format(daynow)}", //days.lengthは７
-                                      //value.toIntで小数を正数に変換
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                      ),
-                                    );
+                                    if (graphlengh > 7) {
+                                      if (daynow.day % 5 == 0)
+                                        return Text(
+                                          "${DateFormat("dd").format(daynow)}", //days.lengthは７
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                          ),
+                                        );
+                                      else
+                                        return SizedBox.shrink();
+                                    } else {
+                                      return Text(
+                                        "${DateFormat("dd").format(daynow)}.${DateFormat('E').format(daynow)}", //days.lengthは７
+                                        //value.toIntで小数を正数に変換
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                        ),
+                                      );
+                                    }
                                   },
                                   interval: 1, //１ずつラベルを表示
                                 ),
@@ -425,3 +525,7 @@ class _GraphScreenState extends State<GraphScreen> {
     );
   }
 }
+
+// ピンチジェスチャーの状態
+double _pinchStartScale = 1.0; // ピンチ開始時のスケール値を保存
+bool _pinchHandled = false;    // ピンチごとに一度だけ処理を行うためのフラグ

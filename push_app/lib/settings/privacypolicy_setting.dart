@@ -1,10 +1,8 @@
 import 'package:push_app/main.dart';
 import 'package:flutter/material.dart';
-import 'package:push_app/settings/settings.dart';
 import 'package:settings_ui/settings_ui.dart';
-import '../screens/screens.dart';
 
-class InfoPage extends StatelessWidget {
+class PrivacyPage extends StatelessWidget {
   // 日付選択時に表示するダイアログ
 
   @override
@@ -21,7 +19,7 @@ class InfoPage extends StatelessWidget {
         titleSpacing: 0, // タイトルの余白
         toolbarHeight: 70,
         title: Text(
-          t("infomation"),
+          t("privacy policy"),
           style: TextStyle(
             color: Colors.white,
             fontSize: 25,
@@ -40,27 +38,9 @@ class InfoPage extends StatelessWidget {
           SettingsSection(
             tiles: <SettingsTile>[
               SettingsTile.navigation(
-                title: Text(t("version")),
-                trailing: Text("1.0.0"),
+                title: Text("${t("privacy policy body")}"),
+                trailing: Text(""),
                 onPressed: (context) {},
-              ),
-              SettingsTile.navigation(
-                title: Text(t("explanation")),
-                onPressed: (context) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Information()),
-                  );
-                },
-              ),
-              SettingsTile.navigation(
-                title: Text(t("privacy policy")),
-                onPressed: (context) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PrivacyPage()),
-                  );
-                },
               ),
             ],
           ),

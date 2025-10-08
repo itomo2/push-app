@@ -2,7 +2,7 @@ import 'package:push_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:push_app/settings/settings.dart';
 import 'package:settings_ui/settings_ui.dart';
-import '../screens/screens.dart';
+import 'package:push_app/explanations/explanations.dart';
 
 class InfoPage extends StatelessWidget {
   // 日付選択時に表示するダイアログ

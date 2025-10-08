@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
-import 'screens.dart';
+import '../screens/screens.dart';
 import '../main.dart';
 
 class graphInfo extends StatefulWidget {
@@ -17,6 +17,19 @@ class _graphInfoState extends State<graphInfo> {
         title: t("explanation"),
         body: t("graph explanation"),
         image: Image.asset('assets/images/graph.png'),
+        decoration: const PageDecoration(
+          titleTextStyle: TextStyle(
+            fontSize: 28.0,
+            fontWeight: FontWeight.w700,
+          ),
+          bodyTextStyle: TextStyle(fontSize: 20.0),
+          pageColor: Color(0xFF2D2D35),
+        ),
+      ),
+      PageViewModel(
+        title: t("graph explanation2"),
+        body: "",
+        image: Image.asset('assets/images/doryoku.png'),
         decoration: const PageDecoration(
           titleTextStyle: TextStyle(
             fontSize: 28.0,

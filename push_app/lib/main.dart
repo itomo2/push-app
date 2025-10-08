@@ -4,6 +4,7 @@ import 'screens/screens.dart';
 import 'package:hive_flutter/hive_flutter.dart'; // HiveのFlutter用パッケージをインポート
 import 'package:push_app/models/models.dart';
 import 'package:push_app/strings/strings.dart';
+import 'package:push_app/explanations/explanations.dart';
 export 'package:push_app/models/models.dart';
 export 'package:push_app/strings/strings.dart';
 
@@ -133,7 +134,7 @@ void main() async {
   box.get('language') == null
       ? language = 'English'
       : language = box.get('language');
-  box.get('information') == null ? information = true : information = false;
+  box.get('information') == null ? information = true : information = true;
   runApp(const PushApp()); // アプリのエントリーポイント。PushAppウィジェットを起動
 }
 
@@ -153,9 +154,9 @@ class _PushAppState extends State<PushApp> {
 
     // 条件で切り替え（例）
     if (information == true) {
-      startScreen = const Information();
+      startScreen = Startlanguage();
     } else {
-      startScreen = const Calendar();
+      startScreen = Calendar();
     }
   }
 

@@ -37,6 +37,7 @@ const appStrings = {
         "Last Updated: October 8, 2025\n\n1. Information Collection\nPushApp (\"the App\") respects your privacy and does not collect any personal information.\n\nAll training data you enter (such as repetitions and dates) are saved only on your device and are never sent to external servers or third parties.\n\n2. Information Collected by Apple\nThis app is distributed through the Apple App Store. Apple Inc. may automatically collect statistical information such as download counts, device information, OS version, and crash reports.\n\nThese details are managed by Apple and are not accessible to the developer in a way that identifies individual users. For more information, please refer to Apple’s Privacy Policy:\nhttps://www.apple.com/legal/privacy/\n\n3. Data Storage and Deletion\nAll user data is stored locally on your device. Uninstalling the app will automatically delete all stored data.\n\n4. Changes to This Policy\nThis policy may be changed without prior notice.\n\n5. Contact\nFor any questions or requests about this policy or the app itself, please contact:\nhello.pushapp@gmail.com",
     "graph explanation":
         "With pinch-out and pinch-in gestures, \nyou can change the graph display.",
+    "graph explanation2": "rack your effort, feel your progress!",
   },
   "日本語": {
     "home": "ホーム",
@@ -60,7 +61,7 @@ const appStrings = {
     "version": "バージョン",
     "page1 title": "Push Appへようこそ!",
     "page2 title": "今日から変わりましょう",
-    "page2 body": "さあ、始めましょう。PushAppはあなたの努力を記録し、進捗を見逃しません。あなた次第で、未来が変わります。",
+    "page2 body": "PushAppはあなたの努力を記録し、進捗を見逃しません。あなた次第で、未来が変わります。",
     "page3 title": "カウントについて",
     "page3 body":
         "カウントモードでは、PushAppが自動で回数をカウントしてくれます。腕立て伏せに集中しましょう！カウントされない？ならさらに深くしっかりと行いましょう",
@@ -71,5 +72,6 @@ const appStrings = {
     "privacy policy body":
         "最終更新日：2025年10月8日\n\n1. 情報の収集について\nPushApp（以下、「本アプリ」）は、ユーザーのプライバシーを尊重し、個人情報を収集しません。\n\n入力されたトレーニングデータ（回数・日付など）はすべてユーザーの端末内にのみ保存され、外部サーバーや第三者へ送信されることはありません。\n\n2. Appleによる情報の収集\n本アプリはApple社が提供するApp Storeを通じて配信されており、Apple社はダウンロード数、デバイス情報、OSバージョン、クラッシュレポートなどの統計情報を自動的に収集する場合があります。\n\nこれらの情報はApple社によって管理され、開発者が個人を特定できる形で取得することはありません。詳細はApple社のプライバシーポリシー（https://www.apple.com/legal/privacy/jp/）をご確認ください。\n\n3. データの保存と削除\nユーザーのデータはすべて端末内に保存されます。アプリをアンインストールすると、保存されたデータは自動的に削除されます。\n\n4. プライバシーポリシーの変更\n本ポリシーは予告なく変更される場合があります。\n\n5. お問い合わせ\n本ポリシー、またこのアプリに関するお問い合わせ、ご要望は以下のメールアドレスまでお願いいたします。\nhello.pushapp@gmail.com",
     "graph explanation": "ピンチアウトとピンチインで\nグラフ表示を変えることができます",
+    "graph explanation2": "まずは一ヶ月続けていきましょう！",
   },
 };

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
-import 'screens.dart';
+import '../screens/screens.dart';
 import '../main.dart';
 
 class Information extends StatefulWidget {

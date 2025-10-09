@@ -268,10 +268,6 @@ class _GraphScreenState extends State<GraphScreen> {
       body: Stack(
         children: [
           Container(color: Colors.black),
-          IconButton(
-            icon: Icon(Icons.circle),
-            onPressed: () => _changemonth(0),
-          ),
           Center(
             child: Column(
               children: [
@@ -420,21 +416,22 @@ class _GraphScreenState extends State<GraphScreen> {
                                   _togglelist[0] ? pushupcount : situpcount,
                                 ) +
                                 5,
-                            barTouchData: BarTouchData(
-                              enabled: true,
-                              touchTooltipData: BarTouchTooltipData(
-                                tooltipBgColor: Colors.black87,
-                                getTooltipItem:
-                                    (group, groupIndex, rod, rodIndex) {
-                                      return BarTooltipItem(
-                                        "${rod.toY.toInt()}${t("reps")}",
-                                        //rodは一本の棒を表すオブジェクト、そのtoYを引き出している
-                                        TextStyle(color: Colors.white),
-                                      );
-                                    },
-                              ),
-                            ),
-                            //棒のタッチが有効になる
+                            barTouchData: BarTouchData(enabled: false),
+                            // barTouchData: BarTouchData(
+                            //   enabled: true,
+                            //   touchTooltipData: BarTouchTooltipData(
+                            //     tooltipBgColor: Colors.black87,
+                            //     getTooltipItem:
+                            //         (group, groupIndex, rod, rodIndex) {
+                            //           return BarTooltipItem(
+                            //             "${rod.toY.toInt()}${t("reps")}",
+                            //             //rodは一本の棒を表すオブジェクト、そのtoYを引き出している
+                            //             TextStyle(color: Colors.white),
+                            //           );
+                            //         },
+                            //   ),
+                            // ),
+                            // //棒のタッチが有効になる
                             titlesData: FlTitlesData(
                               //titlesDataはグラフの軸ラベルやタイトルの表示方法をまとめた設定
                               leftTitles: AxisTitles(
